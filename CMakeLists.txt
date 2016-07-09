@@ -11,5 +11,9 @@ if(NOT ROOT_FOUND)
 	message(FATAL_ERROR "Fatal error: ROOT package not found")
 endif()
 include_directories(${ROOT_INCLUDE_DIR})
+
+file(GLOB IO io/*.cpp)
+add_library(timesyncio ${IO})
+
 add_executable(test test.cpp)
-target_link_libraries(test FitGen gpwrap ${JPET_DATA_LIBS} ${ROOT_LIBRARIES})
+target_link_libraries(test timesyncio FitGen gpwrap ${JPET_DATA_LIBS} ${ROOT_LIBRARIES})
