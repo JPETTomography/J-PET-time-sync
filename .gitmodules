@@ -1,0 +1,6 @@
+[submodule "JPET-Data"]
+	path = JPET-Data
+	url = https://github.com/alexkernphysiker/JPET-Data.git
+[submodule "star-cmake"]
+	path = star-cmake
+	url = https://github.com/alexkernphysiker/star-cmake.git
