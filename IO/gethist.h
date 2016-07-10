@@ -1,3 +1,5 @@
+// this file is distributed under 
+// MIT license
 #ifndef ________GETHIST_H___________
 #	define ________GETHIST_H___________
 #include <string>

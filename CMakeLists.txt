@@ -12,8 +12,11 @@ if(NOT ROOT_FOUND)
 endif()
 include_directories(${ROOT_INCLUDE_DIR})
 
-file(GLOB IO io/*.cpp)
+file(GLOB IO IO/*.cpp)
 add_library(timesyncio ${IO})
 
+file(GLOB CALC Calc/*.cpp)
+add_library(timesynccalc ${CALC})
+
 add_executable(test test.cpp)
-target_link_libraries(test timesyncio FitGen gpwrap ${JPET_DATA_LIBS} ${ROOT_LIBRARIES})
+target_link_libraries(test timesynccalc timesyncio FitGen gpwrap ${JPET_DATA_LIBS} ${ROOT_LIBRARIES})
