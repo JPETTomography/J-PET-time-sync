@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 	hist<double> position;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=48;slot++){
-		cout<<"slot "<<slot<<"..."<<endl;
+		cout<<"=========== Slot "<<slot<<" ==============="<<endl;
 		stringstream histname;
 		histname<<"TimeDiff_Slot"<<slot<<"_Layer1_AB_Th1";
 		auto hist=ReadHist("Go4AutoSave.root",{"Histograms","Layer_1_timeDiffAB"},histname.str()).Scale(4);
