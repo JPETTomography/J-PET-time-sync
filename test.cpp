@@ -9,18 +9,24 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 int main(int argc, char **argv) {
 	Plotter::Instance().SetOutput(".","test");
-	hist<double> position;
-	SortedPoints<double> chisq;
-	for(size_t slot=1;slot<=48;slot++){
-		cout<<"=========== Slot "<<slot<<" ==============="<<endl;
-		stringstream histname;
-		histname<<"TimeDiff_Slot"<<slot<<"_Layer1_AB_Th1";
-		auto hist=ReadHist("Go4AutoSave.root",{"Histograms","Layer_1_timeDiffAB"},histname.str()).Scale(4);
-		auto fit=SyncAB::Fit4SyncAB(hist);
-		position<<point<value<double>>(double(slot),fit.first);
-		chisq<<point<double>(double(slot),fit.second);
+	for(size_t layer=1;layer<=3;layer++){
+		hist<double> position,sigma;
+		SortedPoints<double> chisq;
+		for(size_t slot=1;slot<=48;slot++){
+			stringstream histname,histdir,display;
+			display<<"Layer "<<layer<<" ; Slot "<<slot;
+			cout<<"=========== "<<display.str()<<" ==============="<<endl;
+			histname<<"TimeDiff_Slot"<<slot<<"_Layer"<<layer<<"_AB_Th1";
+			histdir<<"Layer_"<<layer<<"_timeDiffAB";
+			auto hist=ReadHist("Go4AutoSave.root",{"Histograms",histdir.str()},histname.str()).Scale(4);
+			auto fit=SyncAB::Fit4SyncAB(hist,display.str());
+			position<<point<value<double>>(double(slot),fit.pos);
+			sigma<<point<value<double>>(double(slot),fit.sigma);
+			chisq<<point<double>(double(slot),fit.chisq);
+		}
+		Plot<double>().Hist(position,"Position")<<"set key on";
+		Plot<double>().Hist(sigma,"Sigma")<<"set key on";
+		Plot<double>().Line(chisq,"Chi^2")<<"set key on";
 	}
-	Plot<double>().Hist(position,"");
-	Plot<double>().Line(chisq,"");
 	return 0;
 }

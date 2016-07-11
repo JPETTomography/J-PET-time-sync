@@ -12,7 +12,7 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 using namespace Genetic;
 namespace SyncAB{
-	const pair<value<double>,double> Fit4SyncAB(const hist<double>&hist){
+	const PositionFromFit Fit4SyncAB(const hist<double>&hist, const string&&displayname){
 		double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().delta()*2.0;
 		typedef 
 			Mul2<Par<0>,Func3<Gaussian ,Arg<0>,Par<1>,Par<2>>> 
@@ -35,7 +35,7 @@ namespace SyncAB{
 		});
 		fit.SetThreadCount(2);
 		RANDOM r;
-		fit.Init(10*TotalFunc::ParamCount,make_shared<GenerateByGauss>()
+		fit.Init(15*TotalFunc::ParamCount,make_shared<GenerateByGauss>()
 			<<make_pair(total,total*12.0)
 			<<make_pair(hist.left().X().min()+hist.right().X().max()/2.0,hist.right().X().max()-hist.left().X().min())
 			<<make_pair(0.1,0.5)
@@ -59,11 +59,11 @@ namespace SyncAB{
 		SortedPoints<double>
 		totalfit([&fit](double x)->double{return fit({x});},chain),
 		background([&fit](double x)->double{return Background()({x},fit.Parameters());},chain);
-		Plot<double>().Hist(hist,"").Line(totalfit,"Fit").Line(background,"Background")<<"set key on";
+		Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on";
 		cout<<endl<<"done. S="<<fit.Optimality()<<endl;
 		fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
 		for(const auto&P:fit.ParametersWithUncertainties())cout<<P<<endl;
-		return make_pair(fit.ParametersWithUncertainties()[1],fit.Optimality());
+		return {.pos=fit.ParametersWithUncertainties()[1],.sigma=fit.ParametersWithUncertainties()[2],.chisq=fit.Optimality()};
 	}
 
 };
