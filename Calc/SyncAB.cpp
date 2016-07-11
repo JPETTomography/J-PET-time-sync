@@ -21,7 +21,7 @@ namespace SyncAB{
 			Mul3<
 				Func3<FermiFunc,Arg<0>,Par<3>,Par<4>>,
 				Func3<FermiFunc,Arg<0>,Par<5>,Par<6>>,
-				PolynomFunc<0,7,0>//the power can be increased
+				PolynomFunc<0,7,1>//the power can be increased
 			>
 		Background;
 		typedef Add<Foreground,Background> TotalFunc;
@@ -44,6 +44,7 @@ namespace SyncAB{
 			<<make_pair(hist.right().X().min(),hist.right().X().max()-hist.left().X().min())
 			<<make_pair(0.5,0.5)
 			<<make_pair(total,total*10.0)
+			<<make_pair(0.0,10.0)
 		,r);
 		cout<<fit.ParamCount()<<" parameters"<<endl;
 		cout<<fit.PopulationSize()<<" points"<<endl;
