@@ -4,16 +4,15 @@
 #include <Preselection/timesyncpreselector.h>
 using namespace std;
 int main(int argc, char* argv[]) {
-	DB::SERVICES::DBHandler::createDBConnection("../DBConfig/configDB.cfg");
+	DB::SERVICES::DBHandler::createDBConnection("configDB.cfg");
 	JPetManager& manager = JPetManager::getManager();
 	manager.parseCmdLine(argc, argv);
-	
-	// Here create all analysis modules to be used:
 	manager.registerTask([](){
-		return new JPetTaskLoader("hld", "tslot.raw",
-					  new TaskA("Module A: Unp to TSlot Raw",
-						    "Process unpacked HLD file into a tree of JPetTSlot objects"));
-	});    
-	
+		return new JPetTaskLoader("hld", "tslot.raw",new FrameworkTDCWrapper("","",
+			[](const std::vector<std::pair<JPetSigCh,JPetSigCh>>&vec){
+				cout<<vec.size()<<endl;
+			})
+		);
+	});
 	manager.run();
 }
