@@ -3,20 +3,24 @@
 #include <vector>
 #include <functional>
 #include <utility>
+#include <memory>
 #include <JPetTask/JPetTask.h>
 #include <JPetParamBank/JPetParamBank.h>
 #include <JPetParamManager/JPetParamManager.h>
 #include <JPetSigCh/JPetSigCh.h>
-typedef std::function<void(const std::vector<std::pair<JPetSigCh,JPetSigCh>>&)> TDCFUNC;
-class FrameworkTDCWrapper: public JPetTask{
+class JPetWriter;
+class TH1F;
+class FrameworkTimeSyncPreselect: public JPetTask{
 public:
-	FrameworkTDCWrapper(const char * name, const char * description, const TDCFUNC func);
+	FrameworkTimeSyncPreselect(const char * name, const char * description);
 	virtual void exec()override;
 	virtual void terminate()override;
 	virtual void setParamManager(JPetParamManager* paramManager)override;
 	const JPetParamBank& getParamBank();
+	virtual void setWriter(JPetWriter* writer)override;
 protected:
 	JPetParamManager* fParamManager;
-	TDCFUNC fFunction;
+	JPetWriter* fWriter;
+	std::shared_ptr<TH1F> fHistHitsCount;
 };
 #endif

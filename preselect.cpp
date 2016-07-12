@@ -7,12 +7,6 @@ int main(int argc, char* argv[]) {
 	DB::SERVICES::DBHandler::createDBConnection("configDB.cfg");
 	JPetManager& manager = JPetManager::getManager();
 	manager.parseCmdLine(argc, argv);
-	manager.registerTask([](){
-		return new JPetTaskLoader("hld", "tslot.raw",new FrameworkTDCWrapper("","",
-			[](const std::vector<std::pair<JPetSigCh,JPetSigCh>>&vec){
-				cout<<vec.size()<<endl;
-			})
-		);
-	});
+	manager.registerTask([](){return new JPetTaskLoader("hld", "tslot.raw",new FrameworkTimeSyncPreselect("",""));});
 	manager.run();
 }
