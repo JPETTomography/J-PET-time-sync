@@ -12,8 +12,8 @@
  *
  *  @file TaskB.h
  */
-#ifndef TASKB1_H
-#	define TASKB1_H
+#ifndef TASKB_H
+#	define TASKB_H
 
 #include <vector>
 #include <JPetTask/JPetTask.h>
@@ -24,9 +24,9 @@
 #include "LargeBarrelMapping.h"
 
 class JPetWriter;
-class TaskB1: public JPetTask{
+class TaskB: public JPetTask{
 public:
-	TaskB1(const char * name, const char * description);
+	TaskB(const char * name, const char * description);
 	virtual void init(const JPetTaskInterface::Options& opts)override;
 	virtual void exec()override;
 	virtual void terminate()override;

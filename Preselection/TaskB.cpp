@@ -15,12 +15,12 @@
 #include <map>
 #include <string>
 #include <JPetWriter/JPetWriter.h>
-#include "TaskB1.h"
+#include "TaskB.h"
 
-TaskB1::TaskB1(const char * name, const char * description)
+TaskB::TaskB(const char * name, const char * description)
 :JPetTask(name, description){}
 
-void TaskB1::init(const JPetTaskInterface::Options& opts){
+void TaskB::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & tomb : getParamBank().getTOMBChannels()){
 		const char * histo_name = formatUniqueChannelDescription(*(tomb.second), "TOT_");
@@ -38,7 +38,7 @@ void TaskB1::init(const JPetTaskInterface::Options& opts){
 	}
 }
 
-void TaskB1::exec(){
+void TaskB::exec(){
 	auto timeWindow = (JPetTimeWindow&) (*getEvent());
 	std::map<int,JPetSigCh> leadSigChs;
 	std::map<int,JPetSigCh> trailSigChs;
@@ -76,9 +76,8 @@ void TaskB1::exec(){
 	}
 	for (auto & chSigPair : trailSigChs) {
 		int daq_channel = chSigPair.first;
-		if( leadSigChs.count(daq_channel) == 0 ){
+		if( leadSigChs.count(daq_channel) == 0 )
 			getStatistics().getHisto2D("was lead and trail edge?").Fill(1.,0.);
-		} 
 		int pmt_number = calcGlobalPMTNumber(chSigPair.second.getPM());
 		getStatistics().getHisto1D(Form("HitsTrailingEdge_thr%d", chSigPair.second.getThresholdNumber())).Fill(pmt_number);
 	}    
@@ -91,12 +90,12 @@ void TaskB1::exec(){
 		fWriter->write(signal);
 	}
 }
-void TaskB1::terminate(){}
-void TaskB1::saveRawSignal( JPetRawSignal sig){
+void TaskB::terminate(){}
+void TaskB::saveRawSignal( JPetRawSignal sig){
 	assert(fWriter);
 	fWriter->write(sig);
 }
-const char * TaskB1::formatUniqueChannelDescription(const JPetTOMBChannel & channel, const char * prefix = "") const {
+const char * TaskB::formatUniqueChannelDescription(const JPetTOMBChannel & channel, const char * prefix = "") const {
 	int slot_number = fBarrelMap.getSlotNumber(channel.getPM().getBarrelSlot());
 	int layer_number = fBarrelMap.getLayerNumber(channel.getPM().getBarrelSlot().getLayer()); 
 	char side = (channel.getPM().getSide()==JPetPM::SideA ? 'A' : 'B');
@@ -104,26 +103,24 @@ const char * TaskB1::formatUniqueChannelDescription(const JPetTOMBChannel & chan
 	return Form("%slayer_%d_slot_%d_side_%c_thr_%d",prefix,layer_number,slot_number,side,threshold_number);
 }
 
-int TaskB1::calcGlobalPMTNumber(const JPetPM & pmt) const {
+int TaskB::calcGlobalPMTNumber(const JPetPM & pmt) const {
 	const int number_of_sides = 2;
 	int layer_number = fBarrelMap.getLayerNumber(pmt.getBarrelSlot().getLayer());
 	int pmt_no = 0;
-	for(int l=1;l<layer_number;l++){
+	for(int l=1;l<layer_number;l++)
 		pmt_no += number_of_sides * fBarrelMap.getNumberOfSlots(l);
-	}
 	int slot_number = fBarrelMap.getSlotNumber(pmt.getBarrelSlot());
-	if( pmt.getSide() == JPetPM::SideB ){
+	if( pmt.getSide() == JPetPM::SideB )
 		pmt_no += fBarrelMap.getNumberOfSlots(layer_number);
-	}
 	pmt_no += slot_number - 1;
 	return pmt_no;
 }
-void TaskB1::setWriter(JPetWriter* writer) {
+void TaskB::setWriter(JPetWriter* writer) {
 	fWriter = writer;
 }
-void TaskB1::setParamManager(JPetParamManager* paramManager) {
+void TaskB::setParamManager(JPetParamManager* paramManager) {
 	fParamManager = paramManager;
 }
-const JPetParamBank& TaskB1::getParamBank()const{
+const JPetParamBank& TaskB::getParamBank()const{
 	return fParamManager->getParamBank();
 }

@@ -45,30 +45,33 @@ std::vector<JPetHit> TaskC::createHits(std::vector<JPetRawSignal>& signals){
 				JPetRecoSignal recoSignalB;
 				JPetPhysSignal physSignalA;
 				JPetPhysSignal physSignalB;
-				if (i->getPM().getSide() == JPetPM::SideA
-					&& j->getPM().getSide() == JPetPM::SideB) {
+				if (
+					(i->getPM().getSide() == JPetPM::SideA)
+					&&(j->getPM().getSide() == JPetPM::SideB)
+				) {
 					recoSignalA.setRawSignal(*i);
-				recoSignalB.setRawSignal(*j);
-					} else{ 
-						if( (j->getPM().getSide() == JPetPM::SideA)
-							&&(i->getPM().getSide() == JPetPM::SideB)
-						){
-							recoSignalA.setRawSignal(*j);
-							recoSignalB.setRawSignal(*i);
-						} else {
-							WARNING("TWO hits on the same scintillator side we ignore it");         
-							continue;
-						}
+					recoSignalB.setRawSignal(*j);
+				} else{ 
+					if( 
+						(j->getPM().getSide() == JPetPM::SideA)
+						&&(i->getPM().getSide() == JPetPM::SideB)
+					){
+						recoSignalA.setRawSignal(*j);
+						recoSignalB.setRawSignal(*i);
+					} else {
+						WARNING("TWO hits on the same scintillator side we ignore it");         
+						continue;
 					}
-					physSignalA.setRecoSignal(recoSignalA);
-					physSignalB.setRecoSignal(recoSignalB);
-					JPetHit hit;
-					hit.setSignalA(physSignalA);
-					hit.setSignalB(physSignalB);
-					hit.setScintillator(i->getPM().getScin());
-					hit.setBarrelSlot(i->getPM().getScin().getBarrelSlot());
-					hits.push_back(hit);
-					getStatistics().getCounter("No. found hits")++;
+				}
+				physSignalA.setRecoSignal(recoSignalA);
+				physSignalB.setRecoSignal(recoSignalB);
+				JPetHit hit;
+				hit.setSignalA(physSignalA);
+				hit.setSignalB(physSignalB);
+				hit.setScintillator(i->getPM().getScin());
+				hit.setBarrelSlot(i->getPM().getScin().getBarrelSlot());
+				hits.push_back(hit);
+				getStatistics().getCounter("No. found hits")++;
 			}
 		}
 	}
