@@ -10,29 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- *  @file TaskC1.h
+ *  @file TaskC.h
  */
-#ifndef TASKC1_H
-#define TASKC1_H
-#include <vector>
+
+#ifndef TASKC_H 
+#define TASKC_H 
+
 #include <JPetTask/JPetTask.h>
+#include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
-#include <JPetTimeWindow/JPetTimeWindow.h>
-#include <JPetParamBank/JPetParamBank.h>
-#include <JPetParamManager/JPetParamManager.h>
 class JPetWriter;
-class TaskC1: public JPetTask{
+class TaskC:public JPetTask {
 public:
-  TaskC1(const char * name, const char * description);
-  virtual void init(const JPetTaskInterface::Options& opts)override;
-  virtual void exec()override;
-  virtual void terminate()override;
-  virtual void setWriter(JPetWriter* writer)override;
-  virtual void setParamManager(JPetParamManager* paramManager)override;
-  const JPetParamBank& getParamBank()const;
+	TaskC(const char * name, const char * description);
+	virtual void init(const JPetTaskInterface::Options& opts)override;
+	virtual void exec()override;
+	virtual void terminate()override;
+	virtual void setWriter(JPetWriter* writer)override;
 protected:
-  void saveRawSignal( JPetRawSignal sig);
-  JPetWriter* fWriter;
-  JPetParamManager* fParamManager;
+	std::vector<JPetHit> createHits(std::vector<JPetRawSignal>& signals);
+	void saveHits(std::vector<JPetHit> hits);
+	std::vector<JPetRawSignal> fSignals;
+	JPetWriter* fWriter;
 };
 #endif
