@@ -5,7 +5,7 @@
 #include <Preselection/TaskB.h>
 #include <Preselection/TaskC.h>
 #include <Preselection/TaskD.h>
-#include <Preselection/TaskE.h>
+#include <Preselection/TaskTimeSync.h>
 using namespace std;
 int main(int argc, char* argv[]) {
 	DB::SERVICES::DBHandler::createDBConnection("configDB.cfg");
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 		return new JPetTaskLoader("phys.hit", "phys.hit.means",new TaskD("Module D: Make histograms for hits","Only make timeDiff histos and produce mean timeDiff value for each threshold and slot to be used by the next module"));
 	});
 	manager.registerTask([](){
-		return new JPetTaskLoader("phys.hit.means", "phys.hit.coincplots",new TaskE("Module E: Filter hits","Pass only hits with time diffrerence close to the peak"));
+		return new JPetTaskLoader("phys.hit.means", "phys.hit.means.timesyncstat",new TimeSyncTask("TimeSyncTask",""));
 	});
 	manager.run();
 }
