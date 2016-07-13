@@ -24,7 +24,7 @@ void TaskA::init(const JPetTaskInterface::Options& opts){
 	getStatistics().createHistogram( new TH1F("ChannelsPerEvt","Channels fired in one event",200,-0.5,199.5) );
 }
 void TaskA::exec(){  
-	auto evt = reinterpret_cast<EventIII*> (getEvent());
+	auto evt = dynamic_cast<EventIII*>(getEvent());
 	int ntdc = evt->GetTotalNTDCChannels();
 	getStatistics().getHisto1D("ChannelsPerEvt").Fill( ntdc );
 	JPetTimeWindow tslot;
@@ -61,16 +61,13 @@ void TaskA::exec(){
 			sigChTmpTrail.setTOMBChannel(tomb_channel);
 			sigChTmpLead.setThreshold(tomb_channel.getThreshold());
 			sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
-			if( tdcChannel->GetLeadTime(j) == -100000 )
-				continue;
-			if( tdcChannel->GetTrailTime(j) == -100000 )
-				continue;
-			sigChTmpLead.setValue(tdcChannel->GetLeadTime(j) * 1000.);
-			sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j) * 1000.);
+			if(tdcChannel->GetLeadTime (j)==-100000)continue;
+			if(tdcChannel->GetTrailTime(j)==-100000)continue;
+			sigChTmpLead .setValue(tdcChannel->GetLeadTime (j)*1000.);
+			sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j)*1000.);
 			tslot.addCh(sigChTmpLead);
 			tslot.addCh(sigChTmpTrail);
 		}
-		
 	}
 	saveTimeWindow(tslot);
 	fCurrEventNumber++;

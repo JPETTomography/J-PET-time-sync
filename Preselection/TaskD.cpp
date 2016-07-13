@@ -40,9 +40,9 @@ void TaskD::init(const JPetTaskInterface::Options& opts){
 
 
 void TaskD::exec(){
-	JPetHit hit = (JPetHit&) (*getEvent());
-	fillHistosForHit(hit);
-	fWriter->write(hit);
+	JPetHit *hit = dynamic_cast<JPetHit*>(getEvent());
+	fillHistosForHit(*hit);
+	fWriter->write(*hit);
 }
 void TaskD::terminate(){
 	getAuxilliaryData().createMap("timeDiffAB mean values");

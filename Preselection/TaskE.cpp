@@ -41,16 +41,16 @@ void TaskE::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskE::exec(){
-	JPetHit currHit = (JPetHit&) (*getEvent());
+	auto currHit = dynamic_cast<JPetHit*>(getEvent());
 	if (fHits.empty()) {
-		fHits.push_back(currHit);
+		fHits.push_back(*currHit);
 	} else {
-		if (fHits[0].getTimeWindowIndex() == currHit.getSignalB().getTimeWindowIndex()) {
-			fHits.push_back(currHit);
+		if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+			fHits.push_back(*currHit);
 		} else {
 			fillCoincidenceHistos(fHits);
 			fHits.clear();
-			fHits.push_back(currHit);
+			fHits.push_back(*currHit);
 		}
 	}
 }

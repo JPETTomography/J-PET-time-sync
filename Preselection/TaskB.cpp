@@ -39,13 +39,13 @@ void TaskB::init(const JPetTaskInterface::Options& opts){
 }
 
 void TaskB::exec(){
-	auto timeWindow = (JPetTimeWindow&) (*getEvent());
+	auto timeWindow = dynamic_cast<JPetTimeWindow*>(getEvent());
 	std::map<int,JPetSigCh> leadSigChs;
 	std::map<int,JPetSigCh> trailSigChs;
 	std::map<int, JPetRawSignal> signals; 
-	const auto nSigChs = timeWindow.getNumberOfSigCh();
+	const auto nSigChs = timeWindow->getNumberOfSigCh();
 	for (auto i = 0; i < nSigChs; i++) {
-		JPetSigCh sigch = timeWindow[i];
+		JPetSigCh sigch = timeWindow->operator[](i);
 		int daq_channel = sigch.getDAQch();
 		if( sigch.getType() == JPetSigCh::Leading ){
 			leadSigChs[ daq_channel ] = sigch;
@@ -83,7 +83,7 @@ void TaskB::exec(){
 	}    
 	for(auto & pmSignalPair : signals){
 		JPetRawSignal & signal = pmSignalPair.second;
-		signal.setTimeWindowIndex( timeWindow.getIndex() );
+		signal.setTimeWindowIndex( timeWindow->getIndex() );
 		const JPetPM & pmt = getParamBank().getPM(pmSignalPair.first);
 		signal.setPM(pmt);
 		signal.setBarrelSlot(pmt.getBarrelSlot());
