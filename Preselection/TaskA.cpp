@@ -36,10 +36,7 @@ void TaskA::exec(){
 			tdcChannel = static_cast<TDCChannel*>(tdcHits->At(i));
 			auto tomb_number =  tdcChannel->GetChannel();
 			if (tomb_number % 65 == 0)continue;//skip trigger signals from TRB
-			if( getParamBank().getTOMBChannels().count(tomb_number) == 0 ) {
-				WARNING(Form("DAQ Channel %d appears in data but does not exist in the setup from DB.", tomb_number));
-				continue;
-			}
+			assert(0!=getParamBank().getTOMBChannels().count(tomb_number));
 			JPetTOMBChannel& tomb_channel = getParamBank().getTOMBChannel(tomb_number);
 			getStatistics().getHisto1D("HitsPerEvtCh").Fill( tdcChannel->GetHitsNum() );
 			for(int j = tdcChannel->GetHitsNum()-1; j < tdcChannel->GetHitsNum(); ++j){
