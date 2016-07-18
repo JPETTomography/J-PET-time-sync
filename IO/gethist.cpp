@@ -12,7 +12,7 @@
 using namespace std;
 using namespace MathTemplates;
 hist<double> ReadHist(const string&filename,const vector<string>&path,const string&histname){
-	vector<hist<double>::Point> points;
+	hist<double> points;
 	TFile* file=TFile::Open(filename.c_str());
 	if(file){
 		TDirectoryFile* dir1=file;
@@ -30,11 +30,21 @@ hist<double> ReadHist(const string&filename,const vector<string>&path,const stri
 					dy=1.0;
 				double x=histogram->GetBinCenter(i);
 				double dx=histogram->GetBinWidth(i)/2.0;
-				points.push_back(point<value<double>>({x,dx},{y,dy}));
+				points<<point<value<double>>({x,dx},{y,dy});
 			}
 		}
 		file->Close();
 		delete file;
 	}
-	return hist<double>(points);
+	return points;
 }
+hist< double > ReadHist(const vector< string >& filenames, const vector< string >& path, const string& histname){
+	hist<double> result;
+	for(const string&filename:filenames){
+		auto H=ReadHist(filename,path,histname);
+		if(result.size()>0)result.imbibe(H);
+		else result=H;
+	}
+	return result;
+}
+

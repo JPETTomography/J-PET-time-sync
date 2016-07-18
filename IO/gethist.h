@@ -5,4 +5,5 @@
 #include <string>
 #include <math_h/hists.h>
 MathTemplates::hist<double> ReadHist(const std::string&filename,const std::vector<std::string>&path,const std::string&histname);
+MathTemplates::hist<double> ReadHist(const std::vector<std::string>&filenames,const std::vector<std::string>&path,const std::string&histname);
 #endif

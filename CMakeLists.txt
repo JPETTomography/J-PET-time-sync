@@ -23,8 +23,8 @@ add_library(timesyncio ${IO})
 file(GLOB CALC Calc/*.cpp)
 add_library(timesynccalc ${CALC})
 
-add_executable(test test.cpp)
-target_link_libraries(test timesynccalc timesyncio FitGen gpwrap JPetFramework)
+add_executable(fittest fittest.cpp)
+target_link_libraries(fittest timesynccalc timesyncio FitGen gpwrap JPetFramework)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/large_barrel.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/conf_trb3.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

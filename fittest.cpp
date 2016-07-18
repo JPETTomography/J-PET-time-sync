@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 	for(size_t layer=1;layer<=3;layer++){
 		hist<double> position,sigma;
 		SortedPoints<double> chisq;
-		for(size_t slot=1;slot<=48;slot++){
+		for(size_t slot=1;slot<=((layer==3)?96:48);slot++){
 			stringstream histname,histdir,display;
 			display<<"Layer "<<layer<<" ; Slot "<<slot;
 			cout<<"=========== "<<display.str()<<" ==============="<<endl;
