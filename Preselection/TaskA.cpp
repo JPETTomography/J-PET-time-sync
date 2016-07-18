@@ -24,8 +24,7 @@ void TaskA::init(const JPetTaskInterface::Options& opts){
 	getStatistics().createHistogram( new TH1F("ChannelsPerEvt","Channels fired in one event",200,-0.5,199.5) );
 }
 void TaskA::exec(){  
-	auto evt = dynamic_cast<EventIII*>(getEvent());
-	if(evt){
+	auto evt = reinterpret_cast<EventIII*>(getEvent());
 		int ntdc = evt->GetTotalNTDCChannels();
 		getStatistics().getHisto1D("ChannelsPerEvt").Fill( ntdc );
 		JPetTimeWindow tslot;
@@ -67,7 +66,6 @@ void TaskA::exec(){
 		}
 		saveTimeWindow(tslot);
 		fCurrEventNumber++;
-	}
 }
 void TaskA::terminate(){}
 void TaskA::saveTimeWindow( JPetTimeWindow slot){
