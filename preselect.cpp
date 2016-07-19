@@ -8,7 +8,7 @@
 #include <Preselection/TaskTimeSync.h>
 using namespace std;
 int main(int argc, char* argv[]) {
-	if(argc=1){
+	if(argc==1){
 		char * frameworkargs[2];
 		frameworkargs[0]=argv[0];
 		frameworkargs[1]="--help";
