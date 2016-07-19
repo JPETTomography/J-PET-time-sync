@@ -10,21 +10,17 @@ add_definitions(${Framework_DEFINITIONS})
 include_directories(${FITGEN_INC})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${ROOT_INCLUDE_DIR})
-
 file(GLOB PRESELECT Preselection/*.cpp)
 add_library(preselectionlib ${PRESELECT})
 target_link_libraries(preselectionlib JPetFramework)
 add_executable(preselect preselect.cpp)
 target_link_libraries(preselect preselectionlib JPetFramework)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/large_barrel.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/conf_trb3.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 file(GLOB IO IO/*.cpp)
 add_library(timesyncio ${IO})
-
 file(GLOB CALC Calc/*.cpp)
 add_library(timesynccalc ${CALC})
-
 add_executable(fittest fittest.cpp)
 target_link_libraries(fittest timesynccalc timesyncio FitGen gpwrap JPetFramework)
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/large_barrel.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/conf_trb3.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
