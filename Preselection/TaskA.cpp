@@ -25,6 +25,7 @@ void TaskA::init(const JPetTaskInterface::Options& opts){
 }
 void TaskA::exec(){  
 	auto evt = reinterpret_cast<EventIII*>(getEvent());
+	if(evt){
 		int ntdc = evt->GetTotalNTDCChannels();
 		getStatistics().getHisto1D("ChannelsPerEvt").Fill( ntdc );
 		JPetTimeWindow tslot;
@@ -66,6 +67,7 @@ void TaskA::exec(){
 		}
 		saveTimeWindow(tslot);
 		fCurrEventNumber++;
+	}
 }
 void TaskA::terminate(){}
 void TaskA::saveTimeWindow( JPetTimeWindow slot){

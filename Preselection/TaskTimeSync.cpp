@@ -28,23 +28,22 @@ void TimeSyncTask::init(const JPetTaskInterface::Options& opts){
 			char * histo_title = Form("%s;#Delta ID", histo_name); 
 			int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
 			getStatistics().createHistogram( new TH1F(histo_name, histo_title,n_slots_in_half_layer, 0.5, n_slots_in_half_layer+0.5));
-			histo_name = Form("TOF_vs_Delta_ID_layer_%d_thr_%d", fBarrelMap.getLayerNumber(*layer.second), thr);
-			histo_title = Form("%s;#Delta ID;TOF [ns]", histo_name); 
-			getStatistics().createHistogram( new TH2F(histo_name, histo_title,n_slots_in_half_layer, 0.5, n_slots_in_half_layer+0.5,100, 0., 15.));
 		}
 	}
 }
 void TimeSyncTask::exec(){
 	auto currHit = dynamic_cast<JPetHit*>(getEvent());
-	if (fHits.empty()) {
-		fHits.push_back(*currHit);
-	} else {
-		if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+	if(currHit){
+		if (fHits.empty()) {
 			fHits.push_back(*currHit);
 		} else {
-			fillCoincidenceHistos(fHits);
-			fHits.clear();
-			fHits.push_back(*currHit);
+			if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+				fHits.push_back(*currHit);
+			} else {
+				fillCoincidenceHistos(fHits);
+				fHits.clear();
+				fHits.push_back(*currHit);
+			}
 		}
 	}
 }

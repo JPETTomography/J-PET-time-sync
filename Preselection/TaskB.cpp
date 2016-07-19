@@ -40,54 +40,56 @@ void TaskB::init(const JPetTaskInterface::Options& opts){
 
 void TaskB::exec(){
 	auto timeWindow = dynamic_cast<JPetTimeWindow*>(getEvent());
-	std::map<int,JPetSigCh> leadSigChs;
-	std::map<int,JPetSigCh> trailSigChs;
-	std::map<int, JPetRawSignal> signals; 
-	const auto nSigChs = timeWindow->getNumberOfSigCh();
-	for (auto i = 0; i < nSigChs; i++) {
-		JPetSigCh sigch = timeWindow->operator[](i);
-		int daq_channel = sigch.getDAQch();
-		if( sigch.getType() == JPetSigCh::Leading ){
-			leadSigChs[ daq_channel ] = sigch;
+	if(timeWindow){
+		std::map<int,JPetSigCh> leadSigChs;
+		std::map<int,JPetSigCh> trailSigChs;
+		std::map<int, JPetRawSignal> signals; 
+		const auto nSigChs = timeWindow->getNumberOfSigCh();
+		for (auto i = 0; i < nSigChs; i++) {
+			JPetSigCh sigch = timeWindow->operator[](i);
+			int daq_channel = sigch.getDAQch();
+			if( sigch.getType() == JPetSigCh::Leading ){
+				leadSigChs[ daq_channel ] = sigch;
+			}
+			if( sigch.getType() == JPetSigCh::Trailing ){
+				trailSigChs[ daq_channel ] = sigch;
+			}
 		}
-		if( sigch.getType() == JPetSigCh::Trailing ){
-			trailSigChs[ daq_channel ] = sigch;
+		for (auto & chSigPair : leadSigChs) {
+			int daq_channel = chSigPair.first;
+			if( trailSigChs.count(daq_channel) != 0 ){ 
+				getStatistics().getHisto2D("was lead and trail edge?").Fill(1.,1.);
+				JPetSigCh & leadSigCh = chSigPair.second;
+				JPetSigCh & trailSigCh = trailSigChs.at(daq_channel);
+				double tot = trailSigCh.getValue() - leadSigCh.getValue();
+				if( trailSigCh.getPM()!=leadSigCh.getPM() )
+					ERROR("Signals from same channel point to different PMTs! Check the setup mapping!!!");
+				const char * histo_name = formatUniqueChannelDescription(leadSigCh.getTOMBChannel(), "TOT_");
+				getStatistics().getHisto1D(histo_name).Fill( tot / 1000. );
+				int pmt_number = calcGlobalPMTNumber(leadSigCh.getPM());
+				getStatistics().getHisto1D(Form("HitsLeadingEdge_thr%d", leadSigCh.getThresholdNumber())).Fill(pmt_number);
+				double pmt_id = trailSigCh.getPM().getID();
+				signals[pmt_id].addPoint( leadSigCh );
+				signals[pmt_id].addPoint( trailSigCh );
+			}else{
+				getStatistics().getHisto2D("was lead and trail edge?").Fill(0.,1.);
+			}
 		}
-	}
-	for (auto & chSigPair : leadSigChs) {
-		int daq_channel = chSigPair.first;
-		if( trailSigChs.count(daq_channel) != 0 ){ 
-			getStatistics().getHisto2D("was lead and trail edge?").Fill(1.,1.);
-			JPetSigCh & leadSigCh = chSigPair.second;
-			JPetSigCh & trailSigCh = trailSigChs.at(daq_channel);
-			double tot = trailSigCh.getValue() - leadSigCh.getValue();
-			if( trailSigCh.getPM()!=leadSigCh.getPM() )
-				ERROR("Signals from same channel point to different PMTs! Check the setup mapping!!!");
-			const char * histo_name = formatUniqueChannelDescription(leadSigCh.getTOMBChannel(), "TOT_");
-			getStatistics().getHisto1D(histo_name).Fill( tot / 1000. );
-			int pmt_number = calcGlobalPMTNumber(leadSigCh.getPM());
-			getStatistics().getHisto1D(Form("HitsLeadingEdge_thr%d", leadSigCh.getThresholdNumber())).Fill(pmt_number);
-			double pmt_id = trailSigCh.getPM().getID();
-			signals[pmt_id].addPoint( leadSigCh );
-			signals[pmt_id].addPoint( trailSigCh );
-		}else{
-			getStatistics().getHisto2D("was lead and trail edge?").Fill(0.,1.);
+		for (auto & chSigPair : trailSigChs) {
+			int daq_channel = chSigPair.first;
+			if( leadSigChs.count(daq_channel) == 0 )
+				getStatistics().getHisto2D("was lead and trail edge?").Fill(1.,0.);
+			int pmt_number = calcGlobalPMTNumber(chSigPair.second.getPM());
+			getStatistics().getHisto1D(Form("HitsTrailingEdge_thr%d", chSigPair.second.getThresholdNumber())).Fill(pmt_number);
+		}    
+		for(auto & pmSignalPair : signals){
+			JPetRawSignal & signal = pmSignalPair.second;
+			signal.setTimeWindowIndex( timeWindow->getIndex() );
+			const JPetPM & pmt = getParamBank().getPM(pmSignalPair.first);
+			signal.setPM(pmt);
+			signal.setBarrelSlot(pmt.getBarrelSlot());
+			fWriter->write(signal);
 		}
-	}
-	for (auto & chSigPair : trailSigChs) {
-		int daq_channel = chSigPair.first;
-		if( leadSigChs.count(daq_channel) == 0 )
-			getStatistics().getHisto2D("was lead and trail edge?").Fill(1.,0.);
-		int pmt_number = calcGlobalPMTNumber(chSigPair.second.getPM());
-		getStatistics().getHisto1D(Form("HitsTrailingEdge_thr%d", chSigPair.second.getThresholdNumber())).Fill(pmt_number);
-	}    
-	for(auto & pmSignalPair : signals){
-		JPetRawSignal & signal = pmSignalPair.second;
-		signal.setTimeWindowIndex( timeWindow->getIndex() );
-		const JPetPM & pmt = getParamBank().getPM(pmSignalPair.first);
-		signal.setPM(pmt);
-		signal.setBarrelSlot(pmt.getBarrelSlot());
-		fWriter->write(signal);
 	}
 }
 void TaskB::terminate(){}

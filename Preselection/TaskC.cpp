@@ -22,16 +22,18 @@ TaskC::TaskC(const char * name, const char * description)
 void TaskC::init(const JPetTaskInterface::Options& opts){}
 void TaskC::exec(){
 	auto currSignal = dynamic_cast<JPetRawSignal*>(getEvent());
-	getStatistics().getCounter("No. initial signals")++;
-	if (fSignals.empty()) {
-		fSignals.push_back(*currSignal);
-	} else {
-		if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
+	if(currSignal){
+		getStatistics().getCounter("No. initial signals")++;
+		if (fSignals.empty()) {
 			fSignals.push_back(*currSignal);
 		} else {
-			saveHits(createHits(fSignals));
-			fSignals.clear();
-			fSignals.push_back(*currSignal);
+			if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
+				fSignals.push_back(*currSignal);
+			} else {
+				saveHits(createHits(fSignals));
+				fSignals.clear();
+				fSignals.push_back(*currSignal);
+			}
 		}
 	}
 }
