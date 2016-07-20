@@ -13,6 +13,7 @@ using namespace MathTemplates;
 using namespace Genetic;
 namespace SyncAB{
 	const PositionFromFit Fit4SyncAB(const hist<double>&hist, const string&displayname,const size_t threads){
+		cerr<<"=========== "<<displayname<<" ==============="<<endl;
 		double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().delta()*2.0;
 		typedef 
 			Mul2<Par<0>,Func3<Gaussian ,Arg<0>,Par<1>,Par<2>>> 
