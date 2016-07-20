@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 			cout<<"=========== "<<display.str()<<" ==============="<<endl;
 			histname<<"TimeDiff_Slot"<<slot<<"_Layer"<<layer<<"_AB_Th1";
 			histdir<<"Layer_"<<layer<<"_timeDiffAB";
-			auto hist=ReadHist("Go4AutoSave.root",{"Histograms",histdir.str()},histname.str()).Scale(4);
+			auto hist=ReadHist("Go4AutoSave.root",{"Histograms",histdir.str()},histname.str());
 			auto fit=SyncAB::Fit4SyncAB(hist,display.str());
 			position<<point<value<double>>(double(slot),fit.pos);
 			sigma<<point<value<double>>(double(slot),fit.sigma);
