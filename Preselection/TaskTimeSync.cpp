@@ -61,7 +61,7 @@ void TimeSyncTask::fillCoincidenceHistos(std::vector<JPetHit>& hits){
 					if( isGoodTimeDiff(hit1, thr) && isGoodTimeDiff(hit2, thr) ){
 						double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
 						tof /= 1000.; // [ns]
-						if( tof < 50.0 ){
+						if( tof < 100.0 ){
 							int delta_ID = fBarrelMap.calcDeltaID(hit1, hit2);
 							fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
 						}
