@@ -28,10 +28,8 @@ public:
 	virtual void terminate()override;
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
-	const char * formatUniqueSlotDescription(const JPetBarrelSlot & slot, int threshold,const char * prefix);
 	void fillCoincidenceHistos(std::vector<JPetHit>& hits);
 	void fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer);
-	bool isGoodTimeDiff(const JPetHit & hit, int thr);
 	LargeBarrelMapping fBarrelMap;
 	std::vector<JPetHit> fHits;
 	JPetWriter* fWriter;

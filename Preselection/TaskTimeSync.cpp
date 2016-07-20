@@ -24,6 +24,11 @@ void TimeSyncTask::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & layer : getParamBank().getLayers()){
 		for (int thr=1;thr<=4;thr++){
+			for(size_t sl=0,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<n;sl++){
+				char * histo_name = Form("SyncAB_layer_%d_slot_%d_thr_%d", fBarrelMap.getLayerNumber(*layer.second),sl+1,thr);
+				char * histo_title = Form("%s;Delta_t", histo_name); 
+				getStatistics().createHistogram( new TH1F(histo_name, histo_title,300, -30., 30.));
+			}
 			char * histo_name = Form("Delta_ID_for_coincidences_layer_%d_thr_%d", fBarrelMap.getLayerNumber(*layer.second), thr);
 			char * histo_title = Form("%s;#Delta ID", histo_name); 
 			int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
@@ -34,6 +39,11 @@ void TimeSyncTask::init(const JPetTaskInterface::Options& opts){
 void TimeSyncTask::exec(){
 	auto currHit = dynamic_cast<JPetHit*>(getEvent());
 	if(currHit){
+		for(int thr=1;thr<=4;thr++){
+			getStatistics().getHisto1D(
+				Form("SyncAB_layer_%d_slot_%d_thr_%d", fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer()),fBarrelMap.getSlotNumber(currHit->getBarrelSlot()),thr)
+			).Fill(JPetHitUtils::getTimeDiffAtThr(*currHit,thr));
+		}
 		if (fHits.empty()) {
 			fHits.push_back(*currHit);
 		} else {
@@ -58,13 +68,11 @@ void TimeSyncTask::fillCoincidenceHistos(std::vector<JPetHit>& hits){
 				&&(hit1.getScintillator() != hit2.getScintillator())
 			) {
 				for(int thr=1;thr<=4;thr++){
-					if( isGoodTimeDiff(hit1, thr) && isGoodTimeDiff(hit2, thr) ){
-						double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
-						tof /= 1000.; // [ns]
-						if( tof < 100.0 ){
-							int delta_ID = fBarrelMap.calcDeltaID(hit1, hit2);
-							fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
-						}
+					double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
+					tof /= 1000.; // [ns]
+					if( tof < 100.0 ){
+						int delta_ID = fBarrelMap.calcDeltaID(hit1, hit2);
+						fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
 					}
 				}
 			}
@@ -72,20 +80,9 @@ void TimeSyncTask::fillCoincidenceHistos(std::vector<JPetHit>& hits){
 	}
 }
 void TimeSyncTask::terminate(){}
-const char * TimeSyncTask::formatUniqueSlotDescription(const JPetBarrelSlot & slot, int threshold, const char * prefix = ""){
-	int slot_number = fBarrelMap.getSlotNumber(slot);
-	int layer_number = fBarrelMap.getLayerNumber(slot.getLayer()); 
-	return Form("%slayer_%d_slot_%d_thr_%d",prefix,layer_number,slot_number,threshold);
-}
 void TimeSyncTask::fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer){
 	int layer_number = fBarrelMap.getLayerNumber(layer);
 	const char * histo_name = Form("Delta_ID_for_coincidences_layer_%d_thr_%d", layer_number, threshold);
 	getStatistics().getHisto1D(histo_name).Fill(delta_ID);
-}
-bool TimeSyncTask::isGoodTimeDiff(const JPetHit & hit, int thr){
-	double mean_timediff = getAuxilliaryData().getValue("timeDiffAB mean values",formatUniqueSlotDescription(hit.getBarrelSlot(),thr, "timeDiffAB_"));
-	double this_hit_timediff = JPetHitUtils::getTimeDiffAtThr(hit, thr) / 1000.; // [ns]
-	if( fabs( this_hit_timediff - mean_timediff ) < 1.0 )return true;
-	else return false;
 }
 void TimeSyncTask::setWriter(JPetWriter* writer){fWriter =writer;}
