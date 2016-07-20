@@ -20,18 +20,16 @@
 #include <JPetRawSignal/JPetRawSignal.h>
 #include "LargeBarrelMapping.h"
 class JPetWriter;
-class TimeSyncTask:public JPetTask {
+class TaskSyncAB:public JPetTask {
 public:
-	TimeSyncTask(const char * name, const char * description);
+	TaskSyncAB(const char * name, const char * description);
+	virtual ~TaskSyncAB();
 	virtual void init(const JPetTaskInterface::Options& opts)override;
 	virtual void exec()override;
 	virtual void terminate()override;
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
-	void fillCoincidenceHistos(std::vector<JPetHit>& hits);
-	void fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer);
 	LargeBarrelMapping fBarrelMap;
-	std::vector<JPetHit> fHits;
 	JPetWriter* fWriter;
 };
 #endif

@@ -8,18 +8,22 @@ using namespace std;
 using namespace GnuplotWrap;
 using namespace MathTemplates;
 int main(int argc, char **argv) {
+	if(argc==1){
+		cout<<"filename list is requires as parameters"<<endl;
+		return -1;
+	}
+	vector<string> root_filenames;
+	for(int i=1;i<argc;i++)
+		root_filenames.push_back(string(argv[i]));
 	Plotter::Instance().SetOutput(".","test");
 	for(size_t layer=1;layer<=3;layer++){
 		hist<double> position,sigma;
 		SortedPoints<double> chisq;
 		for(size_t slot=1;slot<=((layer==3)?96:48);slot++){
-			stringstream histname,histdir,display;
-			display<<"Layer "<<layer<<" ; Slot "<<slot;
-			cout<<"=========== "<<display.str()<<" ==============="<<endl;
-			histname<<"TimeDiff_Slot"<<slot<<"_Layer"<<layer<<"_AB_Th1";
-			histdir<<"Layer_"<<layer<<"_timeDiffAB";
-			auto hist=ReadHist("Go4AutoSave.root",{"Histograms",histdir.str()},histname.str());
-			auto fit=SyncAB::Fit4SyncAB(hist,display.str());
+			auto name=LayerSlotThr(layer,slot,1);
+			cout<<"=========== "<<name<<" ==============="<<endl;
+			auto hist=ReadHist(root_filenames,{"Stats"},name);
+			auto fit=SyncAB::Fit4SyncAB(hist,name);
 			position<<point<value<double>>(double(slot),fit.pos);
 			sigma<<point<value<double>>(double(slot),fit.sigma);
 			chisq<<point<double>(double(slot),fit.chisq);

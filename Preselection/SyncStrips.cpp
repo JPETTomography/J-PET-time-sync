@@ -15,35 +15,26 @@
 #include <iostream>
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
-#include "TaskTimeSync.h"
-
-TimeSyncTask::TimeSyncTask(const char * name, const char * description)
+#include <IO/gethist.h>
+#include "SyncStrips.h"
+using namespace std;
+TaskSyncStrips::TaskSyncStrips(const char * name, const char * description)
 :JPetTask(name, description){}
 
-void TimeSyncTask::init(const JPetTaskInterface::Options& opts){
+void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & layer : getParamBank().getLayers()){
 		for (int thr=1;thr<=4;thr++){
-			for(size_t sl=0,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<n;sl++){
-				char * histo_name = Form("SyncAB_layer_%d_slot_%d_thr_%d", fBarrelMap.getLayerNumber(*layer.second),sl+1,thr);
-				char * histo_title = Form("%s;Delta_t", histo_name); 
-				getStatistics().createHistogram( new TH1F(histo_name, histo_title,300, -30., 30.));
-			}
-			char * histo_name = Form("Delta_ID_for_coincidences_layer_%d_thr_%d", fBarrelMap.getLayerNumber(*layer.second), thr);
-			char * histo_title = Form("%s;#Delta ID", histo_name); 
+			string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
+			char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
 			int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
-			getStatistics().createHistogram( new TH1F(histo_name, histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
+			getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
 		}
 	}
 }
-void TimeSyncTask::exec(){
+void TaskSyncStrips::exec(){
 	auto currHit = dynamic_cast<JPetHit*>(getEvent());
 	if(currHit){
-		for(int thr=1;thr<=4;thr++){
-			getStatistics().getHisto1D(
-				Form("SyncAB_layer_%d_slot_%d_thr_%d", fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer()),fBarrelMap.getSlotNumber(currHit->getBarrelSlot()),thr)
-			).Fill(JPetHitUtils::getTimeDiffAtThr(*currHit,thr));
-		}
 		if (fHits.empty()) {
 			fHits.push_back(*currHit);
 		} else {
@@ -57,10 +48,10 @@ void TimeSyncTask::exec(){
 		}
 	}
 }
-void TimeSyncTask::fillCoincidenceHistos(std::vector<JPetHit>& hits){
+void TaskSyncStrips::fillCoincidenceHistos(std::vector<JPetHit>& hits){
 	//ToDo: use const modifier to transfer this parameter
-	for (auto i = hits.begin(); i != hits.end(); ++i) {
-		for (auto j = i; ++j != hits.end(); ) {
+	for (auto i = hits.begin(); i != hits.end(); ++i){
+		for (auto j = i; ++j != hits.end(); ){
 			JPetHit & hit1 = *i;
 			JPetHit & hit2 = *j;
 			if (
@@ -79,10 +70,10 @@ void TimeSyncTask::fillCoincidenceHistos(std::vector<JPetHit>& hits){
 		}
 	}
 }
-void TimeSyncTask::terminate(){}
-void TimeSyncTask::fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer){
+void TaskSyncStrips::terminate(){}
+void TaskSyncStrips::fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer){
 	int layer_number = fBarrelMap.getLayerNumber(layer);
-	const char * histo_name = Form("Delta_ID_for_coincidences_layer_%d_thr_%d", layer_number, threshold);
-	getStatistics().getHisto1D(histo_name).Fill(delta_ID);
+	string histo_name = "Delta_ID_for_coincidences_"+LayerThr(layer_number,threshold);
+	getStatistics().getHisto1D(histo_name.c_str()).Fill(delta_ID);
 }
-void TimeSyncTask::setWriter(JPetWriter* writer){fWriter =writer;}
+void TaskSyncStrips::setWriter(JPetWriter* writer){fWriter =writer;}

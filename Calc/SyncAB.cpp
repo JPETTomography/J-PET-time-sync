@@ -12,7 +12,7 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 using namespace Genetic;
 namespace SyncAB{
-	const PositionFromFit Fit4SyncAB(const hist<double>&hist, const string&&displayname){
+	const PositionFromFit Fit4SyncAB(const hist<double>&hist, const string&displayname,const size_t threads){
 		double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().delta()*2.0;
 		typedef 
 			Mul2<Par<0>,Func3<Gaussian ,Arg<0>,Par<1>,Par<2>>> 
@@ -33,7 +33,7 @@ namespace SyncAB{
 			&&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min())
 			&&(P[1]>hist.left().X().max())&&(P[1]<hist.right().X().min());
 		});
-		fit.SetThreadCount(2);
+		fit.SetThreadCount(threads);
 		RANDOM r;
 		fit.Init(15*TotalFunc::ParamCount,make_shared<GenerateByGauss>()
 			<<make_pair(total,total*12.0)
@@ -46,11 +46,11 @@ namespace SyncAB{
 			<<make_pair(total,total*10.0)
 			<<make_pair(0.0,10.0)
 		,r);
-		cout<<fit.ParamCount()<<" parameters"<<endl;
-		cout<<fit.PopulationSize()<<" points"<<endl;
+		cerr<<fit.ParamCount()<<" parameters"<<endl;
+		cerr<<fit.PopulationSize()<<" points"<<endl;
 		while(!fit.AbsoluteOptimalityExitCondition(0.0001)){
 			fit.Iterate(r);
-			cout<<fit.iteration_count()<<" iterations; "
+			cerr<<fit.iteration_count()<<" iterations; "
 				<<fit.Optimality()<<"<S<"
 				<<fit.Optimality(fit.PopulationSize()-1)
 				<<"        \r";
@@ -60,9 +60,9 @@ namespace SyncAB{
 		totalfit([&fit](double x)->double{return fit({x});},chain),
 		background([&fit](double x)->double{return Background()({x},fit.Parameters());},chain);
 		Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on";
-		cout<<endl<<"done. S="<<fit.Optimality()<<endl;
+		cerr<<endl<<"done. S="<<fit.Optimality()<<endl;
 		fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
-		for(const auto&P:fit.ParametersWithUncertainties())cout<<P<<endl;
+		for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
 		return {.pos=fit.ParametersWithUncertainties()[1],.sigma=fit.ParametersWithUncertainties()[2],.chisq=fit.Optimality()};
 	}
 

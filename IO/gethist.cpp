@@ -1,6 +1,7 @@
 // this file is distributed under 
 // MIT license
 #include <math.h>
+#include <sstream>
 #include <TObject.h>
 #include <TH1F.h>
 #include <TH1.h>
@@ -11,6 +12,21 @@
 #include "gethist.h"
 using namespace std;
 using namespace MathTemplates;
+const string LayerThr(const size_t layer, const size_t thr){
+	stringstream stream;
+	stream<<"layer_"<<layer;
+	stream<<"_thr_"<<thr;
+	return stream.str();
+}
+const string LayerSlotThr(const size_t layer, const size_t slot, const size_t thr){
+	stringstream stream;
+	stream<<"layer_"<<layer;
+	stream<<"_slot_"<<slot;
+	stream<<"_thr_"<<thr;
+	return stream.str();
+}
+
+
 hist<double> ReadHist(const string&filename,const vector<string>&path,const string&histname){
 	hist<double> points;
 	TFile* file=TFile::Open(filename.c_str());
