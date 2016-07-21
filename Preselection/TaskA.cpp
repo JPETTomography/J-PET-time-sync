@@ -71,7 +71,7 @@ void TaskA::exec(){
 	}
 }
 void TaskA::terminate(){}
-void TaskA::saveTimeWindow( JPetTimeWindow slot){
+void TaskA::saveTimeWindow(const JPetTimeWindow&slot){
 	assert(fWriter);
 	fWriter->write(slot);
 }

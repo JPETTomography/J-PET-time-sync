@@ -91,7 +91,7 @@ void TaskB::exec(){
 	}
 }
 void TaskB::terminate(){}
-void TaskB::saveRawSignal( JPetRawSignal sig){
+void TaskB::saveRawSignal(const JPetRawSignal&sig){
 	assert(fWriter);
 	fWriter->write(sig);
 }

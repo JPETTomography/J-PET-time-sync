@@ -18,9 +18,7 @@
 #include <IO/gethist.h>
 #include "SyncStrips.h"
 using namespace std;
-TaskSyncStrips::TaskSyncStrips(const char * name, const char * description)
-:JPetTask(name, description){}
-
+TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):JPetTask(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & layer : getParamBank().getLayers()){
@@ -47,12 +45,11 @@ void TaskSyncStrips::exec(){
 		}
 	}
 }
-void TaskSyncStrips::fillCoincidenceHistos(std::vector<JPetHit>& hits){
-	//ToDo: use const modifier to transfer this parameter
+void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 	for (auto i = hits.begin(); i != hits.end(); ++i){
 		for (auto j = i; ++j != hits.end(); ){
-			JPetHit & hit1 = *i;
-			JPetHit & hit2 = *j;
+			auto& hit1 = *i;
+			auto& hit2 = *j;
 			if (
 				(hit1.getBarrelSlot().getLayer() == hit2.getBarrelSlot().getLayer())
 				&&(hit1.getScintillator() != hit2.getScintillator())

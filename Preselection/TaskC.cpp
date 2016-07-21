@@ -38,7 +38,7 @@ void TaskC::exec(){
 	}
 }
 
-vector<JPetHit> TaskC::createHits(vector<JPetRawSignal>& signals){
+vector<JPetHit> TaskC::createHits(const vector<JPetRawSignal>& signals){
 	vector<JPetHit> hits;
 	for (auto i = signals.begin(); i != signals.end(); ++i) {
 		for (auto j = i; ++j != signals.end(); ) {
@@ -86,7 +86,7 @@ void TaskC::terminate(){
 		   static_cast<int>(getStatistics().getCounter("No. found hits")) )
 	);
 }
-void TaskC::saveHits(std::vector<JPetHit> hits){
+void TaskC::saveHits(const vector<JPetHit>&hits){
 	assert(fWriter);
 	for (auto hit : hits) 
 		fWriter->write(hit);

@@ -35,7 +35,7 @@ public:
 	virtual void setParamManager(JPetParamManager* paramManager)override;
 	const JPetParamBank& getParamBank()const;
 protected:
-	void saveRawSignal( JPetRawSignal sig);
+	void saveRawSignal(const JPetRawSignal&sig);
 	const char * formatUniqueChannelDescription(const JPetTOMBChannel & channel, const char * prefix) const;
 	int calcGlobalPMTNumber(const JPetPM & pmt) const;
 	JPetWriter* fWriter;

@@ -29,8 +29,8 @@ public:
 	virtual void terminate()override;
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
-	std::vector<JPetHit> createHits(std::vector<JPetRawSignal>& signals);
-	void saveHits(std::vector<JPetHit> hits);
+	std::vector<JPetHit> createHits(const std::vector<JPetRawSignal>& signals);
+	void saveHits(const std::vector<JPetHit>&hits);
 	std::vector<JPetRawSignal> fSignals;
 	JPetWriter* fWriter;
 };
