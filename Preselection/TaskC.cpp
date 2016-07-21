@@ -22,7 +22,7 @@ TaskC::TaskC(const char * name, const char * description)
 TaskC::~TaskC(){}
 void TaskC::init(const JPetTaskInterface::Options& opts){}
 void TaskC::exec(){
-	if(auto currSignal = dynamic_cast<JPetRawSignal*const>(getEvent())){
+	if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
 		getStatistics().getCounter("No. initial signals")++;
 		if (fSignals.empty()) {
 			fSignals.push_back(*currSignal);

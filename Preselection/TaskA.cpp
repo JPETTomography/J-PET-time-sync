@@ -25,15 +25,16 @@ void TaskA::init(const JPetTaskInterface::Options& opts){
 	getStatistics().createHistogram( new TH1F("ChannelsPerEvt","Channels fired in one event",200,-0.5,199.5) );
 }
 void TaskA::exec(){
-	if(const auto evt = reinterpret_cast<EventIII*const>(getEvent())){
+	// All Get- methods of this class are NOT marked as const :)
+	if(auto evt = reinterpret_cast</*const*/ EventIII*const>(getEvent())){
 		int ntdc = evt->GetTotalNTDCChannels();
 		getStatistics().getHisto1D("ChannelsPerEvt").Fill( ntdc );
 		JPetTimeWindow tslot;
 		tslot.setIndex(fCurrEventNumber);
 		TClonesArray* tdcHits = evt->GetTDCChannelsArray();
-		TDCChannel* tdcChannel;
 		for (int i = 0; i < ntdc; ++i) {
-			tdcChannel = static_cast<TDCChannel*>(tdcHits->At(i));
+			// All Get- methods of this class are NOT marked as const :)
+			auto tdcChannel = dynamic_cast</*const*/ TDCChannel*const>(tdcHits->At(i));
 			auto tomb_number =  tdcChannel->GetChannel();
 			if (tomb_number % 65 == 0)continue;//skip trigger signals from TRB
 			assert(0!=getParamBank().getTOMBChannels().count(tomb_number));

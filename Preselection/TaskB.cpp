@@ -38,7 +38,7 @@ void TaskB::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskB::exec(){
-	if(const auto timeWindow = dynamic_cast<JPetTimeWindow*const>(getEvent())){
+	if(auto timeWindow = dynamic_cast<const JPetTimeWindow*const>(getEvent())){
 		map<int,JPetSigCh> leadSigChs;
 		map<int,JPetSigCh> trailSigChs;
 		map<int, JPetRawSignal> signals; 

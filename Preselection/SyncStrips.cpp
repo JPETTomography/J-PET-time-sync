@@ -33,7 +33,7 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskSyncStrips::exec(){
-	if(const auto currHit = dynamic_cast<JPetHit*const>(getEvent())){
+	if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 		if (fHits.empty()) {
 			fHits.push_back(*currHit);
 		} else {

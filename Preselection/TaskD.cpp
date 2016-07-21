@@ -38,7 +38,7 @@ void TaskD::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskD::exec(){
-	if(const auto hit = dynamic_cast<JPetHit*const>(getEvent())){
+	if(auto hit = dynamic_cast<const JPetHit*const>(getEvent())){
 		fillHistosForHit(*hit);
 		fWriter->write(*hit);
 	}

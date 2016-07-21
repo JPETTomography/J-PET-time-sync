@@ -34,7 +34,7 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskSyncAB::exec(){
-	if(const auto currHit = dynamic_cast<JPetHit*const>(getEvent())){
+	if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 		for(size_t thr=1;thr<=4;thr++){
 			getStatistics().getHisto1D(
 				LayerSlotThr(
