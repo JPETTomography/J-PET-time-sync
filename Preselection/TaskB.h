@@ -27,6 +27,7 @@ class JPetWriter;
 class TaskB: public JPetTask{
 public:
 	TaskB(const char * name, const char * description);
+	virtual ~TaskB();
 	virtual void init(const JPetTaskInterface::Options& opts)override;
 	virtual void exec()override;
 	virtual void terminate()override;

@@ -23,6 +23,7 @@ class JPetWriter;
 class TaskC:public JPetTask {
 public:
 	TaskC(const char * name, const char * description);
+	virtual ~TaskC();
 	virtual void init(const JPetTaskInterface::Options& opts)override;
 	virtual void exec()override;
 	virtual void terminate()override;

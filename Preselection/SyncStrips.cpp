@@ -24,7 +24,7 @@ TaskSyncStrips::TaskSyncStrips(const char * name, const char * description)
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & layer : getParamBank().getLayers()){
-		for (int thr=1;thr<=4;thr++){
+		for (size_t thr=1;thr<=4;thr++){
 			string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
 			char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
 			int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
@@ -33,8 +33,7 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskSyncStrips::exec(){
-	auto currHit = dynamic_cast<JPetHit*>(getEvent());
-	if(currHit){
+	if(const auto currHit = dynamic_cast<JPetHit*const>(getEvent())){
 		if (fHits.empty()) {
 			fHits.push_back(*currHit);
 		} else {

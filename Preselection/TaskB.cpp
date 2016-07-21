@@ -16,10 +16,10 @@
 #include <string>
 #include <JPetWriter/JPetWriter.h>
 #include "TaskB.h"
-
+using namespace std;
 TaskB::TaskB(const char * name, const char * description)
 :JPetTask(name, description){}
-
+TaskB::~TaskB(){}
 void TaskB::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & tomb : getParamBank().getTOMBChannels()){
@@ -37,15 +37,13 @@ void TaskB::init(const JPetTaskInterface::Options& opts){
 		getStatistics().createHistogram( new TH1F(histo_name, histo_title, n_pmts, -0.5, n_pmts-0.5) );
 	}
 }
-
 void TaskB::exec(){
-	auto timeWindow = dynamic_cast<JPetTimeWindow*>(getEvent());
-	if(timeWindow){
-		std::map<int,JPetSigCh> leadSigChs;
-		std::map<int,JPetSigCh> trailSigChs;
-		std::map<int, JPetRawSignal> signals; 
-		const auto nSigChs = timeWindow->getNumberOfSigCh();
-		for (auto i = 0; i < nSigChs; i++) {
+	if(const auto timeWindow = dynamic_cast<JPetTimeWindow*const>(getEvent())){
+		map<int,JPetSigCh> leadSigChs;
+		map<int,JPetSigCh> trailSigChs;
+		map<int, JPetRawSignal> signals; 
+		const size_t nSigChs = timeWindow->getNumberOfSigCh();
+		for (size_t i = 0; i < nSigChs; i++) {
 			JPetSigCh sigch = timeWindow->operator[](i);
 			int daq_channel = sigch.getDAQch();
 			if( sigch.getType() == JPetSigCh::Leading ){

@@ -17,14 +17,14 @@
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <IO/gethist.h>
 #include "SyncAB.h"
-
+using namespace std;
 TaskSyncAB::TaskSyncAB(const char * name, const char * description)
 :JPetTask(name, description){}
 TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & layer : getParamBank().getLayers()){
-		for (int thr=1;thr<=4;thr++){
+		for (size_t thr=1;thr<=4;thr++){
 			for(size_t sl=0,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<n;sl++){
 				auto histo_name = LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),sl+1,thr);
 				char * histo_title = Form("%s;Delta_t", histo_name.c_str()); 
@@ -34,14 +34,14 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 	}
 }
 void TaskSyncAB::exec(){
-	auto currHit = dynamic_cast<JPetHit*>(getEvent());
-	if(currHit){
-		for(int thr=1;thr<=4;thr++){
+	if(const auto currHit = dynamic_cast<JPetHit*const>(getEvent())){
+		for(size_t thr=1;thr<=4;thr++){
 			getStatistics().getHisto1D(
 				LayerSlotThr(
 					fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer()),
-					     fBarrelMap.getSlotNumber(currHit->getBarrelSlot()),
-					     thr).c_str()
+					fBarrelMap.getSlotNumber(currHit->getBarrelSlot()),
+					thr
+				).c_str()
 			).Fill(JPetHitUtils::getTimeDiffAtThr(*currHit,thr));
 		}
 	}

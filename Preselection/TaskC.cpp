@@ -16,13 +16,13 @@
 #include <iostream>
 #include <JPetWriter/JPetWriter.h>
 #include "TaskC.h"
-
+using namespace std;
 TaskC::TaskC(const char * name, const char * description)
 :JPetTask(name, description){}
+TaskC::~TaskC(){}
 void TaskC::init(const JPetTaskInterface::Options& opts){}
 void TaskC::exec(){
-	auto currSignal = dynamic_cast<JPetRawSignal*>(getEvent());
-	if(currSignal){
+	if(auto currSignal = dynamic_cast<JPetRawSignal*const>(getEvent())){
 		getStatistics().getCounter("No. initial signals")++;
 		if (fSignals.empty()) {
 			fSignals.push_back(*currSignal);
@@ -38,8 +38,8 @@ void TaskC::exec(){
 	}
 }
 
-std::vector<JPetHit> TaskC::createHits(std::vector<JPetRawSignal>& signals){
-	std::vector<JPetHit> hits;
+vector<JPetHit> TaskC::createHits(vector<JPetRawSignal>& signals){
+	vector<JPetHit> hits;
 	for (auto i = signals.begin(); i != signals.end(); ++i) {
 		for (auto j = i; ++j != signals.end(); ) {
 			if (i->getPM().getScin() == j->getPM().getScin()) {
@@ -88,8 +88,7 @@ void TaskC::terminate(){
 }
 void TaskC::saveHits(std::vector<JPetHit> hits){
 	assert(fWriter);
-	for (auto hit : hits) { 
+	for (auto hit : hits) 
 		fWriter->write(hit);
-	}
 }
 void TaskC::setWriter(JPetWriter* writer) {fWriter =writer;}

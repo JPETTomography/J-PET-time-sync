@@ -16,16 +16,16 @@
 #include <JPetUnpacker/Unpacker2/EventIII.h>
 #include <JPetWriter/JPetWriter.h>
 #include "TaskA.h"
-
+using namespace std;
 TaskA::TaskA(const char * name, const char * description)
 :JPetTask(name, description),fCurrEventNumber(0){}
+TaskA::~TaskA(){}
 void TaskA::init(const JPetTaskInterface::Options& opts){
 	getStatistics().createHistogram( new TH1F("HitsPerEvtCh","Hits per channel in one event",50,-0.5,49.5) );  
 	getStatistics().createHistogram( new TH1F("ChannelsPerEvt","Channels fired in one event",200,-0.5,199.5) );
 }
-void TaskA::exec(){  
-	auto evt = reinterpret_cast<EventIII*>(getEvent());
-	if(evt){
+void TaskA::exec(){
+	if(const auto evt = reinterpret_cast<EventIII*const>(getEvent())){
 		int ntdc = evt->GetTotalNTDCChannels();
 		getStatistics().getHisto1D("ChannelsPerEvt").Fill( ntdc );
 		JPetTimeWindow tslot;

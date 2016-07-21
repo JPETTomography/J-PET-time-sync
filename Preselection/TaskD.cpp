@@ -16,10 +16,10 @@
 #include <iostream>
 #include <JPetWriter/JPetWriter.h>
 #include "TaskD.h"
-
+using namespace std;
 TaskD::TaskD(const char * name, const char * description)
 :JPetTask(name, description){}
-
+TaskD::~TaskD(){}
 void TaskD::init(const JPetTaskInterface::Options& opts){
 	fBarrelMap.buildMappings(getParamBank());
 	for(auto & scin : getParamBank().getScintillators()){
@@ -37,11 +37,8 @@ void TaskD::init(const JPetTaskInterface::Options& opts){
 		}
 	}
 }
-
-
 void TaskD::exec(){
-	JPetHit *hit = dynamic_cast<JPetHit*>(getEvent());
-	if(hit){
+	if(const auto hit = dynamic_cast<JPetHit*const>(getEvent())){
 		fillHistosForHit(*hit);
 		fWriter->write(*hit);
 	}
@@ -57,8 +54,8 @@ void TaskD::terminate(){
 	}
 }
 void TaskD::fillHistosForHit(const JPetHit & hit){
-	std::map<int,double> lead_times_A = hit.getSignalA().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
-	std::map<int,double> lead_times_B = hit.getSignalB().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
+	auto lead_times_A = hit.getSignalA().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
+	auto lead_times_B = hit.getSignalB().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
 	for(auto & thr_time_pair : lead_times_A){
 		int thr = thr_time_pair.first;
 		if( lead_times_B.count(thr) > 0 ){
