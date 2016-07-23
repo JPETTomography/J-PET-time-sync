@@ -17,6 +17,7 @@ add_library(preselectionlib ${PRESELECT})
 target_link_libraries(preselectionlib JPetFramework timesyncio)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/large_barrel.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config-files/conf_trb3.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/run-one-position.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(GLOB CALC Calc/*.cpp)
 add_library(timesynccalc ${CALC})
 #First stage of analysis
