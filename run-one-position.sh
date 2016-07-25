@@ -7,4 +7,4 @@ for X in `find $1|grep .root|grep .Stat4AB.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
-./SyncAB-fits 4${paramlist}
+./SyncAB-fits 4${paramlist} > AB-center.txt
