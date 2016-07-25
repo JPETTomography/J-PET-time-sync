@@ -1,7 +1,9 @@
 #!/bin/bash
-mylist=`find $1|grep .root|grep .Stat4AB.`
+for X in `find $1|grep .hld`; do
+	./SyncAB-preselect -t hld -f ${X}
+done
 paramlist=""
-for X in ${mylist}; do
+for X in `find $1|grep .root|grep .Stat4AB.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
