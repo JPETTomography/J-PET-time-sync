@@ -20,56 +20,56 @@
 using namespace std;
 TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):JPetTask(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
-	fBarrelMap.buildMappings(getParamBank());
-	for(auto & layer : getParamBank().getLayers()){
-		for (size_t thr=1;thr<=4;thr++){
-			string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
-			char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-			int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
-			getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
-		}
+    fBarrelMap.buildMappings(getParamBank());
+    for(auto & layer : getParamBank().getLayers()){
+	for (size_t thr=1;thr<=4;thr++){
+	    string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
+	    char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
+	    int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
+	    getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
 	}
+    }
 }
 void TaskSyncStrips::exec(){
-	if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-		if (fHits.empty()) {
-			fHits.push_back(*currHit);
-		} else {
-			if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
-				fHits.push_back(*currHit);
-			} else {
-				fillCoincidenceHistos(fHits);
-				fHits.clear();
-				fHits.push_back(*currHit);
-			}
-		}
+    if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
+	if (fHits.empty()) {
+	    fHits.push_back(*currHit);
+	} else {
+	    if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+		fHits.push_back(*currHit);
+	    } else {
+		fillCoincidenceHistos(fHits);
+		fHits.clear();
+		fHits.push_back(*currHit);
+	    }
 	}
+    }
 }
 void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
-	for (auto i = hits.begin(); i != hits.end(); ++i){
-		for (auto j = i; ++j != hits.end(); ){
-			auto& hit1 = *i;
-			auto& hit2 = *j;
-			if (
-				(hit1.getBarrelSlot().getLayer() == hit2.getBarrelSlot().getLayer())
-				&&(hit1.getScintillator() != hit2.getScintillator())
-			) {
-				for(int thr=1;thr<=4;thr++){
-					double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
-					tof /= 1000.; // [ns]
-					if( tof < 100.0 ){
-						int delta_ID = fBarrelMap.calcDeltaID(hit1, hit2);
-						fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
-					}
-				}
-			}
+    for (auto i = hits.begin(); i != hits.end(); ++i){
+	for (auto j = i; ++j != hits.end(); ){
+	    auto& hit1 = *i;
+	    auto& hit2 = *j;
+	    if (
+		(hit1.getBarrelSlot().getLayer() == hit2.getBarrelSlot().getLayer())
+		&&(hit1.getScintillator() != hit2.getScintillator())
+	    ) {
+		for(int thr=1;thr<=4;thr++){
+		    double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
+		    tof /= 1000.; // [ns]
+		    if( tof < 100.0 ){
+			int delta_ID = fBarrelMap.calcDeltaID(hit1, hit2);
+			fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
+		    }
 		}
+	    }
 	}
+    }
 }
 void TaskSyncStrips::terminate(){}
 void TaskSyncStrips::fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer){
-	int layer_number = fBarrelMap.getLayerNumber(layer);
-	string histo_name = "Delta_ID_for_coincidences_"+LayerThr(layer_number,threshold);
-	getStatistics().getHisto1D(histo_name.c_str()).Fill(delta_ID);
+    int layer_number = fBarrelMap.getLayerNumber(layer);
+    string histo_name = "Delta_ID_for_coincidences_"+LayerThr(layer_number,threshold);
+    getStatistics().getHisto1D(histo_name.c_str()).Fill(delta_ID);
 }
 void TaskSyncStrips::setWriter(JPetWriter* writer){fWriter =writer;}
