@@ -28,7 +28,7 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 	    for(size_t sl=0,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<n;sl++){
 		auto histo_name = LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),sl+1,thr);
 		char * histo_title = Form("%s;Delta_t", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,200, -100., 100.));
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,600, -30.,+30.));
 	    }
 	}
     }
