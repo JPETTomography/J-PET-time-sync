@@ -28,8 +28,9 @@ public:
 	int getNumberOfSlots(const JPetLayer & layer) const;
 	int getNumberOfSlots(int layerNumber) const;
 	int getSlotNumber(const JPetBarrelSlot & slot) const;
-	int calcDeltaID(const JPetHit & hit1,const JPetHit & hit2) const;
-	void buildMappings(const JPetParamBank & paramBank);
+        int calcDeltaID(const JPetBarrelSlot& slot1,const JPetBarrelSlot& slot2) const;
+        int opositeDeltaID(const JPetLayer& layer) const;
+        void buildMappings(const JPetParamBank & paramBank);
 private:
 	std::map<double, int> fRadiusToLayer;
 	std::vector<std::map<double, int> > fThetaToSlot;

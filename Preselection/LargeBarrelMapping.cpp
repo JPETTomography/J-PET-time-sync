@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <math_h/error.h>
 #include "LargeBarrelMapping.h"
 using namespace std;
+using namespace MathTemplates;
 const double degFullCircle = 360.;
 
 LargeBarrelMapping::LargeBarrelMapping(){}
@@ -20,15 +22,18 @@ int LargeBarrelMapping::getNumberOfSlots(int layerNumber) const {
 int LargeBarrelMapping::getSlotNumber(const JPetBarrelSlot& slot) const{
 	return fThetaToSlot[getLayerNumber(slot.getLayer())-1].at(slot.getTheta());
 }
-int LargeBarrelMapping::calcDeltaID(const JPetHit& hit1,const JPetHit& hit2) const{
-	if(hit1.getBarrelSlot().getLayer().getId()==hit2.getBarrelSlot().getLayer().getId()){
-		int delta_ID = abs(getSlotNumber(hit1.getBarrelSlot())-getSlotNumber(hit2.getBarrelSlot()));
-		int layer_size = getNumberOfSlots(hit1.getBarrelSlot().getLayer());
-		int half_layer_size = layer_size/2;
-		if( delta_ID > half_layer_size ) return layer_size-delta_ID;
-		return delta_ID;
-	}
-	return -1;//maybe throwing an exception would be a better solution?
+int LargeBarrelMapping::calcDeltaID(const JPetBarrelSlot& slot1,const JPetBarrelSlot& slot2) const{
+    if(slot1.getLayer().getId()==slot2.getLayer().getId()){
+	int delta_ID = abs(getSlotNumber(slot1)-getSlotNumber(slot2));
+	int layer_size = getNumberOfSlots(slot1.getLayer());
+	int half_layer_size = layer_size/2;
+	if( delta_ID > half_layer_size ) return layer_size-delta_ID;
+	return delta_ID;
+    }
+    throw Exception<LargeBarrelMapping>("attempt to calc deltaID for strips from different layers");
+}
+int LargeBarrelMapping::opositeDeltaID(const JPetLayer& layer)const{
+    return getNumberOfSlots(layer)/2;
 }
 void LargeBarrelMapping::buildMappings(const JPetParamBank& paramBank){
 	vector<double> layersRadii;

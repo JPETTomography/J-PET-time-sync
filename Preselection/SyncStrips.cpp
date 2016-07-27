@@ -22,11 +22,18 @@ TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):JPet
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
+	int n_slots_in_half_layer = fBarrelMap.opositeDeltaID(*layer.second);
 	for (size_t thr=1;thr<=4;thr++){
-	    string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
-	    char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-	    int n_slots_in_half_layer = fBarrelMap.getNumberOfSlots(*layer.second) / 2;
-	    getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
+	    {
+		string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
+		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
+	    }
+	    for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
+		string histo_name = "Delta_t_with_oposite_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
+		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,600,-30.,+30.));
+	    }
 	}
     }
 }
@@ -58,8 +65,28 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 		    double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
 		    tof /= 1000.; // [ns]
 		    if( tof < 100.0 ){
-			int delta_ID = fBarrelMap.calcDeltaID(hit1, hit2);
+			int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 			fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
+			auto&layer=hit1.getBarrelSlot().getLayer();
+			if(delta_ID==fBarrelMap.opositeDeltaID(layer)){
+			    map<int,double> lead_times_1 = hit1.getSignalA().getRecoSignal().getRawSignal()
+				.getTimesVsThresholdNumber(JPetSigCh::Leading);
+			    map<int,double> lead_times_2 = hit2.getSignalA().getRecoSignal().getRawSignal()
+				.getTimesVsThresholdNumber(JPetSigCh::Leading);
+			    if((lead_times_1.count(thr)>0)&&(lead_times_2.count(thr)>0)){
+				double time_diff= lead_times_1[thr] - lead_times_2[thr];
+				auto slot_num=fBarrelMap.getSlotNumber(hit1.getBarrelSlot());
+				if(slot_num>fBarrelMap.opositeDeltaID(layer)){
+				    slot_num=fBarrelMap.getSlotNumber(hit2.getBarrelSlot());
+				    time_diff=-time_diff;
+				}
+				getStatistics().getHisto1D(
+				    ("Delta_t_with_oposite_"+LayerSlotThr(
+					fBarrelMap.getLayerNumber(layer),slot_num,thr   
+				    )).c_str()
+				).Fill(time_diff/1000.);
+			    }
+			}
 		    }
 		}
 	    }
