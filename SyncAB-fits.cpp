@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 	vector<string> root_filenames;
 	for(int i=2;i<argc;i++)
 		root_filenames.push_back(string(argv[i]));
-	Plotter::Instance().SetOutput(".","test");
+	Plotter::Instance().SetOutput(".","AB-synchro");
 	for(size_t layer=1;layer<=3;layer++){
 		hist<double> position,sigma;
 		SortedPoints<double> chisq;
@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
 			position<<point<value<double>>(double(slot),fit.pos);
 			sigma<<point<value<double>>(double(slot),fit.sigma);
 			chisq<<point<double>(double(slot),fit.chisq);
-			cout<<fit.pos.val()<<"\t"<<fit.pos.delta()<<"\t"<<fit.sigma.val()<<"\t"<<fit.chisq<<endl;
+			cout<<layer<<"\t"<<slot<<"\t"<<1<<"\t"
+			    <<fit.pos.val()<<"\t"<<fit.pos.delta()<<"\t"<<fit.sigma.val()<<"\t"<<fit.chisq<<endl;
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on";
 		Plot<double>().Hist(sigma,"Sigma")<<"set key on";
