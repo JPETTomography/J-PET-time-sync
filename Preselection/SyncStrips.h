@@ -15,14 +15,17 @@
 
 #ifndef _____TIME___SYNC____TASK_________ 
 #	define _____TIME___SYNC____TASK_________
+#include <memory>
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
+#include <IO/PetDict.h>
+#include <Calc/convention.h>
 #include "LargeBarrelMapping.h"
 class JPetWriter;
 class TaskSyncStrips:public JPetTask {
 public:
-	TaskSyncStrips(const char * name, const char * description);
+	TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>>,const char * name, const char * description);
 	virtual void init(const JPetTaskInterface::Options& opts)override;
 	virtual void exec()override;
 	virtual void terminate()override;
@@ -33,5 +36,6 @@ protected:
 	LargeBarrelMapping fBarrelMap;
 	std::vector<JPetHit> fHits;
 	JPetWriter* fWriter;
+        std::shared_ptr<JPetMap<SyncAB_results>> f_AB_position;
 };
 #endif

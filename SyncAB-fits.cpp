@@ -3,6 +3,7 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
+#include <IO/PetDict.h>
 #include <Calc/SyncAB.h>
 using namespace std;
 using namespace GnuplotWrap;
@@ -26,21 +27,22 @@ int main(int argc, char **argv) {
 	for(int i=2;i<argc;i++)
 		root_filenames.push_back(string(argv[i]));
 	Plotter::Instance().SetOutput(".","AB-synchro");
-	for(size_t layer=1;layer<=3;layer++){
+	auto map=make_JPetMap<SyncAB_results>();
+	for(size_t layer=1;layer<=map->LayersCount();layer++){
 		hist<double> position,sigma;
 		SortedPoints<double> chisq;
-		for(size_t slot=1;slot<=((layer==3)?96:48);slot++){
+		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			auto name=LayerSlotThr(layer,slot,1);
 			auto fit=SyncAB::Fit4SyncAB(ReadHist(root_filenames,name),name,thr_cnt);
-			position<<point<value<double>>(double(slot),fit.pos);
-			sigma<<point<value<double>>(double(slot),fit.sigma);
-			chisq<<point<double>(double(slot),fit.chisq);
-			cout<<layer<<"\t"<<slot<<"\t"<<1<<"\t"
-			    <<fit.pos.val()<<"\t"<<fit.pos.delta()<<"\t"<<fit.sigma.val()<<"\t"<<fit.chisq<<endl;
+			map->Item(layer,slot)=fit;
+			position<<point<value<double>>(double(slot),fit.position);
+			sigma<<point<value<double>>(double(slot),fit.width);
+			chisq<<point<double>(double(slot),fit.chi_sq);
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on";
 		Plot<double>().Hist(sigma,"Sigma")<<"set key on";
 		Plot<double>().Line(chisq,"Chi^2")<<"set key on";
 	}
+	cout<<(*map);
 	return 0;
 }
