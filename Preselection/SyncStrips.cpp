@@ -61,6 +61,10 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 		(hit1.getBarrelSlot().getLayer() == hit2.getBarrelSlot().getLayer())
 		&&(hit1.getScintillator() != hit2.getScintillator())
 	    ) {
+		map<int,double> lead_times_1 = hit1.getSignalA().getRecoSignal().getRawSignal()
+		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
+		map<int,double> lead_times_2 = hit2.getSignalA().getRecoSignal().getRawSignal()
+		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		for(int thr=1;thr<=4;thr++){
 		    double tof = fabs( JPetHitUtils::getTimeAtThr(hit1, thr) - JPetHitUtils::getTimeAtThr(hit2, thr));
 		    tof /= 1000.; // [ns]
@@ -68,12 +72,8 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 			fillDeltaIDhisto(delta_ID, thr, hit1.getBarrelSlot().getLayer());
 			auto&layer=hit1.getBarrelSlot().getLayer();
-			if(delta_ID==fBarrelMap.opositeDeltaID(layer)){
-			    map<int,double> lead_times_1 = hit1.getSignalA().getRecoSignal().getRawSignal()
-				.getTimesVsThresholdNumber(JPetSigCh::Leading);
-			    map<int,double> lead_times_2 = hit2.getSignalA().getRecoSignal().getRawSignal()
-				.getTimesVsThresholdNumber(JPetSigCh::Leading);
-			    if((lead_times_1.count(thr)>0)&&(lead_times_2.count(thr)>0)){
+			if((lead_times_1.count(thr)>0)&&(lead_times_2.count(thr)>0)){
+			    if(delta_ID==fBarrelMap.opositeDeltaID(layer)){    
 				double time_diff= lead_times_1[thr] - lead_times_2[thr];
 				auto slot_num=fBarrelMap.getSlotNumber(hit1.getBarrelSlot());
 				if(slot_num>fBarrelMap.opositeDeltaID(layer)){
