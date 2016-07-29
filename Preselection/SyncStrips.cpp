@@ -94,7 +94,7 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 			    fillDeltaIDhisto(delta_ID, thr, layer1);
 			    if(delta_ID==fBarrelMap.opositeDeltaID(layer1)){    
-				if(slot1>fBarrelMap.opositeDeltaID(layer1))
+				if(slot1<=fBarrelMap.opositeDeltaID(layer1))
 				    getStatistics().getHisto1D(
 					("Delta_t_with_oposite_"+LayerSlotThr(
 					    layer1_n,slot1,thr   
