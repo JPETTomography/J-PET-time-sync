@@ -22,7 +22,7 @@ namespace SyncAB{
 	    Mul3<
 		Func3<FermiFunc,Arg<0>,Par<3>,Par<4>>,
 		Func3<FermiFunc,Arg<0>,Par<5>,Par<6>>,
-		PolynomFunc<0,7,1>//the power can be increased
+		PolynomFunc<0,7,1>
 	    >
 	Background;
 	typedef Add<Foreground,Background> TotalFunc;
@@ -56,11 +56,12 @@ namespace SyncAB{
 	    <<fit.Optimality(fit.PopulationSize()-1)
 	    <<"        \r";
 	}
-	auto chain=ChainWithCount(1000,hist.left().X().min(),hist.right().X().max());
+	auto hist_cut=hist.YRange(0.5,+INFINITY);
+	auto chain=ChainWithCount(1000,hist_cut.left().X().min(),hist_cut.right().X().max());
 	SortedPoints<double>
 	totalfit([&fit](double x)->double{return fit({x});},chain),
 	background([&fit](double x)->double{return Background()({x},fit.Parameters());},chain);
-	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on";
+	Plot<double>().Hist(hist_cut,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on";
 	cerr<<endl<<"done. S="<<fit.Optimality()<<endl;
 	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
 	for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
