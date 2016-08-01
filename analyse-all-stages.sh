@@ -16,3 +16,4 @@ for X in `find $2|grep .root|grep .Stat4Strips.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
+./SyncStrips-fits${paramlist}

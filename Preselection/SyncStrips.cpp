@@ -107,7 +107,7 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 					)).c_str()
 				    ).Fill(-time_diff);
 			    }else{
-				if(delta_ID==2){
+				if(delta_ID==1){
 				    if(
 					((slot1<slot2)&&((slot2-slot1)==2))||
 					((slot1>slot2)&&((slot2+f_AB_position->LayerSize(layer2_n)-slot1)==2))
