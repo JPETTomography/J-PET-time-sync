@@ -33,12 +33,12 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	    for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
 		string histo_name = "Delta_t_with_oposite_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,600,-30.,+30.));
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,1200, -60.,+60.));
 	    }
 	    for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++){
 		string histo_name = "Delta_t_with_neighbour_r_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,600,-50.,+50.));
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,2000, -60.,+60.));
 	    }
 	}
     }
