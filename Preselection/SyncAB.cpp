@@ -35,14 +35,23 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
+	map<int,double> lead_times_A = currHit->getSignalA().getRecoSignal().getRawSignal()
+	    .getTimesVsThresholdNumber(JPetSigCh::Leading);
+	map<int,double> lead_times_B = currHit->getSignalB().getRecoSignal().getRawSignal()
+	    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 	for(size_t thr=1;thr<=4;thr++){
-	    getStatistics().getHisto1D(
-		LayerSlotThr(
-		    fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer()),
-			     fBarrelMap.getSlotNumber(currHit->getBarrelSlot()),
-			     thr
-		).c_str()
-	    ).Fill(JPetHitUtils::getTimeDiffAtThr(*currHit,thr)/1000.);
+	    if(
+		(lead_times_A.count(thr)>0)&&(lead_times_B.count(thr)>0)
+	    ){
+		auto diff_AB=(lead_times_A[thr]-lead_times_B[thr])/1000.0;
+		getStatistics().getHisto1D(
+		    LayerSlotThr(
+			fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer()),
+			fBarrelMap.getSlotNumber(currHit->getBarrelSlot()),
+			thr
+		    ).c_str()
+		).Fill(diff_AB);
+	    }
 	}
     }
 }
