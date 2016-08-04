@@ -71,14 +71,14 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 	    const auto slot2=fBarrelMap.getSlotNumber(hit2.getBarrelSlot());
 	    if ((layer1_n == layer2_n)&&(slot1!=slot2)) {
 		map<int,double> lead_times_1 = hit1.getSignalA().getRecoSignal().getRawSignal()
-		.getTimesVsThresholdNumber(JPetSigCh::Leading);
+		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		map<int,double> lead_times_2 = hit2.getSignalA().getRecoSignal().getRawSignal()
-		.getTimesVsThresholdNumber(JPetSigCh::Leading);
+		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		map<int,double> lead_times_1_B = hit1.getSignalB().getRecoSignal().getRawSignal()
-		.getTimesVsThresholdNumber(JPetSigCh::Leading);
+		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		map<int,double> lead_times_2_B = hit2.getSignalB().getRecoSignal().getRawSignal()
-		.getTimesVsThresholdNumber(JPetSigCh::Leading);
-		for(int thr=1;thr<=1;thr++){//now we have data for only one threshold
+		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
+		for(int thr=2;thr<=2;thr++){//now we have data for only one threshold
 		    if(
 			(lead_times_1.count(thr)>0)&&(lead_times_2.count(thr)>0)&&
 			(lead_times_1_B.count(thr)>0)&&(lead_times_2_B.count(thr)>0)
