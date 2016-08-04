@@ -4,7 +4,7 @@
 #include <math_h/sigma.h>
 struct SyncAB_results{
   MathTemplates::value<double>position,width;double chi_sq;
-  inline const MathTemplates::value<double> Range()const{return {position.val(),width.val()*2.0};}
+  inline const MathTemplates::value<double> Range()const{return {position.val(),width.val()*3.0};}
 };
 inline std::istream&operator>>(std::istream&str,SyncAB_results&item){
   double v,u;
