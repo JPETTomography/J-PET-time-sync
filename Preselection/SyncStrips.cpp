@@ -25,7 +25,7 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
 	int n_slots_in_half_layer = fBarrelMap.opositeDeltaID(*layer.second);
-	for (size_t thr=1;thr<=1;thr++){//Now we have data only for one threshold
+	for (size_t thr=2;thr<=2;thr++){//Now we have data only for one threshold
 	    {
 		string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
@@ -93,7 +93,9 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			    &&(f_AB_position->operator()(layer2_n,slot2).Range().Contains(diff_AB_2))
 			){
 			    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
-			    fillDeltaIDhisto(delta_ID, thr, layer1);
+			    getStatistics().getHisto1D((
+				"Delta_ID_for_coincidences_"+LayerThr(layer1_n,thr)
+			    ).c_str()).Fill(delta_ID);
 			    if(delta_ID==fBarrelMap.opositeDeltaID(layer1)){    
 				if(slot1<=fBarrelMap.opositeDeltaID(layer1))
 				    getStatistics().getHisto1D(
@@ -134,9 +136,4 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
     }
 }
 void TaskSyncStrips::terminate(){}
-void TaskSyncStrips::fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer){
-    int layer_number = fBarrelMap.getLayerNumber(layer);
-    string histo_name = "Delta_ID_for_coincidences_"+LayerThr(layer_number,threshold);
-    getStatistics().getHisto1D(histo_name.c_str()).Fill(delta_ID);
-}
 void TaskSyncStrips::setWriter(JPetWriter* writer){fWriter =writer;}

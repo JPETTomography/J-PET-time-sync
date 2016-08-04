@@ -32,7 +32,6 @@ public:
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
 	void fillCoincidenceHistos(const std::vector<JPetHit>& hits);
-	void fillDeltaIDhisto(int delta_ID, int threshold, const JPetLayer & layer);
 	LargeBarrelMapping fBarrelMap;
 	std::vector<JPetHit> fHits;
 	JPetWriter* fWriter;
