@@ -20,12 +20,12 @@
 using namespace std;
 TaskSyncStrips::TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>> map,const char * name, const char * description)
 :JPetTask(name, description),f_AB_position(map){}
-auto const neighbour_delta_id=1;
+auto const neighbour_delta_id=2;
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
 	int n_slots_in_half_layer = fBarrelMap.opositeDeltaID(*layer.second);
-	for (size_t thr=2;thr<=2;thr++){//Now we have data only for one threshold
+	for (size_t thr=1;thr<=1;thr++){//Now we have data only for one threshold
 	    {
 		string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
@@ -79,14 +79,14 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		map<int,double> lead_times_2_B = hit2.getSignalB().getRecoSignal().getRawSignal()
 		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-		for(int thr=2;thr<=2;thr++){//now we have data for only one threshold
+		for(int thr=1;thr<=1;thr++){//now we have data for only one threshold
 		    if(
 			(lead_times_1_A.count(thr)>0)&&(lead_times_1_B.count(thr)>0)&&
 			(lead_times_2_A.count(thr)>0)&&(lead_times_2_B.count(thr)>0)
 		    ){
-			auto diff_2_1_A= (lead_times_1_A[thr] - lead_times_2_A[thr])/1000.;
-			auto diff_AB_1=(lead_times_1_A[thr]-lead_times_1_B[thr])/1000.0;
-			auto diff_AB_2=(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
+			auto diff_2_1_A=(lead_times_1_A[thr]-lead_times_2_A[thr])/1000.0;
+			auto diff_AB_1 =(lead_times_1_A[thr]-lead_times_1_B[thr])/1000.0;
+			auto diff_AB_2 =(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
 			if(
 			    (fabs(diff_2_1_A)<100.0)
 			    &&(f_AB_position->operator()(layer1_n,slot1).Range().Contains(diff_AB_1))
