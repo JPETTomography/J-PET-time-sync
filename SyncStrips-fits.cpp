@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     Plotter::Instance().SetOutput(".","strips-synchro");
     for(size_t slot=1;slot<=24;slot++){
-	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(1,slot,1)));
-	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_neighbour_r_"+LayerSlotThr(1,slot,1)));
+	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(1,slot,2)));
+	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_neighbour_r_"+LayerSlotThr(1,slot,2)));
     }
     return 0;
 }
