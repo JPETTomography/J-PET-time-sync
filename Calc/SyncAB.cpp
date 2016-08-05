@@ -56,7 +56,7 @@ namespace SyncAB{
 	    <<fit.Optimality(fit.PopulationSize()-1)
 	    <<"        \r";
 	}
-	auto hist_cut=hist.YRange(5.0,+INFINITY);
+	auto hist_cut=hist.YRange(100.0,+INFINITY);
 	auto chain=ChainWithCount(1000,hist_cut.left().X().min(),hist_cut.right().X().max());
 	SortedPoints<double>
 	totalfit([&fit](double x)->double{return fit({x});},chain),
