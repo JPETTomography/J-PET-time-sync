@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(TimeSync)
-set(CMAKE_CXX_FLAGS "-pthread -std=gnu++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=gnu++11")
 add_subdirectory(FitGen)
 add_subdirectory(j-pet-framework)
 message(${Framework_INCLUDE_DIRS})
