@@ -20,7 +20,7 @@
 using namespace std;
 TaskSyncStrips::TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>> map,const char * name, const char * description)
 :JPetTask(name, description),f_AB_position(map){}
-auto const neighbour_delta_id=2;
+auto const neighbour_delta_id=1;
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
