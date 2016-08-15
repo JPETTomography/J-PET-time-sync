@@ -34,12 +34,12 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	    for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
 		string histo_name = "Delta_t_with_oposite_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,4000, -100.,+100.));
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,10000, -200.,+200.));
 	    }
 	    for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++){
 		string histo_name = "Delta_t_with_neighbour_r_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,4000, -100.,+100.));
+		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,10000, -200.,+200.));
 	    }
 	}
     }
@@ -86,7 +86,7 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			auto diff_AB_1 =(lead_times_1_A[thr]-lead_times_1_B[thr])/1000.0;
 			auto diff_AB_2 =(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
 			if(
-			    (fabs(diff_2_1_A)<100.0)
+			    (fabs(diff_2_1_A)<200.0)
 			    &&(f_AB_position->operator()(layer1_n,slot1).Range().Contains(diff_AB_1))
 			    &&(f_AB_position->operator()(layer2_n,slot2).Range().Contains(diff_AB_2))
 			){
