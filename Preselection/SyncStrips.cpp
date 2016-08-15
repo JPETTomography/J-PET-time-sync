@@ -20,7 +20,7 @@
 using namespace std;
 TaskSyncStrips::TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>> map,const char * name, const char * description)
 :JPetTask(name, description),f_AB_position(map){}
-auto const neighbour_delta_id=1;
+auto const neighbour_delta_id=2;
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
@@ -64,10 +64,8 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 	for (auto j = i; ++j != hits.end(); ){
 	    auto& hit1 = *i;
 	    auto& hit2 = *j;
-	    const auto& layer1=hit1.getBarrelSlot().getLayer();
-	    const auto& layer2=hit2.getBarrelSlot().getLayer();
-	    const auto layer1_n=fBarrelMap.getLayerNumber(layer1);
-	    const auto layer2_n=fBarrelMap.getLayerNumber(layer2);
+	    const auto layer1_n=fBarrelMap.getLayerNumber(hit1.getBarrelSlot().getLayer());
+	    const auto layer2_n=fBarrelMap.getLayerNumber(hit2.getBarrelSlot().getLayer());
 	    const auto slot1=fBarrelMap.getSlotNumber(hit1.getBarrelSlot());
 	    const auto slot2=fBarrelMap.getSlotNumber(hit2.getBarrelSlot());
 	    if ((layer1_n == layer2_n)&&(slot1!=slot2)) {
@@ -96,8 +94,9 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			    getStatistics().getHisto1D((
 				"Delta_ID_for_coincidences_"+LayerThr(layer1_n,thr)
 			    ).c_str()).Fill(delta_ID);
-			    if(delta_ID==fBarrelMap.opositeDeltaID(layer1)){    
-				if(slot1<=fBarrelMap.opositeDeltaID(layer1))
+			    auto opa_delta_ID=fBarrelMap.opositeDeltaID(hit1.getBarrelSlot().getLayer());
+			    if(delta_ID==opa_delta_ID){    
+				if(slot1<=opa_delta_ID)
 				    getStatistics().getHisto1D(
 					("Delta_t_with_oposite_"+LayerSlotThr(
 					    layer1_n,slot1,thr   
@@ -112,8 +111,8 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			    }else{
 				if(delta_ID==neighbour_delta_id){
 				    if(
-					((slot1<slot2)&&((slot2-slot1)==neighbour_delta_id))||
-					((slot1>slot2)&&((slot2+f_AB_position->LayerSize(layer2_n)-slot1)==neighbour_delta_id))
+					((slot2-slot1)==neighbour_delta_id)||
+					(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==neighbour_delta_id)
 				    )
 					getStatistics().getHisto1D(
 					    ("Delta_t_with_neighbour_r_"+LayerSlotThr(

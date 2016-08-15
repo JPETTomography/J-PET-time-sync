@@ -33,11 +33,10 @@ int main(int argc, char **argv) {
 		SortedPoints<double> chisq;
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			auto name=LayerSlotThr(layer,slot,1);
-			auto fit=SyncAB::Fit4SyncAB(ReadHist(root_filenames,name).Scale(2),name,thr_cnt);
-			map->Item(layer,slot)=fit;
-			position<<point<value<double>>(double(slot),fit.position);
-			sigma<<point<value<double>>(double(slot),fit.width);
-			chisq<<point<double>(double(slot),fit.chi_sq);
+			map->Item(layer,slot)=SyncAB::Fit4SyncAB(ReadHist(root_filenames,name).Scale(3),name,thr_cnt);
+			position<<point<value<double>>(double(slot),map->Item(layer,slot).position);
+			sigma<<point<value<double>>(double(slot),map->Item(layer,slot).width);
+			chisq<<point<double>(double(slot),map->Item(layer,slot).chi_sq);
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on";
 		Plot<double>().Hist(sigma,"Sigma")<<"set key on";
