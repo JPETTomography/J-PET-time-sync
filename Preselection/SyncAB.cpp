@@ -24,7 +24,7 @@ TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
-	for (size_t thr=1;thr<=4;thr++){
+	for (size_t thr=1;thr<=1;thr++){
 	    for(size_t sl=0,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<n;sl++){
 		auto histo_name = LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),sl+1,thr);
 		char * histo_title = Form("%s;Delta_t", histo_name.c_str()); 
@@ -39,7 +39,7 @@ void TaskSyncAB::exec(){
 	    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 	map<int,double> lead_times_B = currHit->getSignalB().getRecoSignal().getRawSignal()
 	    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-	for(size_t thr=1;thr<=4;thr++){
+	for(size_t thr=1;thr<=1;thr++){
 	    if(
 		(lead_times_A.count(thr)>0)&&(lead_times_B.count(thr)>0)
 	    ){

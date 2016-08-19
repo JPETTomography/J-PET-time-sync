@@ -33,7 +33,6 @@ public:
 	virtual void setParamManager(JPetParamManager* paramManager)override;
 	const JPetParamBank& getParamBank()const;
 protected:
-	void saveTimeWindow(const JPetTimeWindow& slot);
 	JPetWriter* fWriter;
 	JPetParamManager* fParamManager;
 	long long int fCurrEventNumber;

@@ -60,21 +60,18 @@ void TaskA::exec(){
 				sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
 				if(tdcChannel->GetLeadTime (j)==-100000)continue;
 				if(tdcChannel->GetTrailTime(j)==-100000)continue;
+				if((tdcChannel->GetLeadTime (j)+0.1)>tdcChannel->GetTrailTime(j))continue;
 				sigChTmpLead .setValue(tdcChannel->GetLeadTime (j)*1000.);
 				sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j)*1000.);
 				tslot.addCh(sigChTmpLead);
 				tslot.addCh(sigChTmpTrail);
 			}
 		}
-		saveTimeWindow(tslot);
+		fWriter->write(tslot);
 		fCurrEventNumber++;
 	}
 }
 void TaskA::terminate(){}
-void TaskA::saveTimeWindow(const JPetTimeWindow&slot){
-	assert(fWriter);
-	fWriter->write(slot);
-}
 void TaskA::setWriter(JPetWriter* writer) {
 	fWriter = writer;
 }

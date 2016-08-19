@@ -67,8 +67,10 @@ void TaskB::exec(){
 				int pmt_number = calcGlobalPMTNumber(leadSigCh.getPM());
 				getStatistics().getHisto1D(Form("HitsLeadingEdge_thr%d", leadSigCh.getThresholdNumber())).Fill(pmt_number);
 				double pmt_id = trailSigCh.getPM().getID();
-				signals[pmt_id].addPoint( leadSigCh );
-				signals[pmt_id].addPoint( trailSigCh );
+				if(tot>100.){
+				    signals[pmt_id].addPoint( leadSigCh );
+				    signals[pmt_id].addPoint( trailSigCh );
+				}
 			}else{
 				getStatistics().getHisto2D("was lead and trail edge?").Fill(0.,1.);
 			}

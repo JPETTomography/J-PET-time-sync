@@ -18,8 +18,8 @@ int main(int argc, char **argv) {
     Plotter::Instance().SetOutput(".","strips-synchro");
     for(size_t slot=1;slot<=24;slot++)
 	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(1,slot,1)).Scale(4),"opo")<<"set key on";
-    for(size_t slot=1;slot<=48;slot++)
-	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_neighbour_r_"+LayerSlotThr(1,slot,1)).Scale(4),"nei")<<"set key on";
+    for(size_t slot=1;slot<=48;slot++)for(size_t d_id=1;d_id<=4;d_id++)
+	Plot<double>().Hist(ReadHist(root_filenames,"Delta_t_with_neighbour_"+LayerSlotThr(1,slot,1)+"_deltaid"+to_string(d_id)).Scale(4),"nei")<<"set key on";
     
     return 0;
 }

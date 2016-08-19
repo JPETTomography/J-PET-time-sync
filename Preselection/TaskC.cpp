@@ -22,73 +22,85 @@ TaskC::TaskC(const char * name, const char * description)
 TaskC::~TaskC(){}
 void TaskC::init(const JPetTaskInterface::Options& opts){}
 void TaskC::exec(){
-	if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
-		getStatistics().getCounter("No. initial signals")++;
-		if (fSignals.empty()) {
-			fSignals.push_back(*currSignal);
-		} else {
-			if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
-				fSignals.push_back(*currSignal);
-			} else {
-				saveHits(createHits(fSignals));
-				fSignals.clear();
-				fSignals.push_back(*currSignal);
-			}
-		}
+    if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
+	getStatistics().getCounter("No. initial signals")++;
+	if (fSignals.empty()) {
+	    fSignals.push_back(*currSignal);
+	} else {
+	    if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
+		fSignals.push_back(*currSignal);
+	    } else {
+		saveHits(createHits(fSignals));
+		fSignals.clear();
+		fSignals.push_back(*currSignal);
+	    }
 	}
+    }
 }
 
 vector<JPetHit> TaskC::createHits(const vector<JPetRawSignal>& signals){
-	vector<JPetHit> hits;
-	for (auto i = signals.begin(); i != signals.end(); ++i) {
-		for (auto j = i; ++j != signals.end(); ) {
-			if (i->getPM().getScin() == j->getPM().getScin()) {
-				JPetRecoSignal recoSignalA;
-				JPetRecoSignal recoSignalB;
-				JPetPhysSignal physSignalA;
-				JPetPhysSignal physSignalB;
-				if (
-					(i->getPM().getSide() == JPetPM::SideA)
-					&&(j->getPM().getSide() == JPetPM::SideB)
-				) {
-					recoSignalA.setRawSignal(*i);
-					recoSignalB.setRawSignal(*j);
-				} else{ 
-					if( 
-						(j->getPM().getSide() == JPetPM::SideA)
-						&&(i->getPM().getSide() == JPetPM::SideB)
-					){
-						recoSignalA.setRawSignal(*j);
-						recoSignalB.setRawSignal(*i);
-					} else {
-						WARNING("TWO hits on the same scintillator side we ignore it");         
-						continue;
-					}
-				}
-				physSignalA.setRecoSignal(recoSignalA);
-				physSignalB.setRecoSignal(recoSignalB);
-				JPetHit hit;
-				hit.setSignalA(physSignalA);
-				hit.setSignalB(physSignalB);
-				hit.setScintillator(i->getPM().getScin());
-				hit.setBarrelSlot(i->getPM().getScin().getBarrelSlot());
-				hits.push_back(hit);
-				getStatistics().getCounter("No. found hits")++;
-			}
+    vector<JPetHit> hits;
+    for (auto i = signals.begin(); i != signals.end(); ++i) {
+	for (auto j = i; ++j != signals.end(); ) {
+	    if (i->getPM().getScin() == j->getPM().getScin()) {
+		JPetRecoSignal recoSignalA;
+		JPetRecoSignal recoSignalB;
+		if (
+		    (i->getPM().getSide() == JPetPM::SideA)
+		    &&(j->getPM().getSide() == JPetPM::SideB)
+		) {
+		    recoSignalA.setRawSignal(*i);
+		    recoSignalB.setRawSignal(*j);
+		} else{ 
+		    if( 
+			(j->getPM().getSide() == JPetPM::SideA)
+			&&(i->getPM().getSide() == JPetPM::SideB)
+		    ){
+			recoSignalA.setRawSignal(*j);
+			recoSignalB.setRawSignal(*i);
+		    } else {
+			WARNING("TWO hits on the same scintillator side we ignore it");         
+			continue;
+		    }
 		}
+		double TOT_A[5],TOT_B[5];
+		for(size_t thr=1;thr<=4;thr++){
+		    TOT_A[thr-1]=recoSignalA.getRecoTimeAtThreshold(JPetSigCh::Trailing)-recoSignalA.getRecoTimeAtThreshold(JPetSigCh::Leading);
+		    TOT_B[thr-1]=recoSignalB.getRecoTimeAtThreshold(JPetSigCh::Trailing)-recoSignalB.getRecoTimeAtThreshold(JPetSigCh::Leading);
+		}
+		TOT_A[4]=TOT_B[4]=0.0;
+		bool accepted=true;
+		for(size_t thr=1;thr<=4;thr++){
+		    accepted&=(TOT_A[thr-1]>=TOT_A[thr])&&(TOT_B[thr-1]>=TOT_B[thr]);
+		}
+		if(accepted){
+		    JPetPhysSignal physSignalA;
+		    JPetPhysSignal physSignalB;
+		    physSignalA.setRecoSignal(recoSignalA);
+		    physSignalB.setRecoSignal(recoSignalB);
+		    JPetHit hit;
+		    hit.setSignalA(physSignalA);
+		    hit.setSignalB(physSignalB);
+		    hit.setScintillator(i->getPM().getScin());
+		    hit.setBarrelSlot(i->getPM().getScin().getBarrelSlot());
+		    hits.push_back(hit);
+		    getStatistics().getCounter("No. found hits")++;
+		}
+	    }
 	}
-	return hits;
+    }
+    return hits;
 }
 void TaskC::terminate(){
-	saveHits(createHits(fSignals));
-	INFO( Form("From %d initial signals %d hits were paired.", 
-		   static_cast<int>(getStatistics().getCounter("No. initial signals")),
-		   static_cast<int>(getStatistics().getCounter("No. found hits")) )
-	);
+    saveHits(createHits(fSignals));
+    INFO( Form("From %d initial signals %d hits were paired.", 
+	       static_cast<int>(getStatistics().getCounter("No. initial signals")),
+	       static_cast<int>(getStatistics().getCounter("No. found hits")) )
+    );
 }
 void TaskC::saveHits(const vector<JPetHit>&hits){
-	assert(fWriter);
-	for (auto hit : hits) 
-		fWriter->write(hit);
+    assert(fWriter);
+    for (auto hit : hits) 
+	fWriter->write(hit);
 }
 void TaskC::setWriter(JPetWriter* writer) {fWriter =writer;}

@@ -20,7 +20,7 @@
 using namespace std;
 TaskSyncStrips::TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>> map,const char * name, const char * description)
 :JPetTask(name, description),f_AB_position(map){}
-auto const neighbour_delta_id=2;
+auto const neighbour_delta_id_max=4;
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
@@ -36,8 +36,8 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
 		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,10000, -200.,+200.));
 	    }
-	    for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++){
-		string histo_name = "Delta_t_with_neighbour_r_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
+	    for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++)for(size_t d_id=1;d_id<=neighbour_delta_id_max;d_id++){
+		string histo_name = "Delta_t_with_neighbour_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr)+"_deltaid"+to_string(d_id);
 		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
 		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,10000, -200.,+200.));
 	    }
@@ -109,21 +109,20 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 					)).c_str()
 				    ).Fill(-diff_2_1_A);
 			    }else{
-				if(delta_ID==neighbour_delta_id){
+				if((delta_ID<=neighbour_delta_id_max)&&(delta_ID>0)){
 				    if(
-					((slot2-slot1)==neighbour_delta_id)||
-					(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==neighbour_delta_id)
+					((slot2-slot1)==delta_ID)||(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==delta_ID)
 				    )
 					getStatistics().getHisto1D(
-					    ("Delta_t_with_neighbour_r_"+LayerSlotThr(
+					    ("Delta_t_with_neighbour_"+LayerSlotThr(
 						layer1_n,slot1,thr
-					    )).c_str()
+					    )+"_deltaid"+to_string(delta_ID)).c_str()
 					).Fill(diff_2_1_A);
 				    else
 					getStatistics().getHisto1D(
-					    ("Delta_t_with_neighbour_r_"+LayerSlotThr(
+					    ("Delta_t_with_neighbour_"+LayerSlotThr(
 						layer2_n,slot2,thr
-					    )).c_str()
+					    )+"_deltaid"+to_string(delta_ID)).c_str()
 					).Fill(-diff_2_1_A);
 				}
 			    }
