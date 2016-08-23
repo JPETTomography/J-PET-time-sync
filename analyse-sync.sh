@@ -1,10 +1,12 @@
 #!/bin/bash
-for X in `find $2|grep .root|grep .phys.hit.means.`; do
+filelist=`find $2|grep .root|grep .phys.hit.means.`
+echo ${filelist}
+for X in ${filelist}; do
 	echo "Stage AB : ${X}"
 	./SyncAB-preselect -t root -f ${X}
 done
 paramlist=""
-for X in `find $2|grep .root|grep .Stat4AB.`; do
+for X in ${filelist}; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
