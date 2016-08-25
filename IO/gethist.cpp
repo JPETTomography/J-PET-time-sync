@@ -38,15 +38,14 @@ hist<double> ReadHist(const string&filename,const string&histname){
 			TH1F* histogram=dynamic_cast<TH1F*>(list->FindObject(histname.c_str()));
 			if(histogram){
 				for(int i=1,N=histogram->GetNbinsX();i<=N;i++){
-					double y=histogram->GetBinContent(i);
-					double dy=sqrt(y);
-					if(dy<1.0)
-						dy=1.0;
-					double x=histogram->GetBinCenter(i);
-					double dx=histogram->GetBinWidth(i)/2.0;
-					points<<point<value<double>>({x,dx},{y,dy});
+					double x=histogram->GetBinCenter(i),
+					    dx=histogram->GetBinWidth(i)/2.0,
+					    y=histogram->GetBinContent(i);
+					points<<point<value<double>>({x,dx},value<double>::std_error(y));
 				}
+				delete histogram;
 			}else throw Exception<TH1F>("No histogram "+histname);
+			delete list;
 		}else throw Exception<TDirectoryFile>("No hash table Stats");
 		file->Close();
 		delete file;
