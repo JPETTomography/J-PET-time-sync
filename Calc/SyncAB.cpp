@@ -26,7 +26,7 @@ namespace SyncAB{
 	    >
 	Background;
 	typedef Add<Foreground,Background> TotalFunc;
-	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
+	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquareWithXError> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[2]>0)&&(P[7]>0)&&(P[4]<0)&&(P[6]>0)
 	    &&(P[3]<(P[1]-P[2]))&&(P[5]>(P[1]+P[2]))&&(P[0]>P[7])
