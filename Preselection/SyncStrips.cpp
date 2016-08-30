@@ -82,11 +82,13 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			(lead_times_1_A.count(thr)>0)&&(lead_times_1_B.count(thr)>0)&&
 			(lead_times_2_A.count(thr)>0)&&(lead_times_2_B.count(thr)>0)
 		    ){
-			auto diff_2_1_A=(lead_times_1_A[thr]-lead_times_2_A[thr])/1000.0;
-			auto diff_AB_1 =(lead_times_1_A[thr]-lead_times_1_B[thr])/1000.0;
-			auto diff_AB_2 =(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
+			auto hit_1=(lead_times_1_A[thr]+lead_times_1_B[thr])/2000.0,
+			    hit_2=(lead_times_2_A[thr]+lead_times_2_B[thr])/2000.0,
+			    diff_1_2=hit_1-hit_2,
+			    diff_AB_1 =(lead_times_1_A[thr]-lead_times_1_B[thr])/1000.0,
+			    diff_AB_2 =(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
 			if(
-			    (fabs(diff_2_1_A)<200.0)
+			    (fabs(diff_1_2)<200.0)
 			    &&(f_AB_position->operator()(layer1_n,slot1).Range().Contains(diff_AB_1))
 			    &&(f_AB_position->operator()(layer2_n,slot2).Range().Contains(diff_AB_2))
 			){
@@ -101,13 +103,13 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 					("Delta_t_with_oposite_"+LayerSlotThr(
 					    layer1_n,slot1,thr   
 					)).c_str()
-				    ).Fill(diff_2_1_A);
+				    ).Fill(diff_1_2);
 				else
 				    getStatistics().getHisto1D(
 					("Delta_t_with_oposite_"+LayerSlotThr(
 					    layer2_n,slot2,thr   
 					)).c_str()
-				    ).Fill(-diff_2_1_A);
+				    ).Fill(-diff_1_2);
 			    }else{
 				if((delta_ID<=neighbour_delta_id_max)&&(delta_ID>0)){
 				    if(
@@ -117,13 +119,13 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 					    ("Delta_t_with_neighbour_"+LayerSlotThr(
 						layer1_n,slot1,thr
 					    )+"_deltaid"+to_string(delta_ID)).c_str()
-					).Fill(diff_2_1_A);
+					).Fill(diff_1_2);
 				    else
 					getStatistics().getHisto1D(
 					    ("Delta_t_with_neighbour_"+LayerSlotThr(
 						layer2_n,slot2,thr
 					    )+"_deltaid"+to_string(delta_ID)).c_str()
-					).Fill(-diff_2_1_A);
+					).Fill(-diff_1_2);
 				}
 			    }
 			}
