@@ -16,7 +16,7 @@ namespace SyncAB{
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef 
-	    Mul2<Par<0>,Func3<Gaussian ,Arg<0>,Par<1>,Par<2>>> 
+	    Mul2<Par<0>,Func4<Novosibirsk ,Arg<0>,Par<1>,Par<2>,Par<9>>> 
 	Foreground;
 	typedef 
 	    Mul3<
@@ -46,6 +46,7 @@ namespace SyncAB{
 	<<make_pair(0.5,0.5)
 	<<make_pair(total,total*15.0)
 	<<make_pair(0.0,10.0)
+	<<make_pair(0.0,1.0)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
