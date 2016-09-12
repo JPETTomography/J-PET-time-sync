@@ -32,5 +32,5 @@ target_link_libraries(SyncAB-fits timesynccalc timesyncio FitGen gpwrap JPetFram
 #Second stage of analysis
 add_executable(SyncStrips-preselect SyncStrips-preselect.cpp)
 target_link_libraries(SyncStrips-preselect preselectionlib JPetFramework)
-add_executable(SyncStrips-fits SyncStrips-fits.cpp)
-target_link_libraries(SyncStrips-fits timesynccalc timesyncio FitGen gpwrap JPetFramework)
+add_executable(SyncStrips-oposite SyncStrips-oposite.cpp)
+target_link_libraries(SyncStrips-oposite timesynccalc timesyncio FitGen gpwrap JPetFramework)

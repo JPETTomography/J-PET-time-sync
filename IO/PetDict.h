@@ -69,4 +69,8 @@ template<class DataType>
 inline const std::shared_ptr<JPetMap<DataType>> make_JPetMap(){
   return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({48,48,96}));
 }
+template<class DataType>
+inline const std::shared_ptr<JPetMap<DataType>> make_half_JPetMap(){
+  return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({24,24,48}));
+}
 #endif
