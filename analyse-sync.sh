@@ -20,4 +20,5 @@ for X in `find $2|grep .root|grep .Stat4Strips.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
-./SyncStrips-fits $1${paramlist} > ${2}/Oposite-strips.txt
+./SyncStrips-oposite $1${paramlist} > ${2}/Oposite-strips.txt
+#./SyncStrips-neighbour $1${paramlist} > ${2}/Neighbour-strips.txt

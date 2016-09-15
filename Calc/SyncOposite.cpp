@@ -29,7 +29,7 @@ namespace Sync{
 	    <<make_pair(total,total*20.0)
 	    <<make_pair(hist.left().X().min()+hist.right().X().max()/2.0,hist.right().X().max()-hist.left().X().min())
 	    <<make_pair(0.1,0.5)
-	    <<make_pair(0.0,1.0)
+	    <<make_pair(0.0,0.1)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
