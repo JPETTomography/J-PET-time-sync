@@ -21,4 +21,4 @@ for X in `find $2|grep .root|grep .Stat4Strips.`; do
 done
 echo ${paramlist}
 ./SyncStrips-oposite $1${paramlist} > ${2}/Oposite-strips.txt
-#./SyncStrips-neighbour $1${paramlist} > ${2}/Neighbour-strips.txt
+./SyncStrips-neighbour $1${paramlist} > ${2}/Neighbour-strips.txt
