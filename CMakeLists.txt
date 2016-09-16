@@ -36,3 +36,6 @@ add_executable(SyncStrips-oposite SyncStrips-oposite.cpp)
 target_link_libraries(SyncStrips-oposite timesynccalc timesyncio FitGen gpwrap JPetFramework)
 add_executable(SyncStrips-neighbour SyncStrips-neighbour.cpp)
 target_link_libraries(SyncStrips-neighbour timesynccalc timesyncio FitGen gpwrap JPetFramework)
+#Third stage of analysis
+add_executable(Synchro-solve-equations Synchro-solve-equations.cpp)
+target_link_libraries(Synchro-solve-equations timesynccalc timesyncio FitGen gpwrap JPetFramework)
