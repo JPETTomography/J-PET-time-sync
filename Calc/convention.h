@@ -30,4 +30,13 @@ inline std::istream&operator>>(std::istream&str,SyncNeighbour_results&item){
 inline std::ostream&operator<<(std::ostream&str,const SyncNeighbour_results&item){
   return str<<item.position_left<<"\t"<<item.width_left<<"\t"<<item.position_right<<"\t"<<item.width_right<<"\t"<<item.chi_sq;
 }
+struct DeltaT_results{
+  MathTemplates::value<double> A,B;
+};
+inline std::istream&operator>>(std::istream&str,DeltaT_results&item){
+  return str>>item.A>>item.B;
+}
+inline std::ostream&operator<<(std::ostream&str,const DeltaT_results&item){
+  return str<<item.A<<"\t"<<item.B;
+}
 #endif
