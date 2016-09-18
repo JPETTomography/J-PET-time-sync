@@ -26,20 +26,24 @@ int main(int argc, char **argv) {
     vector<string> root_filenames;
     for(int i=2;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
-    auto map=make_JPetMap<SyncOposite_results>();
+    auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
     for(size_t layer=1;layer<=map->LayersCount();layer++){
-	hist<double> position,sigma;
+	hist<double> positionl,sigmal,positionr,sigmar;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    map->Item(layer,slot)=Sync::Fit4SyncOposite(ReadHist(root_filenames,"Delta_t_with_neighbour_"+LayerSlotThr(layer,slot,1)+"_deltaid3"),"Neighbour "+LayerSlotThr(layer,slot,1),thr_cnt);
-	    position<<point<value<double>>(double(slot),map->Item(layer,slot).position);
-	    sigma<<point<value<double>>(double(slot),map->Item(layer,slot).width);
+	    map->Item(layer,slot)=Sync::Fit4SyncNeighbour(
+		ReadHist(root_filenames,"Delta_t_with_neighbour_"+LayerSlotThr(layer,slot,1)+"_deltaid3"),
+			"Neighbour "+LayerSlotThr(layer,slot,1),thr_cnt);
+	    positionl<<point<value<double>>(double(slot),map->Item(layer,slot).position_left);
+	    sigmal<<point<value<double>>(double(slot),map->Item(layer,slot).width_left);
+	    positionr<<point<value<double>>(double(slot),map->Item(layer,slot).position_right);
+	    sigmar<<point<value<double>>(double(slot),map->Item(layer,slot).width_right);
 	    chisq<<point<double>(double(slot),map->Item(layer,slot).chi_sq);
 	    
 	}
-	Plot<double>().Hist(position,"Position")<<"set key on";
-	Plot<double>().Hist(sigma,"Sigma")<<"set key on";
+	Plot<double>().Hist(positionl,"Position Left").Hist(positionr,"Position Right")<<"set key on";
+	Plot<double>().Hist(sigmal,"Sigma Left").Hist(sigmar,"Sigma Right")<<"set key on";
 	Plot<double>().Line(chisq,"Chi^2")<<"set key on";
     }
     cout<<(*map);
