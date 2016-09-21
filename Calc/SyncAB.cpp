@@ -46,7 +46,7 @@ namespace Sync{
 	<<make_pair(0.5,0.5)
 	<<make_pair(total,total*20.0)
 	<<make_pair(0.0,20.0)
-	<<make_pair(0.0,0.1)
+	<<make_pair(0.0,0.01)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
