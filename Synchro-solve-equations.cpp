@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     auto Nei=make_JPetMap<SyncNeighbour_results>();
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
     auto DeltaT=make_JPetMap<DeltaT_results>();
-    for(size_t layer=1;layer<=DeltaT->LayersCount();layer++){
+    for(size_t layer=1;layer<DeltaT->LayersCount();layer++){
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
 	for(size_t i=1;i<=N;i++){
