@@ -14,7 +14,7 @@ using namespace MathTemplates;
 using namespace Genetic;
 int main(int argc, char **argv) {
     RANDOM engine;
-    if(argc!=4){
+    if(argc!=5){
 	cerr<<"Usage: "<<argv[0]<<" <thread_count> <AB.txt> <Oposite.txt> <Nieghbour.txt>"<<endl;
 	return -1;
     }
