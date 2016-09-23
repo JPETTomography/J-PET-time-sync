@@ -36,14 +36,14 @@ namespace Sync{
 	while(!fit.AbsoluteOptimalityExitCondition(0.0000001)){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
-	    <<fit.Optimality()<<"<S<"
+	    <<fit.Optimality()<<"<chi^2<"
 	    <<fit.Optimality(fit.PopulationSize()-1)
 	    <<"        \r";
 	}
 	auto chain=ChainWithCount(1000,hist.left().X().min(),hist.right().X().max());
 	SortedPoints<double> totalfit([&fit](double x)->double{return fit({x});},chain);
 	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]";
-	cerr<<endl<<"done. S="<<fit.Optimality()<<endl;
+	cerr<<endl<<"done. chi^2/D="<<fit.Optimality()/(fit.Points()->size()-fit.ParamCount())<<endl;
 	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
 	for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
 	return {.position=fit.ParametersWithUncertainties()[1],.width=fit.ParametersWithUncertainties()[2],.chi_sq=fit.Optimality()};
