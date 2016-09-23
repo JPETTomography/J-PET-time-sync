@@ -29,7 +29,7 @@ namespace Sync{
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[2]>0)&&(P[7]>0)&&(P[4]<0)&&(P[6]>0)
-	    &&(P[3]<(P[1]))&&(P[5]>(P[1]))//&&(P[0]>P[7])
+	    &&(P[3]<(P[1]-P[2]))&&(P[5]>(P[1]+P[2]))&&(P[0]>P[7])
 	    &&(-(P[4]/P[6])<5.0)&&(-(P[6]/P[4])<5.0)
 	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min())
 	    &&(P[1]>hist.left().X().max())&&(P[1]<hist.right().X().min());
@@ -53,7 +53,7 @@ namespace Sync{
 	while(!fit.AbsoluteOptimalityExitCondition(0.0000001)){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
-	    <<fit.Optimality()<<"<S<"
+	    <<fit.Optimality()<<"<chi^2<"
 	    <<fit.Optimality(fit.PopulationSize()-1)
 	    <<"        \r";
 	}
@@ -62,7 +62,7 @@ namespace Sync{
 	totalfit([&fit](double x)->double{return fit({x});},chain),
 	background([&fit](double x)->double{return Background()({x},fit.Parameters());},chain);
 	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on"<<"set xrange [-30:30]";
-	cerr<<endl<<"done. S="<<fit.Optimality()<<endl;
+	cerr<<endl<<"done. chi^2/D="<<fit.Optimality()/(fit.Points()->size()-fit.ParamCount())<<endl;
 	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
 	for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
 	return {.position=fit.ParametersWithUncertainties()[1],.width=fit.ParametersWithUncertainties()[2],.chi_sq=fit.Optimality()};
