@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	auto init=make_shared<GenerateUniform>();
 	while(init->Count()<(N*2))init<<make_pair(-100,100);
 	solver.Init(N*10,init,engine);
-	while(!solver.AbsoluteOptimalityExitCondition(0.0000001)){
+	while(!solver.AbsoluteOptimalityExitCondition(0.00001)){
 	    solver.Iterate(engine);
 	    cerr<<solver.iteration_count()<<" iterations; "
 	    <<solver.Optimality()<<"<S<"

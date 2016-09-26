@@ -48,7 +48,7 @@ namespace Sync{
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	while(!fit.AbsoluteOptimalityExitCondition(0.000001)){
+	while(!fit.AbsoluteOptimalityExitCondition(0.0001)){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
 	    <<fit.Optimality()<<"<chi^2<"
