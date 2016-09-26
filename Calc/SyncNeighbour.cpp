@@ -24,7 +24,8 @@ namespace Sync{
 	    return (P[0]>0)&&(P[2]>0)&&(P[3]>0)&&(P[5]>0)
 	    &&(P[1]>hist.left().X().max())
 	    &&((P[1]+P[2])<(P[4]-P[5]))
-	    &&(P[4]<hist.right().X().min());
+	    &&(P[4]<hist.right().X().min())
+	    &&((P[0]/P[3])<8.0)&&((P[3]/P[0])<8.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
