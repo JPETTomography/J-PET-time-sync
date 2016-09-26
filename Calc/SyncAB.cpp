@@ -16,7 +16,7 @@ namespace Sync{
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef 
-	    Mul2<Par<0>,Func4<Novosibirsk ,Arg<0>,Par<1>,Par<2>,Par<9>>> 
+	    Mul2<Par<0>,Func3<Gaussian ,Arg<0>,Par<1>,Par<2>>> 
 	Foreground;
 	typedef 
 	    Mul3<
@@ -28,29 +28,27 @@ namespace Sync{
 	typedef Add<Foreground,Background> TotalFunc;
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
-	    return (P[0]>0)&&(P[2]>0)&&(P[7]>0)&&(P[4]<0)&&(P[6]>0)
-	    &&(P[3]<(P[1]))&&(P[5]>(P[1]))//&&(P[0]>P[7])
-	    &&(-(P[4]/P[6])<5.0)&&(-(P[6]/P[4])<5.0)
-	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min())
-	    &&(P[1]>hist.left().X().max())&&(P[1]<hist.right().X().min());
+	    return (P[0]>0)&&(P[2]>0)&&(P[4]<0)&&(P[6]>0)
+	    &&(-(P[4]/P[6])<5.0)&&(-(P[6]/P[4])<4.0)
+	    &&(P[3]<P[1])&&(P[5]>P[1])
+	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min());
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
 	fit.Init(20*TotalFunc::ParamCount,make_shared<GenerateByGauss>()
-	<<make_pair(total,total*30.0)
-	<<make_pair(hist.left().X().min()+hist.right().X().max()/2.0,hist.right().X().max()-hist.left().X().min())
-	<<make_pair(0.1,0.5)
-	<<make_pair(hist.left().X().max(),hist.right().X().max()-hist.left().X().min())
-	<<make_pair(-0.5,0.5)
-	<<make_pair(hist.right().X().min(),hist.right().X().max()-hist.left().X().min())
-	<<make_pair(0.5,0.5)
-	<<make_pair(total,total*20.0)
-	<<make_pair(0.0,20.0)
-	<<make_pair(0.0,0.01)
+	    <<make_pair(total,total*30.0)
+	    <<make_pair(hist.left().X().min()+hist.right().X().max()/2.0,hist.right().X().max()-hist.left().X().min())
+	    <<make_pair(0.1,0.5)
+	    <<make_pair(hist.left().X().max(),hist.right().X().max()-hist.left().X().min())
+	    <<make_pair(-0.5,0.5)
+	    <<make_pair(hist.right().X().min(),hist.right().X().max()-hist.left().X().min())
+	    <<make_pair(0.5,0.5)
+	    <<make_pair(total,total*20.0)
+	    <<make_pair(0.0,20.0)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	while(!fit.AbsoluteOptimalityExitCondition(0.0000001)){
+	while(!fit.AbsoluteOptimalityExitCondition(0.000001)){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
 	    <<fit.Optimality()<<"<chi^2<"
@@ -62,10 +60,11 @@ namespace Sync{
 	totalfit([&fit](double x)->double{return fit({x});},chain),
 	background([&fit](double x)->double{return Background()({x},fit.Parameters());},chain);
 	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on"<<"set xrange [-30:30]";
-	cerr<<endl<<"done. chi^2/D="<<fit.Optimality()/(fit.Points()->size()-fit.ParamCount())<<endl;
+	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
+	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
 	for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
-	return {.position=fit.ParametersWithUncertainties()[1],.width=fit.ParametersWithUncertainties()[2],.chi_sq=fit.Optimality()};
+	return {.position=fit.ParametersWithUncertainties()[1],.width=fit.ParametersWithUncertainties()[2],.chi_sq=chi_sq_norm};
     }
     
 };

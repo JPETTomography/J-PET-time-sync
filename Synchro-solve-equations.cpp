@@ -13,6 +13,7 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 using namespace Genetic;
 int main(int argc, char **argv) {
+    cerr<<"=========== SOLVING EQUATIONS ==============="<<endl;
     RANDOM engine;
     if(argc!=5){
 	cerr<<"Usage: "<<argv[0]<<" <thread_count> <AB.txt> <Oposite.txt> <Nieghbour.txt>"<<endl;
@@ -56,8 +57,13 @@ int main(int argc, char **argv) {
 	auto init=make_shared<GenerateUniform>();
 	while(init->Count()<(N*2))init<<make_pair(-100,100);
 	solver.Init(N*10,init,engine);
-	while(!solver.AbsoluteOptimalityExitCondition(0.0000001))
+	while(!solver.AbsoluteOptimalityExitCondition(0.0000001)){
 	    solver.Iterate(engine);
+	    cerr<<solver.iteration_count()<<" iterations; "
+	    <<solver.Optimality()<<"<S<"
+	    <<solver.Optimality(solver.PopulationSize()-1)
+	    <<"        \r";
+	}
 	for(size_t i=1;i<=N;i++){
 	    DeltaT->Item(layer,i).A=solver[i-1];
 	    DeltaT->Item(layer,i).B=solver[i-1+N];
