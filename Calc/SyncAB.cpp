@@ -44,7 +44,7 @@ namespace Sync{
 	    <<make_pair(hist.right().X().min(),hist.right().X().max()-hist.left().X().min())
 	    <<make_pair(0.5,0.5)
 	    <<make_pair(total,total*20.0)
-	    <<make_pair(2.0,5.0)
+	    <<make_pair(2.0,20.0)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
