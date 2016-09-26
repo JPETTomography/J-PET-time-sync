@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 	hist<double> position,sigma;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    map->Item(layer,slot)=Sync::Fit4SyncOposite(ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(layer,slot,1)),"Oposite"+LayerSlotThr(layer,slot,1),thr_cnt);
+	    map->Item(layer,slot)=Sync::Fit4SyncOposite(ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(layer,slot,1)),"Oposite "+LayerSlotThr(layer,slot,1),thr_cnt);
 	    position<<point<value<double>>(double(slot),map->Item(layer,slot).position);
 	    sigma<<point<value<double>>(double(slot),map->Item(layer,slot).width);
 	    chisq<<point<double>(double(slot),map->Item(layer,slot).chi_sq);
