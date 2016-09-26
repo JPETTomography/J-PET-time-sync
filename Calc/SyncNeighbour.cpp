@@ -28,10 +28,10 @@ namespace Sync{
 	fit.SetThreadCount(threads);
 	RANDOM r;
 	fit.Init(25*TotalFunc::ParamCount,make_shared<GenerateByGauss>()
-	    <<make_pair(total,total*5.0)
+	    <<make_pair(total,total*30.0)
 	    <<make_pair(hist.left().X().min()+hist.right().X().max()/2.0,hist.right().X().max()-hist.left().X().min())
 	    <<make_pair(0.1,1.0)
-	    <<make_pair(total,total*5.0)
+	    <<make_pair(total,total*30.0)
 	    <<make_pair(hist.left().X().min()+hist.right().X().max()/2.0,hist.right().X().max()-hist.left().X().min())
 	    <<make_pair(2.0,10.0)
 	,r);
