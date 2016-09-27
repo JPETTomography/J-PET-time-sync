@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
     for(size_t layer=1;layer<map->LayersCount();layer++){
-	hist<double> positionl,sigmal,positionr,sigmar;
+	hist<double> positionl,sigmal,positionr,sigmar,pos_diff;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    map->Item(layer,slot)=Sync::Fit4SyncNeighbour(
@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
 	    sigmal<<point<value<double>>(double(slot),map->Item(layer,slot).width_left);
 	    positionr<<point<value<double>>(double(slot),map->Item(layer,slot).position_right);
 	    sigmar<<point<value<double>>(double(slot),map->Item(layer,slot).width_right);
+	    pos_diff<<point<value<double>>(double(slot), map->Item(layer,slot).position_right - map->Item(layer,slot).position_left );
 	    chisq<<point<double>(double(slot),map->Item(layer,slot).chi_sq);
 	    
 	}
