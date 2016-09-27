@@ -22,13 +22,13 @@ inline std::ostream&operator<<(std::ostream&str,const SyncOposite_results&item){
   return str<<item.position<<"\t"<<item.width<<"\t"<<item.chi_sq;
 }
 struct SyncNeighbour_results{
-  MathTemplates::value<double>position_left,width_left,position_right,width_right;double chi_sq;
+  MathTemplates::value<double>position_left,width_left,position_right,width_right,assymetry;double chi_sq;
 };
 inline std::istream&operator>>(std::istream&str,SyncNeighbour_results&item){
-  return str>>item.position_left>>item.width_left>>item.position_right>>item.width_right>>item.chi_sq;
+  return str>>item.position_left>>item.width_left>>item.position_right>>item.width_right>>item.assymetry>>item.chi_sq;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncNeighbour_results&item){
-  return str<<item.position_left<<"\t"<<item.width_left<<"\t"<<item.position_right<<"\t"<<item.width_right<<"\t"<<item.chi_sq;
+  return str<<item.position_left<<"\t"<<item.width_left<<"\t"<<item.position_right<<"\t"<<item.width_right<<"\t"<<item.assymetry<<"\t"<<item.chi_sq;
 }
 struct DeltaT_results{
   MathTemplates::value<double> A,B;

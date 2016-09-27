@@ -53,9 +53,11 @@ namespace Sync{
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
 	for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
+	auto F=[](double x){return log(x);};
 	return {
 	    .position_left=fit.ParametersWithUncertainties()[1],.width_left=fit.ParametersWithUncertainties()[2],
 	    .position_right=fit.ParametersWithUncertainties()[4],.width_right=fit.ParametersWithUncertainties()[5],
+	    .assymetry=func_value<double>(F, fit.ParametersWithUncertainties()[3]/fit.ParametersWithUncertainties()[0] ),
 	    .chi_sq=chi_sq_norm
 	};
 	

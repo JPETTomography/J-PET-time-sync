@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
     for(size_t layer=1;layer<map->LayersCount();layer++){
-	hist<double> positionl,sigmal,positionr,sigmar,pos_diff;
+	hist<double> positionl,sigmal,positionr,sigmar,pos_diff,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    map->Item(layer,slot)=Sync::Fit4SyncNeighbour(
@@ -40,11 +40,14 @@ int main(int argc, char **argv) {
 	    positionr<<point<value<double>>(double(slot),map->Item(layer,slot).position_right);
 	    sigmar<<point<value<double>>(double(slot),map->Item(layer,slot).width_right);
 	    pos_diff<<point<value<double>>(double(slot), map->Item(layer,slot).position_right - map->Item(layer,slot).position_left );
+	    assym<<point<value<double>>(double(slot),map->Item(layer,slot).assymetry);
 	    chisq<<point<double>(double(slot),map->Item(layer,slot).chi_sq);
 	    
 	}
 	Plot<double>().Hist(positionl,"Position Left").Hist(positionr,"Position Right")<<"set key on";
 	Plot<double>().Hist(sigmal,"Sigma Left").Hist(sigmar,"Sigma Right")<<"set key on";
+	Plot<double>().Hist(pos_diff,"Distance between peaks")<<"set key on";
+	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on";
 	Plot<double>().Line(chisq,"Chi^2")<<"set key on";
     }
     cout<<(*map);
