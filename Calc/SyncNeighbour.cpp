@@ -55,7 +55,7 @@ namespace Sync{
 	for(const auto&P:fit.ParametersWithUncertainties())cerr<<P<<endl;
 	return {
 	    .position_left=fit.ParametersWithUncertainties()[1],.width_left=fit.ParametersWithUncertainties()[2],
-	    .position_right=fit.ParametersWithUncertainties()[5],.width_right=fit.ParametersWithUncertainties()[6],
+	    .position_right=fit.ParametersWithUncertainties()[4],.width_right=fit.ParametersWithUncertainties()[5],
 	    .chi_sq=chi_sq_norm
 	};
 	
