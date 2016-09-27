@@ -40,19 +40,25 @@ int main(int argc, char **argv) {
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
     auto DeltaT=make_JPetMap<DeltaT_results>();
     for(size_t layer=1;layer<DeltaT->LayersCount();layer++){
+	cerr<<"LAYER "<<layer<<" : "<<endl;
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
 	for(size_t i=1;i<=N;i++){
 	    //dtb-dta=AB
 	    equations.push_back(in_eq([i,N](const ParamSet&P){return P[i-1 +N] - P[i-1];}, (AB->Item(layer,i).position) ));
 	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*NEI
-	    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[(i-1+3)%N +N] + P[(i-1+3)%N])-(P[i-1 +N] + P[i-1]);}, (Nei->Item(layer,i).position_left+Nei->Item(layer,i).position_right) ));
+	    const auto&item=Nei->Item(layer,i);
+	    if(abs(item.assymetry.val())>1.0){
+		auto neighbour_eq_right=(item.position_left+item.position_right);
+		if(neighbour_eq_right.uncertainty()>0.2)
+		    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[(i-1+3)%N +N] + P[(i-1+3)%N])-(P[i-1 +N] + P[i-1]);}, neighbour_eq_right ));
+	    }
 	}
 	for(size_t i=1;i<=(N/2);i++){
 	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*OPO
 	    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[i-1+N/2 +N] + P[i-1+N/2])-(P[i-1 +N] + P[i-1]);}, (Opo->Item(layer,i).position*2.) ));
 	}
-	
+	cerr<<equations.size()<<" equations... "<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver(equations);
 	auto init=make_shared<GenerateUniform>();
 	while(init->Count()<(N*2))init<<make_pair(-100,100);
@@ -60,7 +66,7 @@ int main(int argc, char **argv) {
 	while(!solver.AbsoluteOptimalityExitCondition(0.00001)){
 	    solver.Iterate(engine);
 	    cerr<<solver.iteration_count()<<" iterations; "
-	    <<solver.Optimality()<<"<S<"
+	    <<solver.Optimality()<<"<chi^2<"
 	    <<solver.Optimality(solver.PopulationSize()-1)
 	    <<"        \r";
 	}
