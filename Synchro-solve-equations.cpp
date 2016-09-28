@@ -46,16 +46,18 @@ int main(int argc, char **argv) {
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
 	for(size_t i=1;i<=N;i++){
-	    //dtb-dta=AB
-	    equations.push_back(in_eq([i,N](const ParamSet&P){return P[i-1 +N] - P[i-1];}, (AB->Item(layer,i).position) ));
-	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*NEI
-	    const auto&item=Nei->Item(layer,i);
-	    auto neighbour_eq_right=(item.position_left+item.position_right);
-	    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[(i-1+3)%N +N] + P[(i-1+3)%N])-(P[i-1 +N] + P[i-1]);}, neighbour_eq_right ));
+	    const auto&AB_sync=AB->Item(layer,i);
+	    const size_t A=i-1,B=A+N;
+	    equations.push_back(in_eq( [A,B](const ParamSet&delta){return delta[B]-delta[A];} , AB_sync.position ));
+	    const auto&neighbour_sync=Nei->Item(layer,i);
+	    const size_t An=(A+3)%N,Bn=An+N;
+	    equations.push_back(in_eq([A,B,An,Bn](const ParamSet&delta){return (delta[Bn]+delta[An])-(delta[B]+delta[A]);}, (neighbour_sync.position_left+neighbour_sync.position_right) ));
 	}
 	for(size_t i=1;i<=(N/2);i++){
-	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*OPO
-	    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[i-1+N/2 +N] + P[i-1+N/2])-(P[i-1 +N] + P[i-1]);}, (Opo->Item(layer,i).position*2.) ));
+	    const auto&opo_sync=Opo->Item(layer,i);
+	    const size_t A=i-1,B=A+N;
+	    const size_t Ao=A+(N/2),Bo=Ao+N;
+	    equations.push_back(in_eq([A,B,Ao,Bo](const ParamSet&delta){return ((delta[Bo]+delta[Ao])-(delta[B]+delta[A]))/2.0;}, opo_sync.position));
 	}
 	cerr<<equations.size()<<" equations"<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver(equations);
@@ -64,7 +66,7 @@ int main(int argc, char **argv) {
 	solver.Init(N*5,init,engine);
 	cerr<<solver.ParamCount()<<" variables"<<endl;
 	cerr<<solver.PopulationSize()<<" points"<<endl;
-	while(!solver.AbsoluteOptimalityExitCondition(0.001)){
+	while(!solver.AbsoluteOptimalityExitCondition(0.0001)){
 	    solver.Iterate(engine);
 	    cerr<<solver.iteration_count()<<" iterations; "
 	    <<solver.Optimality()<<"<chi^2<"
