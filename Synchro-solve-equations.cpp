@@ -48,16 +48,18 @@ int main(int argc, char **argv) {
 	for(size_t i=1;i<=N;i++){
 	    const auto&AB_sync=AB->Item(layer,i);
 	    const size_t A=i-1,B=A+N;
-	    equations.push_back(in_eq( [A,B](const ParamSet&delta){return delta[B]-delta[A];} , AB_sync.position ));
+	    equations.push_back(in_eq( [A,B](const ParamSet&delta){return delta[B]-delta[A];} , {AB_sync.position.val(),AB_sync.width.val()} ));
 	    const auto&neighbour_sync=Nei->Item(layer,i);
 	    const size_t An=(A+3)%N,Bn=An+N;
-	    equations.push_back(in_eq([A,B,An,Bn](const ParamSet&delta){return (delta[Bn]+delta[An])-(delta[B]+delta[A]);}, (neighbour_sync.position_left+neighbour_sync.position_right) ));
+	    value<double> leftpeak={neighbour_sync.position_left.val(),neighbour_sync.width_left.val()},
+		rightpeak={neighbour_sync.position_right.val(),neighbour_sync.width_right.val()};
+	    equations.push_back(in_eq([A,B,An,Bn](const ParamSet&delta){return (delta[Bn]+delta[An])-(delta[B]+delta[A]);}, leftpeak+rightpeak ));
 	}
 	for(size_t i=1;i<=(N/2);i++){
 	    const auto&opo_sync=Opo->Item(layer,i);
 	    const size_t A=i-1,B=A+N;
 	    const size_t Ao=A+(N/2),Bo=Ao+N;
-	    equations.push_back(in_eq([A,B,Ao,Bo](const ParamSet&delta){return ((delta[Bo]+delta[Ao])-(delta[B]+delta[A]))/2.0;}, opo_sync.position));
+	    equations.push_back(in_eq([A,B,Ao,Bo](const ParamSet&delta){return ((delta[Bo]+delta[Ao])-(delta[B]+delta[A]))/2.0;}, {opo_sync.position.val(),opo_sync.width.val()}));
 	}
 	cerr<<equations.size()<<" equations"<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver(equations);
@@ -66,7 +68,7 @@ int main(int argc, char **argv) {
 	solver.Init(N*5,init,engine);
 	cerr<<solver.ParamCount()<<" variables"<<endl;
 	cerr<<solver.PopulationSize()<<" points"<<endl;
-	while(!solver.AbsoluteOptimalityExitCondition(0.0001)){
+	while(!solver.AbsoluteOptimalityExitCondition(0.000001)){
 	    solver.Iterate(engine);
 	    cerr<<solver.iteration_count()<<" iterations; "
 	    <<solver.Optimality()<<"<chi^2<"
