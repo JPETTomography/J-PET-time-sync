@@ -76,6 +76,7 @@ int main(int argc, char **argv) {
 	    <<"                 \r";
 	}
 	cout<<endl;
+	cout<<"chi^2/D = "<<solver.Optimality()/(equations.size()-solver.ParamCount())<<endl;
 	for(size_t i=1;i<=N;i++){
 	    A<<point<value<double>>(double(i),solver.ParametersWithUncertainties()[i-1]);
 	    B<<point<value<double>>(double(i),solver.ParametersWithUncertainties()[i-1+N]);
