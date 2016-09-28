@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     auto map=make_half_JPetMap<SyncOposite_results>();
     Plotter::Instance().SetOutput(".","strips-oposite");
-    for(size_t layer=1;layer<map->LayersCount();layer++){
+    for(size_t layer=1;layer<=map->LayersCount();layer++){
 	hist<double> position,sigma;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){

@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 		root_filenames.push_back(string(argv[i]));
 	Plotter::Instance().SetOutput(".","AB-synchro");
 	auto map=make_JPetMap<SyncAB_results>();
-	for(size_t layer=1;layer<map->LayersCount();layer++){
+	for(size_t layer=1;layer<=map->LayersCount();layer++){
 		hist<double> position,sigma;
 		SortedPoints<double> chisq;
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){

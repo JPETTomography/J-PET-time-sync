@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
     auto DeltaT=make_JPetMap<DeltaT_results>();
     Plotter::Instance().SetOutput(".","delta_t_sync");
-    for(size_t layer=1;layer<DeltaT->LayersCount();layer++){
+    for(size_t layer=1;layer<=DeltaT->LayersCount();layer++){
 	hist<double> A,B,eq_hist_left,eq_hist_right;
 	cerr<<"LAYER "<<layer<<" : "<<endl;
 	list<InexactEquation> equations;
