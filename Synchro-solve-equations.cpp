@@ -39,7 +39,9 @@ int main(int argc, char **argv) {
     auto Nei=make_JPetMap<SyncNeighbour_results>();
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
     auto DeltaT=make_JPetMap<DeltaT_results>();
+    Plotter::Instance().SetOutput(".","delta_t_sync");
     for(size_t layer=1;layer<DeltaT->LayersCount();layer++){
+	hist<double> A,B;
 	cerr<<"LAYER "<<layer<<" : "<<endl;
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
@@ -62,7 +64,7 @@ int main(int argc, char **argv) {
 	solver.Init(N*5,init,engine);
 	cerr<<solver.ParamCount()<<" variables"<<endl;
 	cerr<<solver.PopulationSize()<<" points"<<endl;
-	while(!solver.AbsoluteOptimalityExitCondition(0.00001)){
+	while(!solver.AbsoluteOptimalityExitCondition(0.001)){
 	    solver.Iterate(engine);
 	    cerr<<solver.iteration_count()<<" iterations; "
 	    <<solver.Optimality()<<"<chi^2<"
@@ -70,9 +72,12 @@ int main(int argc, char **argv) {
 	    <<"        \r";
 	}
 	for(size_t i=1;i<=N;i++){
+	    A<<point<value<double>>(double(i),solver[i-1]);
+	    B<<point<value<double>>(double(i),solver[i-1+N]);
 	    DeltaT->Item(layer,i).A=solver[i-1];
 	    DeltaT->Item(layer,i).B=solver[i-1+N];
 	}
+	Plot<double>().Hist(A,"A").Hist(B,"B")<<"set key on";
     }
     cout<<(*DeltaT);
 }
