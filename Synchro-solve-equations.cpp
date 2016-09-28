@@ -77,6 +77,7 @@ int main(int argc, char **argv) {
 	}
 	cout<<endl;
 	cout<<"chi^2/D = "<<solver.Optimality()/(equations.size()-solver.ParamCount())<<endl;
+	solver.SetUncertaintyCalcDeltas(parEq(solver.ParamCount(),0.01));
 	for(size_t i=1;i<=N;i++){
 	    A<<point<value<double>>(double(i),solver.ParametersWithUncertainties()[i-1]);
 	    B<<point<value<double>>(double(i),solver.ParametersWithUncertainties()[i-1+N]);
