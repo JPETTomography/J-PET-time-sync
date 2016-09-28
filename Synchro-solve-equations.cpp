@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     auto DeltaT=make_JPetMap<DeltaT_results>();
     Plotter::Instance().SetOutput(".","delta_t_sync");
     for(size_t layer=1;layer<DeltaT->LayersCount();layer++){
-	hist<double> A,B;
+	hist<double> A,B,eq_hist_left,eq_hist_right;
 	cerr<<"LAYER "<<layer<<" : "<<endl;
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
@@ -73,15 +73,24 @@ int main(int argc, char **argv) {
 	    cerr<<solver.iteration_count()<<" iterations; "
 	    <<solver.Optimality()<<"<chi^2<"
 	    <<solver.Optimality(solver.PopulationSize()-1)
-	    <<"        \r";
+	    <<"                 \r";
 	}
+	cout<<endl;
 	for(size_t i=1;i<=N;i++){
-	    A<<point<value<double>>(double(i),solver[i-1]);
-	    B<<point<value<double>>(double(i),solver[i-1+N]);
-	    DeltaT->Item(layer,i).A=solver[i-1];
-	    DeltaT->Item(layer,i).B=solver[i-1+N];
+	    A<<point<value<double>>(double(i),solver.ParametersWithUncertainties()[i-1]);
+	    B<<point<value<double>>(double(i),solver.ParametersWithUncertainties()[i-1+N]);
+	    DeltaT->Item(layer,i).A=solver.ParametersWithUncertainties()[i-1];
+	    DeltaT->Item(layer,i).B=solver.ParametersWithUncertainties()[i-1+N];
 	}
-	Plot<double>().Hist(A,"A").Hist(B,"B")<<"set key on";
+	{size_t index=0;
+	    for(const auto&eq:equations){
+		eq_hist_left<<point<value<double>>(double(index),eq.first(solver.Parameters()));
+		eq_hist_right<<point<value<double>>(double(index),eq.second);
+		index++;
+	    }
+	}
+	Plot<double>().Hist(A,"A").Hist(B,"B")<<"set xlabel 'strip number'"<<"set ylabel 'time offset'"<<"set key on";
+	Plot<double>().Hist(eq_hist_left,"left").Hist(eq_hist_right,"right")<<"set xlabel 'equation index'"<<"set ylabel 'value'"<<"set key on";
     }
     cout<<(*DeltaT);
 }
