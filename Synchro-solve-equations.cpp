@@ -59,8 +59,8 @@ int main(int argc, char **argv) {
 	}
 	cerr<<equations.size()<<" equations"<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver(equations);
-	auto init=make_shared<GenerateUniform>();
-	while(init->Count()<(N*2))init<<make_pair(-100,100);
+	auto init=make_shared<GenerateByGauss>();
+	while(init->Count()<(N*2))init<<make_pair(0,30);
 	solver.Init(N*5,init,engine);
 	cerr<<solver.ParamCount()<<" variables"<<endl;
 	cerr<<solver.PopulationSize()<<" points"<<endl;
