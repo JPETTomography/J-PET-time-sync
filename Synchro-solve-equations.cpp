@@ -48,11 +48,8 @@ int main(int argc, char **argv) {
 	    equations.push_back(in_eq([i,N](const ParamSet&P){return P[i-1 +N] - P[i-1];}, (AB->Item(layer,i).position) ));
 	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*NEI
 	    const auto&item=Nei->Item(layer,i);
-	    if(abs(item.assymetry.val())>1.0){
-		auto neighbour_eq_right=(item.position_left+item.position_right);
-		if(neighbour_eq_right.uncertainty()>0.2)
-		    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[(i-1+3)%N +N] + P[(i-1+3)%N])-(P[i-1 +N] + P[i-1]);}, neighbour_eq_right ));
-	    }
+	    auto neighbour_eq_right=(item.position_left+item.position_right);
+	    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[(i-1+3)%N +N] + P[(i-1+3)%N])-(P[i-1 +N] + P[i-1]);}, neighbour_eq_right ));
 	}
 	for(size_t i=1;i<=(N/2);i++){
 	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*OPO
