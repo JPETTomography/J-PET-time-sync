@@ -55,11 +55,13 @@ int main(int argc, char **argv) {
 	    //(dt2a+dt2b)-(dt1a+dt1b) = 2*OPO
 	    equations.push_back(in_eq([i,N](const ParamSet&P){return (P[i-1+N/2 +N] + P[i-1+N/2])-(P[i-1 +N] + P[i-1]);}, (Opo->Item(layer,i).position*2.) ));
 	}
-	cerr<<equations.size()<<" equations... "<<endl;
+	cerr<<equations.size()<<" equations"<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver(equations);
 	auto init=make_shared<GenerateUniform>();
 	while(init->Count()<(N*2))init<<make_pair(-100,100);
-	solver.Init(N*10,init,engine);
+	solver.Init(N*5,init,engine);
+	cerr<<solver.ParamCount()<<" variables"<<endl;
+	cerr<<solver.PopulationSize()<<" points"<<endl;
 	while(!solver.AbsoluteOptimalityExitCondition(0.00001)){
 	    solver.Iterate(engine);
 	    cerr<<solver.iteration_count()<<" iterations; "
