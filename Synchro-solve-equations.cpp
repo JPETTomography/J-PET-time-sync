@@ -83,9 +83,12 @@ int main(int argc, char **argv) {
 	}
 	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'";
 	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'";
-	//ToDo: SyncAB
 	
-	
+	for(size_t i=1;i<DeltaT->LayerSize(layer);i++){
+	    const auto& ab=AB->Item(layer,i);
+	    const value<double> d_ab={ab.position.val(),ab.width.val()};
+	    DeltaT->Item(layer,i)={.A=solver_hits.ParametersWithUncertainties()[i-1]-(d_ab/2.0),.B=solver_hits.ParametersWithUncertainties()[i-1]+(d_ab/2.0)};
+	}
     }
     cout<<(*DeltaT);
 }
