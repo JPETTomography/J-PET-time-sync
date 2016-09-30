@@ -59,6 +59,7 @@ int main(int argc, char **argv) {
 	InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
 	auto init=make_shared<GenerateByGauss>();
 	while(init->Count()<N)init<<make_pair(0,50);
+	solver_hits.SetThreadCount(thr_cnt);
 	solver_hits.Init(N*20,init,engine);
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
 	cerr<<solver_hits.PopulationSize()<<" points"<<endl;
