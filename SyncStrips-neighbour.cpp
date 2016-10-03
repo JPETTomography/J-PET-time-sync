@@ -28,21 +28,21 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
-    for(size_t layer=1;layer<=map->LayersCount();layer++){
+    for(size_t layer=1;layer<map->LayersCount();layer++){
 	hist<double> positionl,sigmal,positionr,sigmar,pos_diff,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    map->Item(layer,slot)=Sync::Fit4SyncNeighbour(
+	    auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(
 		ReadHist(root_filenames,"Delta_t_with_neighbour_"+LayerSlotThr(layer,slot,1)+"_deltaid3"),
-			"Neighbour "+LayerSlotThr(layer,slot,1),thr_cnt);
-	    positionl<<point<value<double>>(double(slot),map->Item(layer,slot).position_left);
-	    sigmal<<point<value<double>>(double(slot),map->Item(layer,slot).width_left);
-	    positionr<<point<value<double>>(double(slot),map->Item(layer,slot).position_right);
-	    sigmar<<point<value<double>>(double(slot),map->Item(layer,slot).width_right);
-	    pos_diff<<point<value<double>>(double(slot), map->Item(layer,slot).position_right - map->Item(layer,slot).position_left );
-	    assym<<point<value<double>>(double(slot),map->Item(layer,slot).assymetry);
-	    chisq<<point<double>(double(slot),map->Item(layer,slot).chi_sq);
-	    
+		"Neighbour "+LayerSlotThr(layer,slot,1),thr_cnt
+	    );
+	    positionl<<point<value<double>>(double(slot),item.position_left);
+	    sigmal<<point<value<double>>(double(slot),item.width_left);
+	    positionr<<point<value<double>>(double(slot),item.position_right);
+	    sigmar<<point<value<double>>(double(slot),item.width_right);
+	    pos_diff<<point<value<double>>(double(slot), item.position_right - item.position_left );
+	    assym<<point<value<double>>(double(slot),item.assymetry);
+	    chisq<<point<double>(double(slot),item.chi_sq);
 	}
 	Plot<double>().Hist(positionl,"Position Left").Hist(positionr,"Position Right")<<"set key on";
 	Plot<double>().Hist(sigmal,"Sigma Left").Hist(sigmar,"Sigma Right")<<"set key on";
