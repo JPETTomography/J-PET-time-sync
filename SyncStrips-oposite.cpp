@@ -42,8 +42,8 @@ int main(int argc, char **argv) {
 	    
 	}
 	Plot<double>().Hist(position,"Position")<<"set key on";
-	Plot<double>().Hist(sigma,"Sigma")<<"set key on";
-	Plot<double>().Line(chisq,"Chi^2")<<"set key on";
+	Plot<double>().Hist(sigma,"Sigma")<<"set key on"<<"set yrange [0:]";
+	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";
     }
     cout<<(*map);
     return 0;

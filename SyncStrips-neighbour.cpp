@@ -45,10 +45,10 @@ int main(int argc, char **argv) {
 	    chisq<<point<double>(double(slot),item.chi_sq);
 	}
 	Plot<double>().Hist(positionl,"Position Left").Hist(positionr,"Position Right")<<"set key on";
-	Plot<double>().Hist(sigmal,"Sigma Left").Hist(sigmar,"Sigma Right")<<"set key on";
-	Plot<double>().Hist(pos_diff,"Distance between peaks")<<"set key on";
-	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on";
-	Plot<double>().Line(chisq,"Chi^2")<<"set key on";
+	Plot<double>().Hist(sigmal,"Sigma Left").Hist(sigmar,"Sigma Right")<<"set key on"<<"set yrange [0:]";
+	Plot<double>().Hist(pos_diff,"Distance between peaks")<<"set key on"<<"set yrange [0:]";
+	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]";
+	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";
     }
     cout<<(*map);
     return 0;
