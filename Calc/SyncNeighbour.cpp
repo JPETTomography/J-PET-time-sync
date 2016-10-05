@@ -30,7 +30,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(500,make_shared<GenerateByGauss>()
+	fit.Init(300,make_shared<GenerateByGauss>()
 	    <<make_pair(total,total*30.0)
 	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
 	    <<make_pair(1.0,1.5)
@@ -40,7 +40,9 @@ namespace Sync{
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	while(!fit.AbsoluteOptimalityExitCondition(0.00001)){
+	ParamSet pExit{1,0.01,0.001,1,0.01,0.001},
+	pDelta{0.1,0.001,0.0001,0.1,0.001,0.0001};
+	while((!fit.AbsoluteOptimalityExitCondition(0.0001))&&(!fit.ParametersDispersionExitCondition(pExit))){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
 	    <<fit.Optimality()<<"<chi^2<"
@@ -52,7 +54,7 @@ namespace Sync{
 	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
-	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.001));
+	fit.SetUncertaintyCalcDeltas(pDelta);
 	for(const auto&p:fit.ParametersWithUncertainties())cerr<<p<<endl;
 	const auto& P=fit.Parameters();
 	return {.left={P[1],P[2]},.right={P[4],P[5]},.assymetry=P[3]/P[0],.chi_sq=chi_sq_norm};
