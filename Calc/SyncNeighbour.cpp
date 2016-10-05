@@ -52,7 +52,7 @@ namespace Sync{
 	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
-	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.0001));
+	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.001));
 	const auto& P=fit.ParametersWithUncertainties();
 	for(const auto&p:P)cerr<<p<<endl;
 	auto asym_log=[](double x){return log2(x);};
