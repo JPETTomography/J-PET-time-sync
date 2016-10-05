@@ -46,13 +46,11 @@ int main(int argc, char **argv) {
 	const size_t N=DeltaT->LayerSize(layer);
 	for(size_t i=1;i<=N;i++){
 	    const auto&neighbour_sync=Nei->Item(layer,i);
-	    value<double> leftpeak={neighbour_sync.position_left.val(),neighbour_sync.width_left.val()},
-		rightpeak={neighbour_sync.position_right.val(),neighbour_sync.width_right.val()};
-	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+3)%N]-delta[i];}, (leftpeak+rightpeak)/2.0 ));
+	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+3)%N]-delta[i];}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
 	}
 	for(size_t i=1;i<=(N/2);i++){
 	    const auto&opo_sync=Opo->Item(layer,i);
-	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];}, {opo_sync.position.val(),opo_sync.width.val()}));
+	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];}, opo_sync.peak ));
 	}
 	cerr<<equations.size()<<" equations"<<endl;
 	cerr<<"hits:"<<endl;
@@ -73,9 +71,10 @@ int main(int argc, char **argv) {
 	cout<<endl;
 	cout<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
 	solver_hits.SetUncertaintyCalcDeltas(parEq(solver_hits.ParamCount(),0.01));
+	const auto&solution=solver_hits.ParametersWithUncertainties();
 	hist<double> eq_left,eq_right,delta_hits;
 	for(size_t i=0;i<N;i++)
-	    delta_hits<<point<value<double>>(double(i+1),solver_hits.ParametersWithUncertainties()[i]);
+	    delta_hits<<point<value<double>>(double(i+1),solution[i]);
 	for(const auto&eq:equations){
 	    static size_t i=0;
 	    eq_left<<point<value<double>>(double(i),eq.first(solver_hits.Parameters()));
@@ -87,8 +86,7 @@ int main(int argc, char **argv) {
 	
 	for(size_t i=1;i<DeltaT->LayerSize(layer);i++){
 	    const auto& ab=AB->Item(layer,i);
-	    const value<double> d_ab={ab.position.val(),ab.width.val()};
-	    DeltaT->Item(layer,i)={.A=solver_hits.ParametersWithUncertainties()[i-1]-(d_ab/2.0),.B=solver_hits.ParametersWithUncertainties()[i-1]+(d_ab/2.0)};
+	    DeltaT->Item(layer,i)={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
 	}
     }
     cout<<(*DeltaT);

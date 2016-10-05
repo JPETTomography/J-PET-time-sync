@@ -3,32 +3,31 @@
 #include <iostream>
 #include <math_h/sigma.h>
 struct SyncAB_results{
-  MathTemplates::value<double>position,width;double chi_sq;
-  inline const MathTemplates::value<double> Range()const{return {position.val(),1.0*width.val()};}
+  MathTemplates::value<double>peak;double chi_sq;
 };
 inline std::istream&operator>>(std::istream&str,SyncAB_results&item){
-  return str>>item.position>>item.width>>item.chi_sq;
+  return str>>item.peak>>item.chi_sq;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncAB_results&item){
-  return str<<item.position<<"\t"<<item.width<<"\t"<<item.chi_sq;
+  return str<<item.peak<<"\t"<<item.chi_sq;
 }
 struct SyncOposite_results{
-  MathTemplates::value<double>position,width;double chi_sq;
+  MathTemplates::value<double>peak;double chi_sq;
 };
 inline std::istream&operator>>(std::istream&str,SyncOposite_results&item){
-  return str>>item.position>>item.width>>item.chi_sq;
+  return str>>item.peak>>item.chi_sq;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncOposite_results&item){
-  return str<<item.position<<"\t"<<item.width<<"\t"<<item.chi_sq;
+  return str<<item.peak<<"\t"<<item.chi_sq;
 }
 struct SyncNeighbour_results{
-  MathTemplates::value<double>position_left,width_left,position_right,width_right,assymetry;double chi_sq;
+  MathTemplates::value<double>left,right,assymetry;double chi_sq;
 };
 inline std::istream&operator>>(std::istream&str,SyncNeighbour_results&item){
-  return str>>item.position_left>>item.width_left>>item.position_right>>item.width_right>>item.assymetry>>item.chi_sq;
+  return str>>item.left>>item.right>>item.assymetry>>item.chi_sq;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncNeighbour_results&item){
-  return str<<item.position_left<<"\t"<<item.width_left<<"\t"<<item.position_right<<"\t"<<item.width_right<<"\t"<<item.assymetry<<"\t"<<item.chi_sq;
+  return str<<item.left<<"\t"<<item.right<<"\t"<<item.assymetry<<"\t"<<item.chi_sq;
 }
 struct DeltaT_results{
   MathTemplates::value<double> A,B;

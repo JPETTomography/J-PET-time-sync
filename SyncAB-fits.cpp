@@ -37,8 +37,8 @@ int main(int argc, char **argv) {
 			    ReadHist(root_filenames,name).Scale(3),
 			    "SyncAB "+name,thr_cnt
 			);
-			position<<point<value<double>>(double(slot),item.position);
-			sigma<<point<value<double>>(double(slot),item.width);
+			position<<point<value<double>>(double(slot),item.peak);
+			sigma<<point<value<double>>(double(slot),item.peak.uncertainty());
 			chisq<<point<double>(double(slot),item.chi_sq);
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on";

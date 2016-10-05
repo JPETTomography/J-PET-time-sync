@@ -36,11 +36,11 @@ int main(int argc, char **argv) {
 		ReadHist(root_filenames,"Delta_t_with_neighbour_"+LayerSlotThr(layer,slot,1)+"_deltaid3"),
 		"Neighbour "+LayerSlotThr(layer,slot,1),thr_cnt
 	    );
-	    positionl<<point<value<double>>(double(slot),item.position_left);
-	    sigmal<<point<value<double>>(double(slot),item.width_left);
-	    positionr<<point<value<double>>(double(slot),item.position_right);
-	    sigmar<<point<value<double>>(double(slot),item.width_right);
-	    pos_diff<<point<value<double>>(double(slot), item.position_right - item.position_left );
+	    positionl<<point<value<double>>(double(slot),item.left);
+	    sigmal<<point<value<double>>(double(slot),item.left.uncertainty());
+	    positionr<<point<value<double>>(double(slot),item.right);
+	    sigmar<<point<value<double>>(double(slot),item.right.uncertainty());
+	    pos_diff<<point<value<double>>(double(slot), item.right - item.left );
 	    assym<<point<value<double>>(double(slot),item.assymetry);
 	    chisq<<point<double>(double(slot),item.chi_sq);
 	}

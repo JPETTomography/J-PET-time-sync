@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
 		ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(layer,slot,1)),
 		"Oposite "+LayerSlotThr(layer,slot,1),thr_cnt
 	    );
-	    position<<point<value<double>>(double(slot),item.position);
-	    sigma<<point<value<double>>(double(slot),item.width);
+	    position<<point<value<double>>(double(slot),item.peak);
+	    sigma<<point<value<double>>(double(slot),item.peak.uncertainty());
 	    chisq<<point<double>(double(slot),item.chi_sq);
 	    
 	}

@@ -89,8 +89,8 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 			    diff_AB_2 =(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
 			if(
 			    (fabs(diff_1_2)<200.0)
-			    &&(f_AB_position->operator()(layer1_n,slot1).Range().Contains(diff_AB_1))
-			    &&(f_AB_position->operator()(layer2_n,slot2).Range().Contains(diff_AB_2))
+			    &&(f_AB_position->operator()(layer1_n,slot1).peak.Contains(diff_AB_1))
+			    &&(f_AB_position->operator()(layer2_n,slot2).peak.Contains(diff_AB_2))
 			){
 			    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 			    getStatistics().getHisto1D((
