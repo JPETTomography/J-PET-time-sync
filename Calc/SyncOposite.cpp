@@ -44,7 +44,7 @@ namespace Sync{
 	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
-	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.01));
+	fit.SetUncertaintyCalcDeltas(parEq(fit.ParamCount(),0.0001));
 	const auto& P=fit.ParametersWithUncertainties();
 	for(const auto&p:P)cerr<<p<<endl;
 	return {.position=P[1],.width=P[2],.chi_sq=chi_sq_norm};
