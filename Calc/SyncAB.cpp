@@ -28,13 +28,11 @@ namespace Sync{
 	typedef Add<Foreground,Background> TotalFunc;
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
-	    static const Background background;
 	    return (P[0]>0)&&(P[2]>0)&&(P[4]<0)&&(P[6]>0)
 	    &&(-(P[4]/P[6])<5.0)&&(-(P[6]/P[4])<4.0)
 	    &&(P[3]<P[1])&&(P[5]>P[1])
 	    &&((P[5]-P[6])>(P[3]+P[4]))
-	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min())
-	    &&(background({P[3]},P)>0)&&(background({P[5]},P)>0);
+	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min());
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
