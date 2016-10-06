@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
-    for(size_t layer=1;layer<map->LayersCount();layer++){
+    for(size_t layer=1;layer < map->LayersCount();layer++){
 	hist<double> left,right,pos_diff,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
