@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     auto map=make_half_JPetMap<SyncOposite_results>();
     Plotter::Instance().SetOutput(".","strips-oposite");
     for(size_t layer=1;layer<=map->LayersCount();layer++){
-	hist<double> position,sigma;
+	hist<double> position;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    auto& item=map->Item(layer,slot)=Sync::Fit4SyncOposite(
@@ -37,12 +37,10 @@ int main(int argc, char **argv) {
 		"Oposite "+LayerSlotThr(layer,slot,1),thr_cnt
 	    );
 	    position<<point<value<double>>(double(slot),item.peak);
-	    sigma<<point<value<double>>(double(slot),item.peak.uncertainty());
 	    chisq<<point<double>(double(slot),item.chi_sq);
 	    
 	}
 	Plot<double>().Hist(position,"Position")<<"set key on";
-	Plot<double>().Hist(sigma,"Sigma")<<"set key on"<<"set yrange [0:]";
 	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";
     }
     cout<<(*map);

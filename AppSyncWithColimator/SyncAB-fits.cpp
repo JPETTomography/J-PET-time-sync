@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	Plotter::Instance().SetOutput(".","AB-synchro");
 	auto map=make_JPetMap<SyncAB_results>();
 	for(size_t layer=1;layer<=map->LayersCount();layer++){
-		hist<double> position,sigma;
+		hist<double> position;
 		SortedPoints<double> chisq;
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			auto name=LayerSlotThr(layer,slot,1);
@@ -38,11 +38,9 @@ int main(int argc, char **argv) {
 			    "SyncAB "+name,thr_cnt
 			);
 			position<<point<value<double>>(double(slot),item.peak);
-			sigma<<point<value<double>>(double(slot),item.peak.uncertainty());
 			chisq<<point<double>(double(slot),item.chi_sq);
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on";
-		Plot<double>().Hist(sigma,"Sigma")<<"set key on";
 		Plot<double>().Line(chisq,"Chi^2")<<"set key on";
 	}
 	cout<<(*map);
