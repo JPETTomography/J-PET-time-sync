@@ -1,10 +1,6 @@
 #include <JPetManager/JPetManager.h>
 #include <JPetTaskLoader/JPetTaskLoader.h>
 #include <Preselection/PreselectionMain.h>
-#include <Preselection/TaskA.h>
-#include <Preselection/TaskB.h>
-#include <Preselection/TaskC.h>
-#include <Preselection/TaskD.h>
 #include <Preselection/SyncAB.h>
 using namespace std;
 void AddModules() {

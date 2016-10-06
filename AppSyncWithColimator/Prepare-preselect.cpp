@@ -5,7 +5,6 @@
 #include <Preselection/TaskB.h>
 #include <Preselection/TaskC.h>
 #include <Preselection/TaskD.h>
-#include <Preselection/SyncAB.h>
 using namespace std;
 void AddModules() {
 	JPetManager::getManager().registerTask([](){
