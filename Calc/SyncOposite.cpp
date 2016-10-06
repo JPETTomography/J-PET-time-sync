@@ -20,8 +20,7 @@ namespace Sync{
 	TotalFunc;
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
-	    return (P[0]>0)&&(P[2]>0)
-	    &&(P[1]>hist.left().X().max())&&(P[1]<hist.right().X().min());
+	    return (P[0]>0)&&(P[2]>0)&&(P[1]>hist.left().X().max())&&(P[1]<hist.right().X().min());
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
@@ -33,7 +32,7 @@ namespace Sync{
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
 	ParamSet pExit{1,0.01,0.001},
-	pDelta{0.1,0.001,0.0001,0.1,0.001,0.0001};
+	pDelta{0.1,0.001,0.001};
 	while((!fit.AbsoluteOptimalityExitCondition(0.0001))&&(!fit.ParametersDispersionExitCondition(pExit))){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
