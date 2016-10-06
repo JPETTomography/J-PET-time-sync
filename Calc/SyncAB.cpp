@@ -48,8 +48,8 @@ namespace Sync{
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	ParamSet pExit{1,0.01,0.001,0.01,0.001,0.01,0.001,1,0.0001},
-	pDelta{0.1,0.01,0.0001,0.001,0.0001,0.001,0.0001,0.1,0.0001};
+	ParamSet pExit{	1,	0.01,	0.001,	0.01,	0.001,	0.01,	0.001,	1,	0.0001},
+		pDelta{	0.1,	0.01,	0.0001,	0.001,	0.0001,	0.001,	0.0001,	0.1,	0.001};
 	while((!fit.AbsoluteOptimalityExitCondition(0.0001))&&(!fit.ParametersDispersionExitCondition(pExit))){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
