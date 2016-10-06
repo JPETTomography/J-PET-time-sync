@@ -28,17 +28,21 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     auto map=make_half_JPetMap<SyncOposite_results>();
     Plotter::Instance().SetOutput(".","strips-oposite");
-    for(size_t layer=1;layer < map->LayersCount();layer++){
+    for(size_t layer=1;layer <= map->LayersCount();layer++){
 	hist<double> position;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    auto& item=map->Item(layer,slot)=Sync::Fit4SyncOposite(
-		ReadHist(root_filenames,"Delta_t_with_oposite_"+LayerSlotThr(layer,slot,1)),
-		"Oposite "+LayerSlotThr(layer,slot,1),thr_cnt
-	    );
-	    position<<point<value<double>>(double(slot),item.peak);
-	    chisq<<point<double>(double(slot),item.chi_sq);
-	    
+	    const auto name=LayerSlotThr(layer,slot,1);
+	    const auto shist=ReadHist(root_filenames,"Delta_t_with_oposite_"+name);
+	    if(layer==map->LayersCount()){
+		Plot<double>().Hist(shist,"Oposite "+name)<<"set key on"<<"set xrange [-30:30]";
+		position<<point<value<double>>(double(slot),0.0);
+		chisq<<point<double>(double(slot),-1.0);
+	    }else{
+		auto& item=map->Item(layer,slot)=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
+		position<<point<value<double>>(double(slot),item.peak);
+		chisq<<point<double>(double(slot),item.chi_sq);
+	    }
 	}
 	Plot<double>().Hist(position,"Position")<<"set key on";
 	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";

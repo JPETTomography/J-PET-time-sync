@@ -28,19 +28,27 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
-    for(size_t layer=1;layer < map->LayersCount();layer++){
+    for(size_t layer=1;layer <= map->LayersCount();layer++){
 	hist<double> left,right,pos_diff,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(
-		ReadHist(root_filenames,"Delta_t_with_neighbour_"+LayerSlotThr(layer,slot,1)+"_deltaid3"),
-		"Neighbour "+LayerSlotThr(layer,slot,1),thr_cnt
-	    );
-	    left<<point<value<double>>(double(slot),item.left);
-	    right<<point<value<double>>(double(slot),item.right);
-	    pos_diff<<point<value<double>>(double(slot), item.right - item.left );
-	    assym<<point<value<double>>(double(slot),item.assymetry);
-	    chisq<<point<double>(double(slot),item.chi_sq);
+	    const auto name=LayerSlotThr(layer,slot,1);;
+	    const auto shist=ReadHist(root_filenames,"Delta_t_with_neighbour_"+name+"_deltaid3");
+	    if(layer==map->LayersCount()){
+		Plot<double>().Hist(shist,"Neighbour "+name)<<"set key on"<<"set xrange [-30:30]";
+		left<<point<value<double>>(double(slot),0.);
+		right<<point<value<double>>(double(slot),0.);
+		pos_diff<<point<value<double>>(double(slot), 0.);
+		assym<<point<value<double>>(double(slot),0.);
+		chisq<<point<double>(double(slot),-1.);
+	    }else{
+		auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
+		left<<point<value<double>>(double(slot),item.left);
+		right<<point<value<double>>(double(slot),item.right);
+		pos_diff<<point<value<double>>(double(slot), item.right - item.left );
+		assym<<point<value<double>>(double(slot),item.assymetry);
+		chisq<<point<double>(double(slot),item.chi_sq);
+	    }
 	}
 	Plot<double>().Hist(left,"Position Left").Hist(right,"Position Right")<<"set key on";
 	Plot<double>().Hist(pos_diff,"Distance between peaks")<<"set key on"<<"set yrange [0:]";
