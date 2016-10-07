@@ -34,13 +34,7 @@ int main(int argc, char **argv) {
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);;
 	    const auto shist=ReadHist(root_filenames,"Delta_t_with_neighbour_"+name+"_deltaid3");
-	    if(layer==map->LayersCount()){
-		Plot<double>().Hist(shist,"Neighbour "+name)<<"set key on"<<"set xrange [-30:30]";
-		left<<point<value<double>>(double(slot),0.);
-		right<<point<value<double>>(double(slot),0.);
-		assym<<point<value<double>>(double(slot),0.);
-		chisq<<point<double>(double(slot),-1.);
-	    }else{
+	    {
 		auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);

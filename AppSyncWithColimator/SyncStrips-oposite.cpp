@@ -33,15 +33,11 @@ int main(int argc, char **argv) {
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);
-	    const auto shist=ReadHist(root_filenames,"Delta_t_with_oposite_"+name);
-	    if(layer==map->LayersCount()){
-		Plot<double>().Hist(shist,"Oposite "+name)<<"set key on"<<"set xrange [-30:30]";
-		position<<point<value<double>>(double(slot),0.0);
-		chisq<<point<double>(double(slot),-1.0);
-	    }else{
+	    const auto shist=ReadHist(root_filenames,"Delta_t_with_oposite_"+name).Scale(2);
+	    {
 		auto& item=map->Item(layer,slot)=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
 		position<<point<value<double>>(double(slot),item.peak);
-		chisq<<point<double>(double(slot),item.chi_sq);
+		chisq<<point<double>(slot,item.chi_sq);
 	    }
 	}
 	Plot<double>().Hist(position,"Position")<<"set key on";
