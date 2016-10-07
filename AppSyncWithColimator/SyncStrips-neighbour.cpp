@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     auto map=make_JPetMap<SyncNeighbour_results>();
     Plotter::Instance().SetOutput(".","strips-neighbour");
     for(size_t layer=1;layer <= map->LayersCount();layer++){
-	hist<double> left,right,pos_diff,assym;
+	hist<double> left,right,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);;
@@ -38,20 +38,17 @@ int main(int argc, char **argv) {
 		Plot<double>().Hist(shist,"Neighbour "+name)<<"set key on"<<"set xrange [-30:30]";
 		left<<point<value<double>>(double(slot),0.);
 		right<<point<value<double>>(double(slot),0.);
-		pos_diff<<point<value<double>>(double(slot), 0.);
 		assym<<point<value<double>>(double(slot),0.);
 		chisq<<point<double>(double(slot),-1.);
 	    }else{
 		auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);
-		pos_diff<<point<value<double>>(double(slot), item.right - item.left );
 		assym<<point<value<double>>(double(slot),item.assymetry);
 		chisq<<point<double>(double(slot),item.chi_sq);
 	    }
 	}
 	Plot<double>().Hist(left,"Position Left").Hist(right,"Position Right")<<"set key on";
-	Plot<double>().Hist(pos_diff,"Distance between peaks")<<"set key on"<<"set yrange [0:]";
 	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]";
 	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";
     }
