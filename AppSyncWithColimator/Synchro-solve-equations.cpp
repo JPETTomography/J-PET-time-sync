@@ -44,21 +44,21 @@ int main(int argc, char **argv) {
 	cerr<<"=======LAYER "<<layer<<" : "<<endl;
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
-	for(size_t i=1;i<=N;i++){
-	    const auto&neighbour_sync=Nei->Item(layer,i);
+	for(size_t i=0;i<N;i++){
+	    const auto&neighbour_sync=Nei->Item(layer,i+1);
 	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+3)%N]-delta[i];}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
 	}
-	for(size_t i=1;i<=(N/2);i++){
-	    const auto&opo_sync=Opo->Item(layer,i);
+	for(size_t i=0;i<(N/2);i++){
+	    const auto&opo_sync=Opo->Item(layer,i+1);
 	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];}, opo_sync.peak ));
 	}
 	cerr<<equations.size()<<" equations"<<endl;
 	cerr<<"hits:"<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
-	auto init=make_shared<GenerateByGauss>();
-	while(init->Count()<N)init<<make_pair(0,50);
+	auto init=make_shared<GenerateUniform>();
+	while(init->Count()<N)init<<make_pair(-100,100);
 	solver_hits.SetThreadCount(thr_cnt);
-	solver_hits.Init(N*20,init,engine);
+	solver_hits.Init(N*10,init,engine);
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
 	cerr<<solver_hits.PopulationSize()<<" points"<<endl;
 	while(!solver_hits.AbsoluteOptimalityExitCondition(0.000001)){
