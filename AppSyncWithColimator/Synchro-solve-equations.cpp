@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
     auto DeltaT=make_JPetMap<DeltaT_results>();
     Plotter::Instance().SetOutput(".","delta_t_sync");
-    for(size_t layer=1;layer<DeltaT->LayersCount();layer++){
+    for(size_t layer=1;layer<=DeltaT->LayersCount();layer++){
 	cerr<<"=======LAYER "<<layer<<" : "<<endl;
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(layer);
@@ -61,13 +61,17 @@ int main(int argc, char **argv) {
 	solver_hits.Init(N*10,init,engine);
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
 	cerr<<solver_hits.PopulationSize()<<" points"<<endl;
-	while(!solver_hits.AbsoluteOptimalityExitCondition(0.000001)){
+	SortedPoints<double> opt_min,opt_max;
+	while(!solver_hits.AbsoluteOptimalityExitCondition(0.0001)){
 	    solver_hits.Iterate(engine);
+	    auto min=solver_hits.Optimality(),max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
 	    cerr<<solver_hits.iteration_count()<<" iterations; "
-	    <<solver_hits.Optimality()<<"<chi^2<"
-	    <<solver_hits.Optimality(solver_hits.PopulationSize()-1)
-	    <<"                 \r";
+	    <<min<<"<chi^2<"<<max<<"                 \r";
+	    opt_min << point<double>(solver_hits.iteration_count(),min);
+	    opt_max << point<double>(solver_hits.iteration_count(),max);
 	}
+	Plot<double>().Line(opt_min,"").Line(opt_max,"")<<"set xlabel 'layer "+to_string(layer)+"'";
+	Plotter::Instance()<<"unset log y";
 	cout<<endl;
 	cout<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
 	solver_hits.SetUncertaintyCalcDeltas(parEq(solver_hits.ParamCount(),0.01));
@@ -81,7 +85,7 @@ int main(int argc, char **argv) {
 	    eq_right<<point<value<double>>(double(i),eq.second);
 	    i++;
 	}
-	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'";
+	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'"<<"unset log y";
 	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'";
 	
 	for(size_t i=1;i<DeltaT->LayerSize(layer);i++){
