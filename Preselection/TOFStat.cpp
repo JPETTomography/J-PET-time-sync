@@ -24,23 +24,22 @@ TOFStat::~TOFStat(){}
 void TOFStat::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
+	auto l=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
-	    string histo_name_A = "TOT_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),sl,1)+"_A";
-	    getStatistics().createHistogram( new TH1F(histo_name_A.c_str(), histo_name_A.c_str(),600, 0.,+60.));
-	    string histo_name_B = "TOT_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),sl,1)+"_B";
-	    getStatistics().createHistogram( new TH1F(histo_name_B.c_str(), histo_name_B.c_str(),600, 0.,+60.));
+	    string histo_name_A = "TOT_"+LayerSlotThr(l,sl,1)+"_A";
+	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_A").c_str(), "",600, 0.,+60.));
+	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_B").c_str(), "",600, 0.,+60.));
 	}
     }
 }
 void TOFStat::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 	auto l=fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer()),s=fBarrelMap.getSlotNumber(currHit->getBarrelSlot());
-	getStatistics().getHisto1D(
-	    ("TOT_"+LayerSlotThr(l,s,1)+"_A").c_str()
-	).Fill(currHit->getSignalA().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber().at(1));
-	getStatistics().getHisto1D(
-	    ("TOT_"+LayerSlotThr(l,s,1)+"_B").c_str()
-	).Fill(currHit->getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber().at(1));
+	auto TOT_A=currHit->getSignalA().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber(),
+	    TOT_B=currHit->getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber();
+	const int thr=1;
+	getStatistics().getHisto1D(("TOT_"+LayerSlotThr(l,s,1)+"_A").c_str()).Fill(TOT_A[thr]);
+	getStatistics().getHisto1D(("TOT_"+LayerSlotThr(l,s,1)+"_B").c_str()).Fill(TOT_B[thr]);
     }
 }
 void TOFStat::terminate(){}
