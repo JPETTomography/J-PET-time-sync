@@ -1,4 +1,10 @@
 #!/bin/bash
+filelist=`find $2|grep .root|grep .phys.hit.`
+echo ${filelist}
+for X in ${filelist}; do
+	echo "TOF build : ${X}"
+	./TOF-build -t root -f ${X}
+done
 paramlist=""
 for X in `find $2|grep .root|grep .TOF.stat.`; do
 	paramlist=${paramlist}" "${X}
@@ -14,7 +20,7 @@ for X in ${filelist}; do
 done
 
 paramlist=""
-for X in `find $2|grep .root|grep .phys.hit.TOF.cut.`; do
+for X in `find $2|grep .root|grep .TOF.cut.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}

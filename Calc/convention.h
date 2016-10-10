@@ -29,6 +29,7 @@ inline std::istream&operator>>(std::istream&str,SyncOposite_results&item){
 inline std::ostream&operator<<(std::ostream&str,const SyncOposite_results&item){
   return str<<item.peak<<"\t"<<item.chi_sq;
 }
+const size_t neighbour_delta_id=3;
 struct SyncNeighbour_results{
   MathTemplates::value<double>left,right,assymetry;double chi_sq;
 };

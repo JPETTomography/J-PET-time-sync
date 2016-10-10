@@ -8,6 +8,6 @@ void AddModules() {
 	auto map=make_JPetMap<TOT_cut>();
 	cin>>(*map);
 	JPetManager::getManager().registerTask([map](){
-		return new JPetTaskLoader("phys.hit","phys.hit.TOF.cut",new TOFCut("TOF cut","",map));
+		return new JPetTaskLoader("phys.hit","TOF.cut",new TOFCut("TOF cut","",map));
 	});
 }

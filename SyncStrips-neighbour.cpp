@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);;
-	    const auto shist=ReadHist(root_filenames,"Delta_t_with_neighbour_"+name+"_deltaid3");
+	    const auto shist=ReadHist(root_filenames,"Delta_t_with_neighbour_"+name+"_deltaid"+to_string(neighbour_delta_id));
 	    {
 		auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);

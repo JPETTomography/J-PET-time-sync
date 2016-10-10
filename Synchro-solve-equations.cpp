@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 	const size_t N=DeltaT->LayerSize(layer);
 	for(size_t i=0;i<N;i++){
 	    const auto&neighbour_sync=Nei->Item(layer,i+1);
-	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+3)%N]-delta[i];}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
+	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+neighbour_delta_id)%N]-delta[i];}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
 	}
 	for(size_t i=0;i<(N/2);i++){
 	    const auto&opo_sync=Opo->Item(layer,i+1);

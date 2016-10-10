@@ -20,16 +20,10 @@ int main(int argc, char **argv) {
     auto map=make_JPetMap<char>();
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    {
-		const string name="TOT_"+LayerSlotThr(layer,slot,1)+"_A";
-		const auto shist=ReadHist(root_filenames,name);
-		Plot<double>().Hist(shist,name)<<"set key on";
-	    }
-	    {
-		const string name="TOT_"+LayerSlotThr(layer,slot,1)+"_B";
-		const auto shist=ReadHist(root_filenames,name);
-		Plot<double>().Hist(shist,name)<<"set key on";
-	    }
+	    string name="TOT_"+LayerSlotThr(layer,slot,1)+"_A";
+	    Plot<double>().Hist(ReadHist(root_filenames,name),name)<<"set key on";
+	    name="TOT_"+LayerSlotThr(layer,slot,1)+"_B";
+	    Plot<double>().Hist(ReadHist(root_filenames,name),name)<<"set key on";
 	}
     }
     return 0;
