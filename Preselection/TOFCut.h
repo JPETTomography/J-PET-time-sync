@@ -19,21 +19,22 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
+#include <IO/PetDict.h>
+#include <Calc/convention.h>
 #include "LargeBarrelMapping.h"
 
 class JPetWriter;
-class TaskD:public JPetTask {
+class TOFCut:public JPetTask {
 public:
-	TaskD(const char * name, const char * description);
-	virtual ~TaskD();
-	virtual void init(const JPetTaskInterface::Options& opts)override;
-	virtual void exec()override;
-	virtual void terminate()override;
-	virtual void setWriter(JPetWriter* writer)override;
+  TOFCut(const char * name, const char * description,const std::shared_ptr<JPetMap<TOT_cut>>map);
+  virtual ~TOFCut();
+  virtual void init(const JPetTaskInterface::Options& opts)override;
+  virtual void exec()override;
+  virtual void terminate()override;
+  virtual void setWriter(JPetWriter* writer)override;
 protected:
-	const char * formatUniqueSlotDescription(const JPetBarrelSlot & slot, int threshold,const char * prefix);
-	void fillHistosForHit(const JPetHit & hit);
-	JPetWriter* fWriter;
-	LargeBarrelMapping fBarrelMap;
+  JPetWriter* fWriter;
+  LargeBarrelMapping fBarrelMap;
+  std::shared_ptr<JPetMap<TOT_cut>>f_map;
 };
 #endif

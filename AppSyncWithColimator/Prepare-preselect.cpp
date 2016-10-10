@@ -4,7 +4,7 @@
 #include <Preselection/TaskA.h>
 #include <Preselection/TaskB.h>
 #include <Preselection/TaskC.h>
-#include <Preselection/TaskD.h>
+#include <Preselection/TOFStat.h>
 using namespace std;
 void AddModules() {
 	JPetManager::getManager().registerTask([](){
@@ -17,6 +17,6 @@ void AddModules() {
 		return new JPetTaskLoader("raw.sig", "phys.hit",new TaskC("Module C: Pair signals","Create hits from pairs of signals")); 
 	}); 
 	JPetManager::getManager().registerTask([](){
-		return new JPetTaskLoader("phys.hit", "phys.hit.means",new TaskD("Module D: Make histograms for hits","Only make timeDiff histos and produce mean timeDiff value for each threshold and slot to be used by the next module"));
+		return new JPetTaskLoader("phys.hit", "TOF.stat",new TOFStat("TOF stat: create TOF histograms","prepairs TOF statistics for making TOF cut"));
 	});
 }

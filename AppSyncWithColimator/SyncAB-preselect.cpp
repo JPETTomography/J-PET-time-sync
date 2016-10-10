@@ -5,6 +5,6 @@
 using namespace std;
 void AddModules() {
 	JPetManager::getManager().registerTask([](){
-		return new JPetTaskLoader("phys.hit.means", "Stat4AB",new TaskSyncAB("Synchronization A-B",""));
+		return new JPetTaskLoader("phys.hit.TOF.cut", "Stat4AB",new TaskSyncAB("Synchronization A-B",""));
 	});
 }

@@ -12,7 +12,6 @@
  *
  *  @file TaskE.cpp
  */
-#include <iostream>
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <IO/gethist.h>
