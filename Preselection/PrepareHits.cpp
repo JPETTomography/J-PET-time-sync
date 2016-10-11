@@ -23,11 +23,10 @@ PrepareHits::PrepareHits(const char * name, const char * description,const std::
 PrepareHits::~PrepareHits(){}
 void PrepareHits::init(const JPetTaskInterface::Options& opts){
     for(auto & layer : getParamBank().getLayers()){
-	auto l=fBarrelMap.getLayerNumber(*layer.second);
+	auto l_n=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
-	    string histo_name_A = "TOT_"+LayerSlotThr(l,sl,1)+"_A";
-	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_A").c_str(), "",500, 0.,100.));
-	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_B").c_str(), "",500, 0.,100.));
+	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l_n,sl,1)+"_A").c_str(), "",500, 0.,100.));
+	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l_n,sl,1)+"_B").c_str(), "",500, 0.,100.));
 	}
     }
 }
@@ -76,14 +75,13 @@ vector<JPetHit> PrepareHits::createHits(const vector<JPetRawSignal>& signals){
 		const auto layer=fBarrelMap.getLayerNumber(bs.getLayer());
 		const auto slot=fBarrelMap.getSlotNumber(bs);
 		
-		double TOT_A[5],TOT_B[5];
+		double TOT_A[4],TOT_B[4];
 		for(size_t thr=1;thr<=4;thr++){
 		    TOT_A[thr-1]=(recoSignalA.getRecoTimeAtThreshold(JPetSigCh::Trailing)-recoSignalA.getRecoTimeAtThreshold(JPetSigCh::Leading))/1000.;
 		    TOT_B[thr-1]=(recoSignalB.getRecoTimeAtThreshold(JPetSigCh::Trailing)-recoSignalB.getRecoTimeAtThreshold(JPetSigCh::Leading))/1000.;
 		}
-		TOT_A[4]=TOT_B[4]=0.0;
 		bool accepted=true;
-		for(size_t thr=1;thr<=4;thr++){
+		for(size_t thr=1;thr<4;thr++){
 		    accepted&=(TOT_A[thr-1]>=TOT_A[thr])&&(TOT_B[thr-1]>=TOT_B[thr]);
 		}
 		accepted&=(TOT_A[0]>f_map->Item(layer,slot).A);
