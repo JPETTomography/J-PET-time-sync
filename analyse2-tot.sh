@@ -4,7 +4,7 @@ for X in `find $1|grep .root|grep .Signals.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
-./TOF-hists-before${paramlist} > ${1}/TOF-cut.txt
+./TOT-hists-before${paramlist} > ${1}/TOF-cut.txt
 
 filelist=`find $1|grep .root|grep .Signals.`
 echo ${filelist}
@@ -18,4 +18,4 @@ for X in `find $1|grep .root|grep .Hits.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
-./TOF-hists-after${paramlist}
+./TOT-hists-after${paramlist}
