@@ -52,12 +52,14 @@ If one has gnuplot installed in the system the plots with debug information will
 Lets consider the HLD files from the measurement described above to be stored in /path/to/the/data.
 In that case the commands needed to perform the analysis look so:
 
+	cd J-PET-time-sync-build
+
 	./analyse1-prepare /path/to/the/data
 
 	./analyse2-tot /path/to/the/data
-	
+
 	./analyse3-AB 1 /path/to/the/data
-	
+
 	./analyse4-final 1 /path/to/the/data
 
 The parameter '1' in last two lines means that when the genetic algorithm will run it will be executed in one thread.
