@@ -22,6 +22,7 @@ PrepareSignals::PrepareSignals(const char * name, const char * description)
 :JPetTask(name, description),fCurrEventNumber(0){}
 PrepareSignals::~PrepareSignals(){}
 void PrepareSignals::init(const JPetTaskInterface::Options& opts){
+    fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
 	auto l=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){

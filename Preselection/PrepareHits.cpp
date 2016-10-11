@@ -22,6 +22,7 @@ PrepareHits::PrepareHits(const char * name, const char * description,const std::
 :JPetTask(name, description),f_map(map){}
 PrepareHits::~PrepareHits(){}
 void PrepareHits::init(const JPetTaskInterface::Options& opts){
+    fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
 	auto l_n=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
