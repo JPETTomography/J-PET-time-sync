@@ -27,8 +27,8 @@ void TOFStat::init(const JPetTaskInterface::Options& opts){
 	auto l=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
 	    string histo_name_A = "TOT_"+LayerSlotThr(l,sl,1)+"_A";
-	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_A").c_str(), "",600, 0.,+60.));
-	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_B").c_str(), "",600, 0.,+60.));
+	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_A").c_str(), "",100, 0.,10.));
+	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l,sl,1)+"_B").c_str(), "",100, 0.,10.));
 	}
     }
 }
