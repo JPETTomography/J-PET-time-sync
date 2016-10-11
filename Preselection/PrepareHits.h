@@ -19,19 +19,24 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
+#include <IO/PetDict.h>
+#include <Calc/convention.h>
+#include "LargeBarrelMapping.h"
 class JPetWriter;
-class TaskC:public JPetTask {
+class PrepareHits:public JPetTask {
 public:
-	TaskC(const char * name, const char * description);
-	virtual ~TaskC();
-	virtual void init(const JPetTaskInterface::Options& opts)override;
-	virtual void exec()override;
-	virtual void terminate()override;
-	virtual void setWriter(JPetWriter* writer)override;
+  PrepareHits(const char * name, const char * description,const std::shared_ptr<JPetMap<TOT_cut>>map);
+  virtual ~PrepareHits();
+  virtual void init(const JPetTaskInterface::Options& opts)override;
+  virtual void exec()override;
+  virtual void terminate()override;
+  virtual void setWriter(JPetWriter* writer)override;
 protected:
-	std::vector<JPetHit> createHits(const std::vector<JPetRawSignal>& signals);
-	void saveHits(const std::vector<JPetHit>&hits);
-	std::vector<JPetRawSignal> fSignals;
-	JPetWriter* fWriter;
+  std::vector<JPetHit> createHits(const std::vector<JPetRawSignal>& signals);
+  void saveHits(const std::vector<JPetHit>&hits);
+  std::vector<JPetRawSignal> fSignals;
+  JPetWriter* fWriter;
+  LargeBarrelMapping fBarrelMap;
+  std::shared_ptr<JPetMap<TOT_cut>>f_map;
 };
 #endif

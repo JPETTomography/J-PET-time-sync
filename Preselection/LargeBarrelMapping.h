@@ -31,6 +31,7 @@ public:
         int calcDeltaID(const JPetBarrelSlot& slot1,const JPetBarrelSlot& slot2) const;
         int opositeDeltaID(const JPetLayer& layer) const;
         void buildMappings(const JPetParamBank & paramBank);
+        const int calcGlobalPMTNumber(const JPetPM & pmt) const;
 private:
 	std::map<double, int> fRadiusToLayer;
 	std::vector<std::map<double, int> > fThetaToSlot;

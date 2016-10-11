@@ -68,3 +68,16 @@ void LargeBarrelMapping::buildMappings(const JPetParamBank& paramBank){
 		layerNumber++;
 	}
 }
+
+const int LargeBarrelMapping::calcGlobalPMTNumber(const JPetPM & pmt) const {
+    const int number_of_sides = 2;
+    int layer_number = getLayerNumber(pmt.getBarrelSlot().getLayer());
+    int pmt_no = 0;
+    for(int l=1;l<layer_number;l++)
+	pmt_no += number_of_sides * getNumberOfSlots(l);
+    int slot_number = getSlotNumber(pmt.getBarrelSlot());
+    if( pmt.getSide() == JPetPM::SideB )
+	pmt_no += getNumberOfSlots(layer_number);
+    pmt_no += slot_number - 1;
+    return pmt_no;
+}

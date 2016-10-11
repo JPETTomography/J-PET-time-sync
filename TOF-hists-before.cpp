@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 		Plot<double>().Hist(shist,name)<<"set key on";
 		double numerator=0,denominator=0;
 		for(const auto&point:shist){
-		    numerator+=point.X().val()*point.Y().val();
+		    numerator+=point.Y().val()*point.X().val();
 		    denominator+=point.Y().val();
 		}
 		map->Item(layer,slot).A=numerator/denominator;
