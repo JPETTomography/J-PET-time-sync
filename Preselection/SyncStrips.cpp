@@ -25,22 +25,15 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap.buildMappings(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
 	int n_slots_in_half_layer = fBarrelMap.opositeDeltaID(*layer.second);
-	for (size_t thr=1;thr<=1;thr++){//Now we have data only for one threshold
-	    {
-		string histo_name = "Delta_ID_for_coincidences_"+LayerThr(fBarrelMap.getLayerNumber(*layer.second),thr);
-		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
-	    }
-	    for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
-		string histo_name = "Delta_t_with_oposite_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr);
-		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,400, -100.,+100.));
-	    }
-	    for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++){
-		string histo_name = "Delta_t_with_neighbour_"+LayerSlotThr(fBarrelMap.getLayerNumber(*layer.second),slot,thr)+"_deltaid"+to_string(neighbour_delta_id);
-		char * histo_title = Form("%s;#Delta ID", histo_name.c_str()); 
-		getStatistics().createHistogram( new TH1F(histo_name.c_str(), histo_title,400, -100.,+100.));
-	    }
+	const auto layer_n=fBarrelMap.getLayerNumber(*layer.second);
+	getStatistics().createHistogram( new TH1F(("DeltaID-for-coincidences-"+LayerThr(layer_n,1)).c_str(),"",n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
+	for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
+	    string histo_name = "DeltaT-with-oposite-"+LayerSlotThr(layer_n,slot,1);
+	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
+	}
+	for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++){
+	    string histo_name = "DeltaT-with-neighbour-"+LayerSlotThr(layer_n,slot,1)+"-deltaid"+to_string(neighbour_delta_id);
+	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
 	}
     }
 }
@@ -98,19 +91,19 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 		if(fabs(diff_1_2)<200.0){
 		    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 		    getStatistics().getHisto1D((
-			"Delta_ID_for_coincidences_"+LayerThr(layer1_n,1)
+			"DeltaID-for-coincidences-"+LayerThr(layer1_n,1)
 		    ).c_str()).Fill(delta_ID);
 		    auto opa_delta_ID=fBarrelMap.opositeDeltaID(hit1.getBarrelSlot().getLayer());
 		    if(delta_ID==opa_delta_ID){    
 			if(slot1<=opa_delta_ID)
 			    getStatistics().getHisto1D(
-				("Delta_t_with_oposite_"+
+				("DeltaT-with-oposite-"+
 				    LayerSlotThr(layer1_n,slot1,1)
 				).c_str()
 			    ).Fill(diff_1_2);
 			else
 			    getStatistics().getHisto1D(
-				("Delta_t_with_oposite_"+
+				("DeltaT-with-oposite-"+
 				    LayerSlotThr(layer2_n,slot2,1)
 				).c_str()
 			    ).Fill(-diff_1_2);
@@ -120,16 +113,16 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 				((slot2-slot1)==delta_ID)||(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==delta_ID)
 			    )
 				getStatistics().getHisto1D(
-				    ("Delta_t_with_neighbour_"+
+				    ("DeltaT-with-neighbour-"+
 					LayerSlotThr(layer1_n,slot1,1)+
-					"_deltaid"+to_string(neighbour_delta_id)
+					"-deltaid"+to_string(neighbour_delta_id)
 				    ).c_str()
 				).Fill(diff_1_2);
 			    else
 				getStatistics().getHisto1D(
-				    ("Delta_t_with_neighbour_"+
+				    ("DeltaT-with-neighbour-"+
 					LayerSlotThr(layer2_n,slot2,1)+
-					"_deltaid"+to_string(neighbour_delta_id)
+					"-deltaid"+to_string(neighbour_delta_id)
 				    ).c_str()
 				).Fill(-diff_1_2);
 			}
