@@ -22,14 +22,10 @@ int main(int argc, char **argv) {
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    auto action=[&root_filenames](const string&name,double&output){
-		const auto shist=ReadHist(root_filenames,name);
+		auto shist=ReadHist(root_filenames,name);
 		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:70]";
-		double numerator=0,denominator=0;
-		for(const auto&point:shist)if(point.X().Above(point.X().uncertainty())){
-		    numerator+=point.Y().val()*point.X().val();
-		    denominator+=point.Y().val();
-		}
-		output=numerator/denominator;
+		shist=shist.YRange(200,INFINITY);
+		output=(shist.left().X()+shist.right().X()).val()/2.0;
 	    };
 	    auto&item=map->Item(layer,slot);
 	    action("TOT-"+LayerSlotThr(layer,slot,1)+"-A"+postfix,item.A);
