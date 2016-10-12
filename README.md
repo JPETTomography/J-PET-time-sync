@@ -49,18 +49,21 @@ The input data format is HLD and the output format for time offsets in plain tex
 Lets consider the HLD files from the measurement described above to be stored in /path/to/the/data.
 During the analysis the software also generates ROOT files for events data and TXT files with such information as:
 
-- Cuts for TOT
+- Cuts for TOT (TOF-cut.txt)
 
-- Positions of peaks on t_A-t_B spectra
+- Positions of peaks on t_A-t_B spectra (AB-center.txt)
 
-- Positions of peaks on t_hit1-t_hit2 spectra for oposite strips
+- Positions of peaks on t_hit1-t_hit2 spectra for oposite strips (Oposite-strips.txt)
 
-- Positions of peaks on t_hit1-t_hit2 spectra for neighbour strips.
+- Positions of peaks on t_hit1-t_hit2 spectra for neighbour strips (Nieghbour-strips.txt)
+
+- The final result - time offsets for synchronization (Deltas.txt)
 
 All these files are stored in the same directory with data files.
 
 The software also stores huge amount of debug information in build directory.
 If one has gnuplot installed in the system the plots with this information will be stored in PNG files.
+When this software is used once more for another data these files are overwritten.
 
 The commands needed to perform the analysis look so:
 
