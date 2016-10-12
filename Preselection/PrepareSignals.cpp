@@ -17,6 +17,7 @@
 #include <JPetWriter/JPetWriter.h>
 #include "PrepareSignals.h"
 #include <IO/gethist.h>
+#include <math_h/error.h>
 using namespace std;
 PrepareSignals::PrepareSignals(const char * name, const char * description)
 :JPetTask(name, description),fCurrEventNumber(0){}
@@ -100,8 +101,15 @@ void PrepareSignals::exec(){
 		signals[pmt_id].addPoint( leadSigCh );
 		signals[pmt_id].addPoint( trailSigCh );
 		if(leadSigCh.getThresholdNumber()==1)switch(pm.getSide()){
-		    case JPetPM::SideA: getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_A").c_str()).Fill(tot / 1000.);
-		    case JPetPM::SideB: getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_B").c_str()).Fill(tot / 1000.);
+		    case JPetPM::SideA: 
+			getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_A").c_str()).Fill(tot / 1000.);
+		    break;
+		    case JPetPM::SideB: 
+			getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_B").c_str()).Fill(tot / 1000.);
+		    break;
+		    default: 
+			throw MathTemplates::Exception<PrepareSignals>("signal has unknown side");
+			
 		}
 	    }
 	}

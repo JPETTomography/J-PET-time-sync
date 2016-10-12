@@ -17,6 +17,7 @@
 #include <JPetWriter/JPetWriter.h>
 #include "PrepareHits.h"
 #include <IO/gethist.h>
+#include <math_h/error.h>
 using namespace std;
 PrepareHits::PrepareHits(const char * name, const char * description,const std::shared_ptr<JPetMap<TOT_cut>>map)
 :JPetTask(name, description),f_map(map){}
@@ -33,15 +34,34 @@ void PrepareHits::init(const JPetTaskInterface::Options& opts){
 }
 void PrepareHits::exec(){
     if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
-	if (fSignals.empty()) {
-	    fSignals.push_back(*currSignal);
-	} else {
-	    if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
+	double TOT=currSignal->getTOTsVsThresholdNumber()[1]/1000.;
+	const auto&bs=currSignal->getPM().getScin().getBarrelSlot();
+	const auto layer=fBarrelMap.getLayerNumber(bs.getLayer());
+	const auto slot=fBarrelMap.getSlotNumber(bs);
+	const auto&item=f_map->Item(layer,slot);
+	switch(currSignal->getPM().getSide()){
+	    case JPetPM::SideA:
+		getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_A").c_str()).Fill(TOT);
+		TOT-=item.A;
+	    break;
+	    case JPetPM::SideB: 
+		getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_B").c_str()).Fill(TOT);
+		TOT-=item.B;
+	    break;
+	    default: 
+		throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
+	}
+	if(TOT>0){
+	    if (fSignals.empty()) {
 		fSignals.push_back(*currSignal);
 	    } else {
-		saveHits(createHits(fSignals));
-		fSignals.clear();
-		fSignals.push_back(*currSignal);
+		if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
+		    fSignals.push_back(*currSignal);
+		} else {
+		    saveHits(createHits(fSignals));
+		    fSignals.clear();
+		    fSignals.push_back(*currSignal);
+		}
 	    }
 	}
     }
@@ -72,36 +92,16 @@ vector<JPetHit> PrepareHits::createHits(const vector<JPetRawSignal>& signals){
 			continue;
 		    }
 		}
-		const auto&bs=i->getPM().getScin().getBarrelSlot();
-		const auto layer=fBarrelMap.getLayerNumber(bs.getLayer());
-		const auto slot=fBarrelMap.getSlotNumber(bs);
-		
-		double TOT_A[4],TOT_B[4];
-		for(size_t thr=1;thr<=4;thr++){
-		    TOT_A[thr-1]=(recoSignalA.getRecoTimeAtThreshold(JPetSigCh::Trailing)-recoSignalA.getRecoTimeAtThreshold(JPetSigCh::Leading))/1000.;
-		    TOT_B[thr-1]=(recoSignalB.getRecoTimeAtThreshold(JPetSigCh::Trailing)-recoSignalB.getRecoTimeAtThreshold(JPetSigCh::Leading))/1000.;
-		}
-		bool accepted=true;
-		for(size_t thr=1;thr<4;thr++){
-		    accepted&=(TOT_A[thr-1]>=TOT_A[thr])&&(TOT_B[thr-1]>=TOT_B[thr]);
-		}
-		accepted&=(TOT_A[0]>f_map->Item(layer,slot).A);
-		accepted&=(TOT_B[0]>f_map->Item(layer,slot).B);
-		if(accepted){
-		    getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_A").c_str()).Fill(TOT_A[0]);
-		    getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_B").c_str()).Fill(TOT_B[0]);
-		    
-		    JPetPhysSignal physSignalA;
-		    JPetPhysSignal physSignalB;
-		    physSignalA.setRecoSignal(recoSignalA);
-		    physSignalB.setRecoSignal(recoSignalB);
-		    JPetHit hit;
-		    hit.setSignalA(physSignalA);
-		    hit.setSignalB(physSignalB);
-		    hit.setScintillator(i->getPM().getScin());
-		    hit.setBarrelSlot(i->getPM().getScin().getBarrelSlot());
-		    hits.push_back(hit);
-		}
+		JPetPhysSignal physSignalA;
+		JPetPhysSignal physSignalB;
+		physSignalA.setRecoSignal(recoSignalA);
+		physSignalB.setRecoSignal(recoSignalB);
+		JPetHit hit;
+		hit.setSignalA(physSignalA);
+		hit.setSignalB(physSignalB);
+		hit.setScintillator(i->getPM().getScin());
+		hit.setBarrelSlot(i->getPM().getScin().getBarrelSlot());
+		hits.push_back(hit);
 	    }
 	}
     }
