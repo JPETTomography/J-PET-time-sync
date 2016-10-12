@@ -46,11 +46,23 @@ How to use the software
 =======================
 
 The input data format is HLD and the output format for time offsets in plain text.
-During the analysis the software also generates *.root files for events data and text files with different kind of debug information.
-If one has gnuplot installed in the system the plots with debug information will be stored in PNG files.
-
 Lets consider the HLD files from the measurement described above to be stored in /path/to/the/data.
-In that case the commands needed to perform the analysis look so:
+During the analysis the software also generates ROOT files for events data and TXT files with such information as:
+
+- Cuts for TOT
+
+- Positions of peaks on t_A-t_B spectra
+
+- Positions of peaks on t_hit1-t_hit2 spectra for oposite strips
+
+- Positions of peaks on t_hit1-t_hit2 spectra for neighbour strips.
+
+All these files are stored in the same directory with data files.
+
+The software also stores huge amount of debug information in build directory.
+If one has gnuplot installed in the system the plots with this information will be stored in PNG files.
+
+The commands needed to perform the analysis look so:
 
 	cd J-PET-time-sync-build
 
@@ -64,6 +76,3 @@ In that case the commands needed to perform the analysis look so:
 
 The parameter '1' in last two lines means that when the genetic algorithm will run in one thread.
 One can increase this parameter for parallelizing it if the processor has more than one core.
-
-The deltas will be stored in the same directory with the data in file Deltas.txt.
-ROOT files also will be placed there but the debug plots will appear in the build directory.
