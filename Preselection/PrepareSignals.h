@@ -33,7 +33,7 @@ public:
   virtual void setWriter(JPetWriter* writer)override;
   virtual void setParamManager(JPetParamManager* paramManager)override;
   const JPetParamBank& getParamBank()const;
-protected:
+private:
   JPetWriter* fWriter;
   JPetParamManager* fParamManager;
   long long int fCurrEventNumber;

@@ -31,9 +31,8 @@ public:
   virtual void exec()override;
   virtual void terminate()override;
   virtual void setWriter(JPetWriter* writer)override;
-protected:
+private:
   std::vector<JPetHit> createHits(const std::vector<JPetRawSignal>& signals);
-  void saveHits(const std::vector<JPetHit>&hits);
   std::vector<JPetRawSignal> fSignals;
   JPetWriter* fWriter;
   LargeBarrelMapping fBarrelMap;
