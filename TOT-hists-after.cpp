@@ -21,9 +21,9 @@ int main(int argc, char **argv) {
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    string name="TOT_"+LayerSlotThr(layer,slot,1)+"_A";
-	    Plot<double>().Hist(ReadHist(root_filenames,name),name)<<"set key on"<<"set xrange [30:60]";
+	    Plot<double>().Hist(ReadHist(root_filenames,name),name)<<"set key on"<<"set xrange [30:70]";
 	    name="TOT_"+LayerSlotThr(layer,slot,1)+"_B";
-	    Plot<double>().Hist(ReadHist(root_filenames,name),name)<<"set key on"<<"set xrange [30:60]";
+	    Plot<double>().Hist(ReadHist(root_filenames,name),name)<<"set key on"<<"set xrange [30:70]";
 	}
     }
     return 0;
