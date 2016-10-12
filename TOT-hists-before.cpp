@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 		const auto shist=ReadHist(root_filenames,name);
 		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:70]";
 		double numerator=0,denominator=0;
-		for(const auto&point:shist)if(point.X().Above(0.)){
+		for(const auto&point:shist)if(point.X().Above(point.X().uncertainty())){
 		    numerator+=point.Y().val()*point.X().val();
 		    denominator+=point.Y().val();
 		}
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 		const auto shist=ReadHist(root_filenames,name);
 		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:70]";
 		double numerator=0,denominator=0;
-		for(const auto&point:shist)if(point.X().Above(0.)){
+		for(const auto&point:shist)if(point.X().Above(point.X().uncertainty())){
 		    numerator+=point.X().val()*point.Y().val();
 		    denominator+=point.Y().val();
 		}
