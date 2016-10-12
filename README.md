@@ -62,7 +62,8 @@ In that case the commands needed to perform the analysis look so:
 
 	./analyse4-final 1 /path/to/the/data
 
-The parameter '1' in last two lines means that when the genetic algorithm will run it will be executed in one thread.
-One can increase this parameter for parallelizing it.
+The parameter '1' in last two lines means that when the genetic algorithm will run in one thread.
+One can increase this parameter for parallelizing it if the processor has more than one core.
+
 The deltas will be stored in the same directory with the data in file Deltas.txt.
 ROOT files also will be placed there but the debug plots will appear in the build directory.
