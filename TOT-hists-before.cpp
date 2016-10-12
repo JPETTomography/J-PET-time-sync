@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	    {
 		const string name="TOT_"+LayerSlotThr(layer,slot,1)+"_A";
 		const auto shist=ReadHist(root_filenames,name);
-		Plot<double>().Hist(shist,name)<<"set key on";
+		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:60]";
 		double numerator=0,denominator=0;
 		for(const auto&point:shist){
 		    numerator+=point.Y().val()*point.X().val();
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 	    {
 		const string name="TOT_"+LayerSlotThr(layer,slot,1)+"_B";
 		const auto shist=ReadHist(root_filenames,name);
-		Plot<double>().Hist(shist,name)<<"set key on";
+		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:60]";
 		double numerator=0,denominator=0;
 		for(const auto&point:shist){
 		    numerator+=point.X().val()*point.Y().val();
