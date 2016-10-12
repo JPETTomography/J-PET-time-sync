@@ -1,7 +1,7 @@
 #!/bin/bash
-for X in `find $1|grep .hld`; do
-	echo "Preparing file  ${X}"
-	if [ -e ${X%.*}.phys.hit.root ]; then
+for X in `find $1|grep .hld|grep -v .root`; do
+	echo "File  ${X}"
+	if [ -e ${X%.*}.Signals.root ]; then
 		echo "has been analysed"
 	else
 		echo "starting analysis"

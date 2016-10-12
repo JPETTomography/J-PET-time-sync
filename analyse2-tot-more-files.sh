@@ -1,16 +1,15 @@
 #!/bin/bash
-paramlist=""
-for X in `find $1|grep .root|grep .Signals.`; do
-	paramlist=${paramlist}" "${X}
-done
-echo ${paramlist}
-./TOT-hists-before${paramlist} > ${1}/TOF-cut.txt
 
 filelist=`find $1|grep .root|grep .Signals.`
 echo ${filelist}
 for X in ${filelist}; do
-	echo "TOT cut : ${X}"
-	./Preselect-Hits -t root -f ${X} < ${1}/TOF-cut.txt
+	echo "File  ${X} for TOT cut"
+	if [ -e ${X%.*.*}.Hits.root ]; then
+		echo "has been analysed"
+	else
+		echo "starting analysis"
+		./Preselect-Hits -t root -f ${X} < ${1}/TOF-cut.txt
+	fi
 done
 
 paramlist=""
