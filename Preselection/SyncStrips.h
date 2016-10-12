@@ -31,7 +31,7 @@ public:
 	virtual void terminate()override;
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
-	void fillCoincidenceHistos(const std::vector<JPetHit>& hits);
+	void fillCoincidenceHistos();
 	LargeBarrelMapping fBarrelMap;
 	std::vector<JPetHit> fHits;
 	JPetWriter* fWriter;

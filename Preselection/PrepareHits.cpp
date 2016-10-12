@@ -66,8 +66,7 @@ void PrepareHits::exec(){
 		if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
 		    fSignals.push_back(*currSignal);
 		} else {
-		    createHits(fSignals);
-		    fSignals.clear();
+		    createAndStoreHits();
 		    fSignals.push_back(*currSignal);
 		}
 	    }
@@ -75,39 +74,34 @@ void PrepareHits::exec(){
     }
 }
 
-void PrepareHits::createHits(const vector<JPetRawSignal>& signals){
+void PrepareHits::createAndStoreHits(){
+    if(fSignals.empty())return;
     assert(fWriter);
-    for (size_t i=0,n=signals.size();i<n;i++) {
+    for (size_t i=0,n=fSignals.size();i<n;i++) {
+	auto&pm_i=fSignals[i].getPM();
+	auto&scin=pm_i.getScin();
 	for (auto j = i+1;j<n ;j++) {
-	    if (signals[i].getPM().getScin() == signals[j].getPM().getScin()) {
-		auto&scin=signals[i].getPM().getScin();
-		JPetRecoSignal recoSignalA,recoSignalB;
-		auto i_side=signals[i].getPM().getSide(),
-		    j_side=signals[j].getPM().getSide();
-		if ((i_side==JPetPM::SideA)&&(j_side==JPetPM::SideB)){
-		    recoSignalA.setRawSignal(signals[i]);
-		    recoSignalB.setRawSignal(signals[j]);
-		}else{ 
-		    if((j_side==JPetPM::SideA)&&(i_side==JPetPM::SideB)){
-			recoSignalA.setRawSignal(signals[j]);
-			recoSignalB.setRawSignal(signals[i]);
-		    }else{
-			WARNING("TWO hits on the same scintillator side we ignore it");         
-			continue;
-		    }
+	    auto&pm_j=fSignals[j].getPM();
+	    if (pm_j.getScin()==scin) {
+		const auto side_i=pm_i.getSide(),side_j=pm_j.getSide();
+		if(side_i!=side_j){
+		    JPetRecoSignal recoSignalA,recoSignalB;
+		    recoSignalA.setRawSignal(fSignals[(side_i==JPetPM::SideA)?i:j]);
+		    recoSignalB.setRawSignal(fSignals[(side_j==JPetPM::SideA)?i:j]);
+		    JPetPhysSignal physSignalA,physSignalB;
+		    physSignalA.setRecoSignal(recoSignalA);
+		    physSignalB.setRecoSignal(recoSignalB);
+		    JPetHit hit;
+		    hit.setSignalA(physSignalA);
+		    hit.setSignalB(physSignalB);
+		    hit.setScintillator(scin);
+		    hit.setBarrelSlot(scin.getBarrelSlot());
+		    fWriter->write(hit);
 		}
-		JPetPhysSignal physSignalA,physSignalB;
-		physSignalA.setRecoSignal(recoSignalA);
-		physSignalB.setRecoSignal(recoSignalB);
-		JPetHit hit;
-		hit.setSignalA(physSignalA);
-		hit.setSignalB(physSignalB);
-		hit.setScintillator(scin);
-		hit.setBarrelSlot(scin.getBarrelSlot());
-		fWriter->write(hit);
 	    }
 	}
     }
+    fSignals.clear();
 }
-void PrepareHits::terminate(){createHits(fSignals);}
+void PrepareHits::terminate(){}
 void PrepareHits::setWriter(JPetWriter* writer) {fWriter =writer;}

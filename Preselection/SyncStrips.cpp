@@ -54,20 +54,19 @@ void TaskSyncStrips::exec(){
 	    if (fHits.empty()) {
 		fHits.push_back(*currHit);
 	    } else {
-		if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+		if (fHits[0].getTimeWindowIndex() == currHit->getTimeWindowIndex()) {
 		    fHits.push_back(*currHit);
 		} else {
-		    fillCoincidenceHistos(fHits);
-		    fHits.clear();
+		    fillCoincidenceHistos();
 		    fHits.push_back(*currHit);
 		}
 	    }
 	}
     }
 }
-void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
-    for (auto i = hits.begin(); i != hits.end(); ++i){
-	for (auto j = i; ++j != hits.end(); ){
+void TaskSyncStrips::fillCoincidenceHistos(){
+    for (auto i = fHits.begin(); i != fHits.end(); ++i){
+	for (auto j = i; ++j != fHits.end(); ){
 	    auto& hit1 = *i;
 	    auto& hit2 = *j;
 	    const auto layer1_n=fBarrelMap.getLayerNumber(hit1.getBarrelSlot().getLayer());
@@ -131,6 +130,7 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 	    }
 	}
     }
+    fHits.clear();
 }
 void TaskSyncStrips::terminate(){}
 void TaskSyncStrips::setWriter(JPetWriter* writer){fWriter =writer;}
