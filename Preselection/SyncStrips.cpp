@@ -46,15 +46,28 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 }
 void TaskSyncStrips::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	if (fHits.empty()) {
-	    fHits.push_back(*currHit);
-	} else {
-	    if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+	bool accept=true;{
+	    const auto layer=fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer());
+	    const auto slot=fBarrelMap.getSlotNumber(currHit->getBarrelSlot());
+	    map<int,double> lead_times_A = currHit->getSignalA().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
+	    map<int,double> lead_times_B = currHit->getSignalB().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
+	    accept&=(lead_times_A.count(1)>0)&&(lead_times_B.count(1)>0);
+	    if(accept){
+		double diff_AB =(lead_times_A[1]-lead_times_B[1])/1000.0;
+		accept&=f_AB_position->operator()(layer,slot).peak.Contains(diff_AB);
+	    }
+	}
+	if(accept){
+	    if (fHits.empty()) {
 		fHits.push_back(*currHit);
 	    } else {
-		fillCoincidenceHistos(fHits);
-		fHits.clear();
-		fHits.push_back(*currHit);
+		if (fHits[0].getTimeWindowIndex() == currHit->getSignalB().getTimeWindowIndex()) {
+		    fHits.push_back(*currHit);
+		} else {
+		    fillCoincidenceHistos(fHits);
+		    fHits.clear();
+		    fHits.push_back(*currHit);
+		}
 	    }
 	}
     }
@@ -77,57 +90,48 @@ void TaskSyncStrips::fillCoincidenceHistos(const vector<JPetHit>& hits){
 		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		map<int,double> lead_times_2_B = hit2.getSignalB().getRecoSignal().getRawSignal()
 		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-		for(int thr=1;thr<=1;thr++){//now we have data for only one threshold
-		    if(
-			(lead_times_1_A.count(thr)>0)&&(lead_times_1_B.count(thr)>0)&&
-			(lead_times_2_A.count(thr)>0)&&(lead_times_2_B.count(thr)>0)
-		    ){
-			auto hit_1=(lead_times_1_A[thr]+lead_times_1_B[thr])/2000.0,
-			    hit_2=(lead_times_2_A[thr]+lead_times_2_B[thr])/2000.0,
-			    diff_1_2=hit_1-hit_2,
-			    diff_AB_1 =(lead_times_1_A[thr]-lead_times_1_B[thr])/1000.0,
-			    diff_AB_2 =(lead_times_2_A[thr]-lead_times_2_B[thr])/1000.0;
-			if(
-			    (fabs(diff_1_2)<200.0)
-			    &&(f_AB_position->operator()(layer1_n,slot1).peak.Contains(diff_AB_1))
-			    &&(f_AB_position->operator()(layer2_n,slot2).peak.Contains(diff_AB_2))
-			){
-			    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
-			    getStatistics().getHisto1D((
-				"Delta_ID_for_coincidences_"+LayerThr(layer1_n,thr)
-			    ).c_str()).Fill(delta_ID);
-			    auto opa_delta_ID=fBarrelMap.opositeDeltaID(hit1.getBarrelSlot().getLayer());
-			    if(delta_ID==opa_delta_ID){    
-				if(slot1<=opa_delta_ID)
-				    getStatistics().getHisto1D(
-					("Delta_t_with_oposite_"+LayerSlotThr(
-					    layer1_n,slot1,thr   
-					)).c_str()
-				    ).Fill(diff_1_2);
-				else
-				    getStatistics().getHisto1D(
-					("Delta_t_with_oposite_"+LayerSlotThr(
-					    layer2_n,slot2,thr   
-					)).c_str()
-				    ).Fill(-diff_1_2);
-			    }else{
-				if(neighbour_delta_id==delta_ID){
-				    if(
-					((slot2-slot1)==delta_ID)||(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==delta_ID)
-				    )
-					getStatistics().getHisto1D(
-					    ("Delta_t_with_neighbour_"+LayerSlotThr(
-						layer1_n,slot1,thr
-					    )+"_deltaid"+to_string(neighbour_delta_id)).c_str()
-					).Fill(diff_1_2);
-				    else
-					getStatistics().getHisto1D(
-					    ("Delta_t_with_neighbour_"+LayerSlotThr(
-						layer2_n,slot2,thr
-					    )+"_deltaid"+to_string(neighbour_delta_id)).c_str()
-					).Fill(-diff_1_2);
-				}
-			    }
+		auto hit_1=(lead_times_1_A[1]+lead_times_1_B[1])/2000.0,
+		hit_2=(lead_times_2_A[1]+lead_times_2_B[1])/2000.0,
+		diff_1_2=hit_1-hit_2,
+		diff_AB_1 =(lead_times_1_A[1]-lead_times_1_B[1])/1000.0,
+		diff_AB_2 =(lead_times_2_A[1]-lead_times_2_B[1])/1000.0;
+		if(fabs(diff_1_2)<200.0){
+		    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
+		    getStatistics().getHisto1D((
+			"Delta_ID_for_coincidences_"+LayerThr(layer1_n,1)
+		    ).c_str()).Fill(delta_ID);
+		    auto opa_delta_ID=fBarrelMap.opositeDeltaID(hit1.getBarrelSlot().getLayer());
+		    if(delta_ID==opa_delta_ID){    
+			if(slot1<=opa_delta_ID)
+			    getStatistics().getHisto1D(
+				("Delta_t_with_oposite_"+
+				    LayerSlotThr(layer1_n,slot1,1)
+				).c_str()
+			    ).Fill(diff_1_2);
+			else
+			    getStatistics().getHisto1D(
+				("Delta_t_with_oposite_"+
+				    LayerSlotThr(layer2_n,slot2,1)
+				).c_str()
+			    ).Fill(-diff_1_2);
+		    }else{
+			if(neighbour_delta_id==delta_ID){
+			    if(
+				((slot2-slot1)==delta_ID)||(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==delta_ID)
+			    )
+				getStatistics().getHisto1D(
+				    ("Delta_t_with_neighbour_"+
+					LayerSlotThr(layer1_n,slot1,1)+
+					"_deltaid"+to_string(neighbour_delta_id)
+				    ).c_str()
+				).Fill(diff_1_2);
+			    else
+				getStatistics().getHisto1D(
+				    ("Delta_t_with_neighbour_"+
+					LayerSlotThr(layer2_n,slot2,1)+
+					"_deltaid"+to_string(neighbour_delta_id)
+				    ).c_str()
+				).Fill(-diff_1_2);
 			}
 		    }
 		}
