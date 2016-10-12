@@ -75,7 +75,7 @@ void PrepareHits::exec(){
     }
 }
 
-vector<JPetHit> PrepareHits::createHits(const vector<JPetRawSignal>& signals){
+void PrepareHits::createHits(const vector<JPetRawSignal>& signals){
     assert(fWriter);
     for (size_t i=0,n=signals.size();i<n;i++) {
 	for (auto j = i+1;j<n ;j++) {

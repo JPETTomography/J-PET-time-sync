@@ -32,7 +32,7 @@ public:
   virtual void terminate()override;
   virtual void setWriter(JPetWriter* writer)override;
 private:
-  std::vector<JPetHit> createHits(const std::vector<JPetRawSignal>& signals);
+  void createHits(const std::vector<JPetRawSignal>& signals);
   std::vector<JPetRawSignal> fSignals;
   JPetWriter* fWriter;
   LargeBarrelMapping fBarrelMap;
