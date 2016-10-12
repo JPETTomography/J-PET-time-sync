@@ -17,4 +17,4 @@ for X in `find $1|grep .root|grep .Hits.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
-./TOT-hists after-cut${paramlist} > /dev/null
+./TOT-hists -after-cut${paramlist} > /dev/null

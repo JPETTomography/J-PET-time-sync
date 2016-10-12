@@ -27,8 +27,8 @@ void PrepareHits::init(const JPetTaskInterface::Options& opts){
     for(auto & layer : getParamBank().getLayers()){
 	auto l_n=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
-	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l_n,sl,1)+"_A").c_str(), "",500, 0.,100.));
-	    getStatistics().createHistogram( new TH1F(("TOT_"+LayerSlotThr(l_n,sl,1)+"_B").c_str(), "",500, 0.,100.));
+	    getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,1)+"-A-after-cut").c_str(), "",500, 0.,100.));
+	    getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,1)+"-B-after-cut").c_str(), "",500, 0.,100.));
 	}
     }
 }
@@ -41,17 +41,25 @@ void PrepareHits::exec(){
 	const auto&item=f_map->Item(layer,slot);
 	switch(currSignal->getPM().getSide()){
 	    case JPetPM::SideA:
-		getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_A").c_str()).Fill(TOT);
 		TOT-=item.A;
 	    break;
 	    case JPetPM::SideB: 
-		getStatistics().getHisto1D(("TOT_"+LayerSlotThr(layer,slot,1)+"_B").c_str()).Fill(TOT);
 		TOT-=item.B;
 	    break;
 	    default: 
 		throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
 	}
 	if(TOT>0){
+	    switch(currSignal->getPM().getSide()){
+		case JPetPM::SideA:
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-A-after-cut").c_str()).Fill(TOT+item.A);
+		    break;
+		case JPetPM::SideB: 
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-B-after-cut").c_str()).Fill(TOT+item.B);
+		    break;
+		default: 
+		    throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
+	    }
 	    if (fSignals.empty()) {
 		fSignals.push_back(*currSignal);
 	    } else {

@@ -16,12 +16,12 @@ using namespace std;
 using namespace MathTemplates;
 const string LayerThr(const size_t layer, const size_t thr){
     stringstream stream;
-    stream<<"layer_"<<layer<<"_thr_"<<thr;
+    stream<<"layer"<<layer<<"-thr"<<thr;
     return stream.str();
 }
 const string LayerSlotThr(const size_t layer, const size_t slot, const size_t thr){
     stringstream stream;
-    stream<<"layer_"<<layer<<"_slot_"<<slot<<"_thr_"<<thr;
+    stream<<"layer"<<layer<<"-slot"<<slot<<"-thr"<<thr;
     return stream.str();
 }
 

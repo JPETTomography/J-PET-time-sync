@@ -16,7 +16,8 @@ int main(int argc, char **argv) {
     vector<string> root_filenames;
     for(int i=2;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
-    Plotter::Instance().SetOutput(".","TOF-hists-"+string(argv[1]));
+    string postfix=argv[1];
+    Plotter::Instance().SetOutput(".","TOF-hists"+postfix);
     auto map=make_JPetMap<TOT_cut>();
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
@@ -31,8 +32,8 @@ int main(int argc, char **argv) {
 		output=numerator/denominator;
 	    };
 	    auto&item=map->Item(layer,slot);
-	    action("TOT_"+LayerSlotThr(layer,slot,1)+"_A",item.A);
-	    action("TOT_"+LayerSlotThr(layer,slot,1)+"_B",item.B);
+	    action("TOT-"+LayerSlotThr(layer,slot,1)+"-A"+postfix,item.A);
+	    action("TOT-"+LayerSlotThr(layer,slot,1)+"-B"+postfix,item.B);
 	}
     }
     cout<<(*map);
