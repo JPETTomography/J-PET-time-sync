@@ -24,7 +24,9 @@ int main(int argc, char **argv) {
 	    auto action=[&root_filenames](const string&name,double&output){
 		auto shist=ReadHist(root_filenames,name);
 		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:70]";
-		shist=shist.YRange(200,INFINITY);
+		shist=shist.XRange(0.2,INFINITY);
+		double max=0;for(const auto&p:shist)if(max<p.Y().val())max=p.Y().val();
+		shist=shist.YRange(max*0.1,INFINITY);
 		output=(shist.left().X()+shist.right().X()).val()/2.0;
 	    };
 	    auto&item=map->Item(layer,slot);
