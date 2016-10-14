@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
 	hist<double> left,right,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    const auto name=LayerSlotThr(layer,slot,1);;
-	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name+"-deltaid"+to_string(neighbour_delta_id));
+	    const auto name=LayerSlotThr(layer,slot,1);
+	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name+"-deltaid"+to_string(neighbour_delta_id)).Scale(2);
 	    {
 		auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);
