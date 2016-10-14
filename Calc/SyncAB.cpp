@@ -40,7 +40,7 @@ namespace Sync{
 	fit.Init(fit.Points()->size()*2,make_shared<GenerateByGauss>()
 	    <<make_pair(total,total*30.0)
 	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
-	    <<make_pair(1.5,2.5)
+	    <<make_pair(2.0,2.5)
 	    <<make_pair(hist.left().X().max(),(hist.right().X().max()-hist.left().X().min())/2.0)
 	    <<make_pair(-0.5,0.5)
 	    <<make_pair(hist.right().X().min(),(hist.right().X().max()-hist.left().X().min())/2.0)

@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 		SortedPoints<double> chisq;
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			const auto name=LayerSlotThr(layer,slot,1);
-			const auto shist=ReadHist(root_filenames,name).Scale(3);
+			const auto shist=ReadHist(root_filenames,name);
 			auto&item=map->Item(layer,slot)=Sync::Fit4SyncAB(shist,"SyncAB "+name,thr_cnt);
 			position<<point<value<double>>(double(slot),item.peak);
 			chisq<<point<double>(double(slot),item.chi_sq);

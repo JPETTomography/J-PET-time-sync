@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);
-	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name).Scale(3);
+	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
 	    {
 		auto& item=map->Item(layer,slot)=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
 		position<<point<value<double>>(double(slot),item.peak);
