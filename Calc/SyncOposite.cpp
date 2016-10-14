@@ -24,7 +24,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(fit.Points()->size(),make_shared<GenerateByGauss>()
+	fit.Init(fit.Points()->size()*2,make_shared<GenerateByGauss>()
 	    <<make_pair(total,total*30.0)
 	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
 	    <<make_pair(1.5,2.5)
