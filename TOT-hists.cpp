@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 		shist=shist.XRange(0.2,INFINITY);
 		double max=0;for(const auto&p:shist)if(max<p.Y().val())max=p.Y().val();
 		shist=shist.YRange(max*0.1,INFINITY);
-		output=(shist.left().X()+shist.right().X()).val()/2.0;
+		output=(shist.left().X()+shist.right().X()).val()/2.0 +1.0;
 	    };
 	    auto&item=map->Item(layer,slot);
 	    action("TOT-"+LayerSlotThr(layer,slot,1)+"-A"+postfix,item.A);
