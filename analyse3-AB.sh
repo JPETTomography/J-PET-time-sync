@@ -10,4 +10,5 @@ for X in `find $2|grep .root|grep .Stat4AB.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo ${paramlist}
+./AB-hists${paramlist}
 ./Fit-AB $1${paramlist} > ${2}/AB-center.txt
