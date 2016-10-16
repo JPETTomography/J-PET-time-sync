@@ -34,28 +34,29 @@ void PrepareHits::init(const JPetTaskInterface::Options& opts){
 }
 void PrepareHits::exec(){
     if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
-	double TOT=currSignal->getTOTsVsThresholdNumber()[1]/1000.;
+	const double TOT=currSignal->getTOTsVsThresholdNumber()[1]/1000.;
 	const auto&bs=currSignal->getPM().getScin().getBarrelSlot();
 	const auto layer=fBarrelMap.getLayerNumber(bs.getLayer());
 	const auto slot=fBarrelMap.getSlotNumber(bs);
 	const auto&item=f_map->Item(layer,slot);
+	double thr=TOT;
 	switch(currSignal->getPM().getSide()){
 	    case JPetPM::SideA:
-		TOT-=item.A;
+		thr-=item.A;
 	    break;
 	    case JPetPM::SideB: 
-		TOT-=item.B;
+		thr-=item.B;
 	    break;
 	    default: 
 		throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
 	}
-	if(TOT>0){
+	if(thr>0){
 	    switch(currSignal->getPM().getSide()){
 		case JPetPM::SideA:
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-A-after-cut").c_str()).Fill(TOT+item.A);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-A-after-cut").c_str()).Fill(TOT);
 		    break;
 		case JPetPM::SideB: 
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-B-after-cut").c_str()).Fill(TOT+item.B);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-B-after-cut").c_str()).Fill(TOT);
 		    break;
 		default: 
 		    throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
