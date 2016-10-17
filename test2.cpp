@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     vector<string> root_filenames;
     for(int i=1;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
-    Plotter::Instance().SetOutput(".","AB");
+    Plotter::Instance().SetOutput(".","test");
     auto map=make_JPetMap<char>();
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
