@@ -42,7 +42,7 @@ void TestSyncAB::exec(){
 		(lead_times_A[3]-lead_times_B[3])/1000.0,
 		(lead_times_A[4]-lead_times_B[4])/1000.0
 	    };
-	    auto diff_AB=(delta_AB[0]+delta_AB[1])/2.0;
+	    auto diff_AB=(delta_AB[0]+delta_AB[1]+delta_AB[2])/3.0;
 	    const auto layer=fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer());
 	    const auto slot=fBarrelMap.getSlotNumber(currHit->getBarrelSlot());
 	    getStatistics().getHisto1D(LayerSlotThr(layer,slot,1).c_str()).Fill(diff_AB);
