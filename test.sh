@@ -11,4 +11,3 @@ for X in ${filelist}; do
 	echo ${paramlist}
 	./test2${paramlist}
 done
-./Fit-AB 1${paramlist}
