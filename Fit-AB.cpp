@@ -13,8 +13,7 @@ int main(int argc, char **argv) {
 		cerr<<"Usage: "<<argv[0]<<" <thread_count> <filename> <filename> ..."<<endl;
 		return -1;
 	}
-	size_t thr_cnt=0;
-	{
+	size_t thr_cnt=0;{
 		stringstream thr_count(argv[1]);
 		thr_count>>thr_cnt;
 		if(0==thr_cnt){
