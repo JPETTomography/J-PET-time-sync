@@ -21,7 +21,7 @@
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <IO/PetDict.h>
 #include <Calc/convention.h>
-#include "LargeBarrelMapping.h"
+#include "LargeBarrelExtensions.h"
 class JPetWriter;
 class PrepareHits:public JPetTask {
 public:

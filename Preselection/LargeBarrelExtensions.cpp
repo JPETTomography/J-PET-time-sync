@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <math_h/error.h>
-#include "LargeBarrelMapping.h"
+#include "LargeBarrelExtensions.h"
 using namespace std;
 using namespace MathTemplates;
 const double degFullCircle = 360.;
@@ -11,10 +11,10 @@ LargeBarrelMapping::LargeBarrelMapping(const JPetParamBank& paramBank){
 	buildMappings(paramBank);
 }
 int LargeBarrelMapping::getLayerNumber(const JPetLayer& layer) const{
-	return fRadiusToLayer.at(layer.getRadius());//??????? it's very strange thing
+	return fRadiusToLayer.at(layer.getRadius());
 }
 int LargeBarrelMapping::getNumberOfSlots(const JPetLayer& layer) const {
-	return fNumberOfSlotsInLayer.at(fRadiusToLayer.at(layer.getRadius()) - 1);//??????? it's very strange thing
+	return fNumberOfSlotsInLayer.at(fRadiusToLayer.at(layer.getRadius()) - 1);
 }
 int LargeBarrelMapping::getNumberOfSlots(int layerNumber) const {
 	return fNumberOfSlotsInLayer.at(layerNumber-1);

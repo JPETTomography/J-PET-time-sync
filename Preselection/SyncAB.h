@@ -18,7 +18,7 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
-#include "LargeBarrelMapping.h"
+#include "LargeBarrelExtensions.h"
 class JPetWriter;
 class TaskSyncAB:public JPetTask {
 public:

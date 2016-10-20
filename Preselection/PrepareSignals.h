@@ -21,7 +21,7 @@
 #include <JPetTimeWindow/JPetTimeWindow.h>
 #include <JPetParamBank/JPetParamBank.h>
 #include <JPetParamManager/JPetParamManager.h>
-#include "LargeBarrelMapping.h"
+#include "LargeBarrelExtensions.h"
 class JPetWriter;
 class PrepareSignals: public JPetTask{
 public:
