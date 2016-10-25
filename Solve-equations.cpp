@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
 	}
 	Plot<double>().Line(opt_min,"").Line(opt_max,"")<<"set xlabel 'layer "+to_string(layer)+"'";
 	Plotter::Instance()<<"unset log y";
-	cout<<endl;
-	cout<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
+	cerr<<endl;
+	cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
 	solver_hits.SetUncertaintyCalcDeltas(parEq(solver_hits.ParamCount(),0.01));
 	const auto&solution=solver_hits.ParametersWithUncertainties();
 	hist<double> eq_left,eq_right,delta_hits;
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'"<<"unset log y";
 	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'";
 	
-	for(size_t i=1;i<DeltaT->LayerSize(layer);i++){
+	for(size_t i=1;i<=DeltaT->LayerSize(layer);i++){
 	    const auto& ab=AB->Item(layer,i);
 	    DeltaT->Item(layer,i)={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
 	}
