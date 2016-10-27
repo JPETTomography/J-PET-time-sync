@@ -1,4 +1,11 @@
 #!/bin/bash
+if [ -e $2/Deltas.txt ]; then
+    echo "Deltas.txt exists"
+else
+    echo "Creating Deltas.txt"
+    ./gen_empty > $2/Deltas.txt
+fi
+                                                                
 for X in `find $2|grep .root|grep .Hits.`; do
 	echo "Stage AB : ${X}"
 	(cat ${2}/Deltas.txt)| ./Preselect-AB -t root -f ${X}
