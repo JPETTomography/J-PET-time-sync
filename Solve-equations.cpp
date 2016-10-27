@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
     auto DeltaT_D=make_JPetMap<DeltaT_results>();
     auto DeltaT=make_JPetMap<SynchroStrip>();
+    cin>>(*DeltaT);
     Plotter::Instance().SetOutput(".","delta_t_sync");
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
 	cerr<<"=======LAYER "<<L<<" : "<<endl;

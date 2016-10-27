@@ -11,4 +11,4 @@ echo ${paramlist}
 ./Fit-oposite $1${paramlist} > ${2}/Oposite-strips.txt
 ./Fit-neighbour $1${paramlist} > ${2}/Neighbour-strips.txt
 
-./Solve-equations $1 ${2}/AB-center.txt ${2}/Oposite-strips.txt ${2}/Neighbour-strips.txt > ${2}/Deltas.txt
+(cat ${2}/Deltas.txt)|./Solve-equations $1 ${2}/AB-center.txt ${2}/Oposite-strips.txt ${2}/Neighbour-strips.txt > ${2}/Deltas.new.txt
