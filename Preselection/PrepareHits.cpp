@@ -27,36 +27,39 @@ void PrepareHits::init(const JPetTaskInterface::Options& opts){
     for(auto & layer : getParamBank().getLayers()){
 	auto l_n=fBarrelMap.getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
-	    getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,1)+"-A-after-cut").c_str(), "",500, 0.,100.));
-	    getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,1)+"-B-after-cut").c_str(), "",500, 0.,100.));
+	    for(size_t thr=1;thr<=4;thr++){
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-A-before-cut").c_str(), "",500, 0.,100.));
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-B-before-cut").c_str(), "",500, 0.,100.));
+	    }
 	}
     }
 }
 void PrepareHits::exec(){
     if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
-	const double TOT=currSignal->getTOTsVsThresholdNumber()[1]/1000.;
+	auto TOT=currSignal->getTOTsVsThresholdNumber();
 	const auto&bs=currSignal->getPM().getScin().getBarrelSlot();
 	const auto layer=fBarrelMap.getLayerNumber(bs.getLayer());
 	const auto slot=fBarrelMap.getSlotNumber(bs);
 	const auto&item=f_map->Item(layer,slot);
-	double thr=TOT;
-	switch(currSignal->getPM().getSide()){
-	    case JPetPM::SideA:
-		thr-=item.A;
-	    break;
+	bool passed=true;
+	for(size_t thr=1;thr<4;thr++)passed&=(TOT[thr]>TOT[thr+1]);
+	for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
+	    case JPetPM::SideA:    
+		passed&=(TOT[thr]>item.A[thr-1]);
+		break;
 	    case JPetPM::SideB: 
-		thr-=item.B;
-	    break;
+		passed&=(TOT[thr]>item.B[thr-1]);
+		break;
 	    default: 
 		throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
 	}
-	if(thr>0){
-	    switch(currSignal->getPM().getSide()){
-		case JPetPM::SideA:
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-A-after-cut").c_str()).Fill(TOT);
+	if(passed>0){
+	    for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
+		case JPetPM::SideA:    
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,thr)+"-A-after-cut").c_str()).Fill(TOT[thr]);
 		    break;
 		case JPetPM::SideB: 
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,1)+"-B-after-cut").c_str()).Fill(TOT);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,thr)+"-B-after-cut").c_str()).Fill(TOT[thr]);
 		    break;
 		default: 
 		    throw MathTemplates::Exception<PrepareHits>("signal has unknown side");

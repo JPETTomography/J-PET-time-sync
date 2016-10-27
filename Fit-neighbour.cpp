@@ -3,7 +3,7 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
-#include <IO/PetDict.h>
+#include <j-pet-framework-extension/PetDict.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;

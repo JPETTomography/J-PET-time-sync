@@ -19,7 +19,7 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
-#include <IO/PetDict.h>
+#include <j-pet-framework-extension/PetDict.h>
 #include <Calc/convention.h>
 #include "LargeBarrelExtensions.h"
 class JPetWriter;

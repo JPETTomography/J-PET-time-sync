@@ -6,7 +6,7 @@
 #include <Genetic/genetic.h>
 #include <Genetic/initialconditions.h>
 #include <IO/gethist.h>
-#include <IO/PetDict.h>
+#include <j-pet-framework-extension/PetDict.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;

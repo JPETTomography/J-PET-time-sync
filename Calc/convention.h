@@ -2,15 +2,6 @@
 #	define ___________CONV_JPET_TIME_SYNC________
 #include <iostream>
 #include <math_h/sigma.h>
-struct TOT_cut{
-  double A,B;
-};
-inline std::istream&operator>>(std::istream&str,TOT_cut&item){
-  return str>>item.A>>item.B;
-}
-inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
-  return str<<item.A<<"\t"<<item.B;
-}
 struct SyncAB_results{
   MathTemplates::value<double>peak;double chi_sq;
 };

@@ -3,8 +3,8 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
-#include <IO/PetDict.h>
-#include <Calc/convention.h>
+#include <j-pet-framework-extension/PetDict.h>
+#include <j-pet-framework-extension/deltas.h>
 using namespace std;
 using namespace GnuplotWrap;
 using namespace MathTemplates;
@@ -21,20 +21,25 @@ int main(int argc, char **argv) {
     auto map=make_JPetMap<TOT_cut>();
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    auto action=[&root_filenames](const string&name,double&output){
-		auto shist=ReadHist(root_filenames,name);
-		Plot<double>().Hist(shist,name)<<"set key on"<<"set xrange [30:70]";
-		shist=shist.XRange(0.5,INFINITY);
-		double num=0,denom=0;
-		for(const auto&p:shist){
-		    num+=p.X().val()*p.Y().val();
-		    denom+=p.Y().val();
+	    auto action=[&root_filenames,layer,slot,&postfix](double*output){
+		Plot<double> plot;
+		plot<<"set key on"<<"set xrange [0:100]";
+		for(size_t t=0;t<thresholds_count;t++){
+		    string name="TOT-"+LayerSlotThr(layer,slot,t+1)+"-A"+postfix;
+		    auto shist=ReadHist(root_filenames,name);
+		    plot.Hist(shist,name);
+		    shist=shist.XRange(0.5,INFINITY);
+		    double num=0,denom=0;
+		    for(const auto&p:shist){
+			num+=p.X().val()*p.Y().val();
+			denom+=p.Y().val();
+		    }
+		    output[t]= num/denom;
 		}
-		output= num/denom;
 	    };
 	    auto&item=map->Item(layer,slot);
-	    action("TOT-"+LayerSlotThr(layer,slot,1)+"-A"+postfix,item.A);
-	    action("TOT-"+LayerSlotThr(layer,slot,1)+"-B"+postfix,item.B);
+	    action(item.A);
+	    action(item.B);
 	}
     }
     cout<<(*map);
