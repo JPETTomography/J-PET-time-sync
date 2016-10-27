@@ -21,11 +21,11 @@ int main(int argc, char **argv) {
     auto map=make_JPetMap<TOT_cut>();
     for(size_t layer=1;layer<=map->LayersCount();layer++){
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    auto action=[&root_filenames,layer,slot,&postfix](double*output){
+	    auto action=[&root_filenames,layer,slot,&postfix](const string&letter,double*output){
 		Plot<double> plot;
-		plot<<"set key on"<<"set xrange [0:100]";
+		plot<<"set key on"<<"set xrange [30:80]";
 		for(size_t t=0;t<thresholds_count;t++){
-		    string name="TOT-"+LayerSlotThr(layer,slot,t+1)+"-A"+postfix;
+		    string name="TOT-"+LayerSlotThr(layer,slot,t+1)+letter+postfix;
 		    auto shist=ReadHist(root_filenames,name);
 		    plot.Hist(shist,name);
 		    shist=shist.XRange(0.5,INFINITY);
@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
 		}
 	    };
 	    auto&item=map->var_item({.layer=layer,.slot=slot});
-	    action(item.A);
-	    action(item.B);
+	    action("-A",item.A);
+	    action("-B",item.B);
 	}
     }
     cout<<(*map);
