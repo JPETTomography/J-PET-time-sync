@@ -43,7 +43,6 @@ void PrepareHits::exec(){
 	const auto strippos=fBarrelMap->getStripPos(bs);
 	const auto&item=f_map->item(strippos);
 	bool passed=true;
-	for(size_t thr=1;thr<4;thr++)passed&=(TOT[thr]>TOT[thr+1]);
 	for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
 	    case JPetPM::SideA:    
 		passed&=(TOT[thr]>item.A[thr-1]);

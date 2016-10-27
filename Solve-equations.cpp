@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
 	cerr<<solver_hits.PopulationSize()<<" points"<<endl;
 	SortedPoints<double> opt_min,opt_max;
-	while(!solver_hits.AbsoluteOptimalityExitCondition(0.0001)){
+	while(!solver_hits.AbsoluteOptimalityExitCondition(0.001)){
 	    solver_hits.Iterate(engine);
 	    auto min=solver_hits.Optimality(),max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
 	    cerr<<solver_hits.iteration_count()<<" iterations; "
