@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlotThr(layer,slot,1);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
 	    {
-		auto& item=map->Item(layer,slot)=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
+		const auto& item=map->var_item({.layer=layer,.slot=slot})=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
 		position<<point<value<double>>(double(slot),item.peak);
 		chisq<<point<double>(slot,item.chi_sq);
 	    }

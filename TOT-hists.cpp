@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 		    output[t]= num/denom;
 		}
 	    };
-	    auto&item=map->Item(layer,slot);
+	    auto&item=map->var_item({.layer=layer,.slot=slot});
 	    action(item.A);
 	    action(item.B);
 	}

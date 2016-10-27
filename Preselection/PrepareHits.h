@@ -19,13 +19,12 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
-#include <j-pet-framework-extension/PetDict.h>
 #include <Calc/convention.h>
-#include "LargeBarrelExtensions.h"
+class LargeBarrelMapping;
 class JPetWriter;
 class PrepareHits:public JPetTask {
 public:
-  PrepareHits(const char * name, const char * description,const std::shared_ptr<JPetMap<TOT_cut>>map);
+  PrepareHits(const char * name, const char * description);
   virtual ~PrepareHits();
   virtual void init(const JPetTaskInterface::Options& opts)override;
   virtual void exec()override;
@@ -35,7 +34,7 @@ private:
   void createAndStoreHits();
   std::vector<JPetRawSignal> fSignals;
   JPetWriter* fWriter;
-  LargeBarrelMapping fBarrelMap;
+  std::shared_ptr<LargeBarrelMapping>fBarrelMap;
   std::shared_ptr<JPetMap<TOT_cut>>f_map;
 };
 #endif

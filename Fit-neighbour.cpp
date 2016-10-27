@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlotThr(layer,slot,1);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name+"-deltaid"+to_string(neighbour_delta_id));
 	    {
-		auto& item=map->Item(layer,slot)=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
+		const auto& item=map->var_item({.layer=layer,.slot=slot})=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);
 		assym<<point<value<double>>(double(slot),item.assymetry);

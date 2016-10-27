@@ -20,21 +20,21 @@
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <j-pet-framework-extension/PetDict.h>
-#include <Calc/convention.h>
-#include "LargeBarrelExtensions.h"
+class LargeBarrelMapping;
+class SyncAB_results;
 class JPetWriter;
 class TaskSyncStrips:public JPetTask {
 public:
-	TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>>,const char * name, const char * description);
+	TaskSyncStrips(const char * name, const char * description);
 	virtual void init(const JPetTaskInterface::Options& opts)override;
 	virtual void exec()override;
 	virtual void terminate()override;
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
 	void fillCoincidenceHistos();
-	LargeBarrelMapping fBarrelMap;
 	std::vector<JPetHit> fHits;
 	JPetWriter* fWriter;
+        std::shared_ptr<LargeBarrelMapping> fBarrelMap;
         std::shared_ptr<JPetMap<SyncAB_results>> f_AB_position;
 };
 #endif

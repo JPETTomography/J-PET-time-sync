@@ -14,19 +14,21 @@
  */
 
 #include <iostream>
-#include <JPetWriter/JPetWriter.h>
-#include "PrepareHits.h"
-#include <IO/gethist.h>
 #include <math_h/error.h>
+#include <JPetWriter/JPetWriter.h>
+#include <j-pet-framework-extension/BarrelExtensions.h>
+#include <IO/gethist.h>
+#include "PrepareHits.h"
 using namespace std;
-PrepareHits::PrepareHits(const char * name, const char * description,const std::shared_ptr<JPetMap<TOT_cut>>map)
-:JPetTask(name, description),f_map(map){}
+PrepareHits::PrepareHits(const char * name, const char * description):JPetTask(name, description){}
 PrepareHits::~PrepareHits(){}
 void PrepareHits::init(const JPetTaskInterface::Options& opts){
-    fBarrelMap.buildMappings(getParamBank());
+    fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
+    f_map=make_shared<JPetMap<TOT_cut>>(fBarrelMap->getLayersSizes());
+    cin>>(*f_map);
     for(auto & layer : getParamBank().getLayers()){
-	auto l_n=fBarrelMap.getLayerNumber(*layer.second);
-	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
+	auto l_n=fBarrelMap->getLayerNumber(*layer.second);
+	for(size_t sl=1,n=fBarrelMap->getSlotsCount(*layer.second);sl<=n;sl++){
 	    for(size_t thr=1;thr<=4;thr++){
 		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-A-before-cut").c_str(), "",500, 0.,100.));
 		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-B-before-cut").c_str(), "",500, 0.,100.));
@@ -38,9 +40,8 @@ void PrepareHits::exec(){
     if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
 	auto TOT=currSignal->getTOTsVsThresholdNumber();
 	const auto&bs=currSignal->getPM().getScin().getBarrelSlot();
-	const auto layer=fBarrelMap.getLayerNumber(bs.getLayer());
-	const auto slot=fBarrelMap.getSlotNumber(bs);
-	const auto&item=f_map->Item(layer,slot);
+	const auto strippos=fBarrelMap->getStripPos(bs);
+	const auto&item=f_map->item(strippos);
 	bool passed=true;
 	for(size_t thr=1;thr<4;thr++)passed&=(TOT[thr]>TOT[thr+1]);
 	for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
@@ -53,13 +54,13 @@ void PrepareHits::exec(){
 	    default: 
 		throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
 	}
-	if(passed>0){
+	if(passed){
 	    for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
 		case JPetPM::SideA:    
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,thr)+"-A-after-cut").c_str()).Fill(TOT[thr]);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-A-after-cut").c_str()).Fill(TOT[thr]);
 		    break;
 		case JPetPM::SideB: 
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(layer,slot,thr)+"-B-after-cut").c_str()).Fill(TOT[thr]);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-B-after-cut").c_str()).Fill(TOT[thr]);
 		    break;
 		default: 
 		    throw MathTemplates::Exception<PrepareHits>("signal has unknown side");

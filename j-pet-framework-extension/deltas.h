@@ -1,6 +1,8 @@
 #ifndef _________DELTAS_H_______
 #       define _________DELTAS_H_______
+#include <memory>
 #include <JPetHit/JPetHit.h>
+#include "BarrelExtensions.h"
 #include "PetDict.h"
 struct SynchroStrip{double A,B;};
 inline std::istream&operator>>(std::istream&str,SynchroStrip&item){
@@ -9,5 +11,13 @@ inline std::istream&operator>>(std::istream&str,SynchroStrip&item){
 inline std::ostream&operator<<(std::ostream&str,const SynchroStrip&item){
   return str<<item.A<<"\t"<<item.B;
 }
-
+class Synchronization{
+public:
+  Synchronization(const std::shared_ptr<AbstractBarrelMapping>map);
+  virtual ~Synchronization();
+  const SynchroStrip GetTimes(const JPetHit&hit)const;
+private:
+  std::shared_ptr<AbstractBarrelMapping> f_mapping;
+  std::shared_ptr<JPetMap<SynchroStrip>> f_offsets;
+};
 #endif

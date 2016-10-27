@@ -13,20 +13,21 @@
  *  @file TaskA.cpp
  */
 
+#include <math_h/error.h>
 #include <JPetUnpacker/Unpacker2/EventIII.h>
 #include <JPetWriter/JPetWriter.h>
-#include "PrepareSignals.h"
+#include <j-pet-framework-extension/BarrelExtensions.h>
 #include <IO/gethist.h>
-#include <math_h/error.h>
+#include "PrepareSignals.h"
 using namespace std;
 PrepareSignals::PrepareSignals(const char * name, const char * description)
 :JPetTask(name, description),fCurrEventNumber(0){}
 PrepareSignals::~PrepareSignals(){}
 void PrepareSignals::init(const JPetTaskInterface::Options& opts){
-    fBarrelMap.buildMappings(getParamBank());
+    fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
     for(auto & layer : getParamBank().getLayers()){
-	auto l=fBarrelMap.getLayerNumber(*layer.second);
-	for(size_t sl=1,n=fBarrelMap.getNumberOfSlots(*layer.second);sl<=n;sl++){
+	auto l=fBarrelMap->getLayerNumber(*layer.second);
+	for(size_t sl=1,n=fBarrelMap->getSlotsCount(*layer.second);sl<=n;sl++){
 	    for(size_t thr=1;thr<=4;thr++){
 		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l,sl,thr)+"-A-before-cut").c_str(), "",500, 0.,100.));
 		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l,sl,thr)+"-B-before-cut").c_str(), "",500, 0.,100.));
@@ -87,7 +88,7 @@ void PrepareSignals::exec(){
 	    if(sigch.getType()==JPetSigCh::Trailing)
 		trailSigChs[daq_channel]=sigch;
 	}
-	for (auto & chSigPair : leadSigChs) {
+	for (auto & chSigPair : leadSigChs){
 	    int daq_channel = chSigPair.first;
 	    if( trailSigChs.count(daq_channel) != 0 ){ 
 		JPetSigCh & leadSigCh = chSigPair.second;
@@ -96,9 +97,9 @@ void PrepareSignals::exec(){
 		if( trailSigCh.getPM()!=leadSigCh.getPM() )
 		    ERROR("Signals from same channel point to different PMTs! Check the setup mapping!!!");
 		const auto&pm=leadSigCh.getPM();
-		const auto layer=fBarrelMap.getLayerNumber(pm.getBarrelSlot().getLayer());
-		const auto slot=fBarrelMap.getSlotNumber(pm.getBarrelSlot());
-		const auto pmt_number = fBarrelMap.calcGlobalPMTNumber(pm);
+		const auto layer=fBarrelMap->getLayerNumber(pm.getBarrelSlot().getLayer());
+		const auto slot=fBarrelMap->getSlotNumber(pm.getBarrelSlot());
+		const auto pmt_number = fBarrelMap->calcGlobalPMTNumber(pm);
 		double pmt_id = pm.getID();
 		signals[pmt_id].addPoint( leadSigCh );
 		signals[pmt_id].addPoint( trailSigCh );

@@ -15,23 +15,26 @@
 #include <iostream>
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
+#include <j-pet-framework-extension/PetDict.h>
+#include <j-pet-framework-extension/BarrelExtensions.h>
 #include <Calc/convention.h>
 #include <IO/gethist.h>
 #include "SyncStrips.h"
 using namespace std;
-TaskSyncStrips::TaskSyncStrips(const std::shared_ptr<JPetMap<SyncAB_results>> map,const char * name, const char * description)
-:JPetTask(name, description),f_AB_position(map){}
+TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):JPetTask(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
-    fBarrelMap.buildMappings(getParamBank());
+    fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
+    f_AB_position=make_shared<JPetMap<SyncAB_results>>(fBarrelMap->getLayersSizes());
+    cin>>(*f_AB_position);
     for(auto & layer : getParamBank().getLayers()){
-	int n_slots_in_half_layer = fBarrelMap.opositeDeltaID(*layer.second);
-	const auto layer_n=fBarrelMap.getLayerNumber(*layer.second);
+	int n_slots_in_half_layer = fBarrelMap->getSlotsCount(*layer.second)/2;
+	const auto layer_n=fBarrelMap->getLayerNumber(*layer.second);
 	getStatistics().createHistogram( new TH1F(("DeltaID-for-coincidences-"+LayerThr(layer_n,1)).c_str(),"",n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
 	for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
 	    string histo_name = "DeltaT-with-oposite-"+LayerSlotThr(layer_n,slot,1);
 	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
 	}
-	for(size_t slot=1;slot<=fBarrelMap.getNumberOfSlots(*layer.second);slot++){
+	for(size_t slot=1;slot<=fBarrelMap->getSlotsCount(*layer.second);slot++){
 	    string histo_name = "DeltaT-with-neighbour-"+LayerSlotThr(layer_n,slot,1)+"-deltaid"+to_string(neighbour_delta_id);
 	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
 	}
@@ -40,14 +43,13 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 void TaskSyncStrips::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 	bool accept=true;{
-	    const auto layer=fBarrelMap.getLayerNumber(currHit->getBarrelSlot().getLayer());
-	    const auto slot=fBarrelMap.getSlotNumber(currHit->getBarrelSlot());
+	    const auto strip=fBarrelMap->getStripPos(currHit->getBarrelSlot());
 	    map<int,double> lead_times_A = currHit->getSignalA().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
 	    map<int,double> lead_times_B = currHit->getSignalB().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
 	    accept&=(lead_times_A.count(1)>0)&&(lead_times_B.count(1)>0);
 	    if(accept){
 		double diff_AB =(lead_times_A[1]-lead_times_B[1])/1000.0;
-		accept&=f_AB_position->operator()(layer,slot).peak.Contains(diff_AB);
+		accept&=f_AB_position->item(strip).peak.Contains(diff_AB);
 	    }
 	}
 	if(accept){
@@ -69,11 +71,10 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 	for (auto j = i; ++j != fHits.end(); ){
 	    auto& hit1 = *i;
 	    auto& hit2 = *j;
-	    const auto layer1_n=fBarrelMap.getLayerNumber(hit1.getBarrelSlot().getLayer());
-	    const auto layer2_n=fBarrelMap.getLayerNumber(hit2.getBarrelSlot().getLayer());
-	    const auto slot1=fBarrelMap.getSlotNumber(hit1.getBarrelSlot());
-	    const auto slot2=fBarrelMap.getSlotNumber(hit2.getBarrelSlot());
-	    if ((layer1_n == layer2_n)&&(slot1!=slot2)) {
+	    const auto strip1=fBarrelMap->getStripPos(hit1.getBarrelSlot());
+	    const auto strip2=fBarrelMap->getStripPos(hit2.getBarrelSlot());
+	    if ((strip1.layer == strip2.layer)&&(strip1.slot!=strip2.slot)) {
+		const auto layer=strip1.layer;
 		map<int,double> lead_times_1_A = hit1.getSignalA().getRecoSignal().getRawSignal()
 		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
 		map<int,double> lead_times_2_A = hit2.getSignalA().getRecoSignal().getRawSignal()
@@ -88,39 +89,40 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		diff_AB_1 =(lead_times_1_A[1]-lead_times_1_B[1])/1000.0,
 		diff_AB_2 =(lead_times_2_A[1]-lead_times_2_B[1])/1000.0;
 		if(fabs(diff_1_2)<200.0){
-		    int delta_ID = fBarrelMap.calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
+		    const int delta_ID = fBarrelMap->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 		    getStatistics().getHisto1D((
-			"DeltaID-for-coincidences-"+LayerThr(layer1_n,1)
+			"DeltaID-for-coincidences-"+LayerThr(layer,1)
 		    ).c_str()).Fill(delta_ID);
-		    auto opa_delta_ID=fBarrelMap.opositeDeltaID(hit1.getBarrelSlot().getLayer());
+		    auto opa_delta_ID=fBarrelMap->getSlotsCount(layer)/2;
 		    if(delta_ID==opa_delta_ID){    
-			if(slot1<=opa_delta_ID)
+			if(strip1.slot<=opa_delta_ID)
 			    getStatistics().getHisto1D(
 				("DeltaT-with-oposite-"+
-				    LayerSlotThr(layer1_n,slot1,1)
+				    LayerSlotThr(layer,strip1.slot,1)
 				).c_str()
 			    ).Fill(diff_1_2);
 			else
 			    getStatistics().getHisto1D(
 				("DeltaT-with-oposite-"+
-				    LayerSlotThr(layer2_n,slot2,1)
+				    LayerSlotThr(layer,strip2.slot,1)
 				).c_str()
 			    ).Fill(-diff_1_2);
 		    }else{
 			if(neighbour_delta_id==delta_ID){
 			    if(
-				((slot2-slot1)==delta_ID)||(((slot2+f_AB_position->LayerSize(layer2_n))-slot1)==delta_ID)
+				(delta_ID==(strip2.slot-strip1.slot))
+				||(delta_ID==((strip2.slot+fBarrelMap->getSlotsCount(layer))-strip1.slot))
 			    )
 				getStatistics().getHisto1D(
 				    ("DeltaT-with-neighbour-"+
-					LayerSlotThr(layer1_n,slot1,1)+
+					LayerSlotThr(layer,strip1.slot,1)+
 					"-deltaid"+to_string(neighbour_delta_id)
 				    ).c_str()
 				).Fill(diff_1_2);
 			    else
 				getStatistics().getHisto1D(
 				    ("DeltaT-with-neighbour-"+
-					LayerSlotThr(layer2_n,slot2,1)+
+					LayerSlotThr(layer,strip2.slot,1)+
 					"-deltaid"+to_string(neighbour_delta_id)
 				    ).c_str()
 				).Fill(-diff_1_2);

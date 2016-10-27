@@ -1,16 +1,15 @@
 #ifndef ______PET__DICT___H_________
 #       define ______PET__DICT___H_________
-#include <list>
 #include <vector>
 #include <functional>
 #include <math_h/error.h>
-#include <math_h/sigma.h>
+struct StripPos{size_t layer,slot;};
 template<class DataType>
 class JPetMap{
 private:
   std::vector<std::vector<DataType>> f_data;
 public:
-  JPetMap(const std::initializer_list<size_t>&layer_sizes){
+  JPetMap(const std::vector<size_t>&layer_sizes){
     size_t layer_index=0;
     for(const size_t&item:layer_sizes){
       f_data.push_back(std::vector<DataType>());
@@ -21,6 +20,7 @@ public:
       layer_index++;
     }
   }
+  virtual ~JPetMap(){}
   void Read(std::istream&str){
     for(auto&layer:f_data)
       for(auto&item:layer)
@@ -31,7 +31,6 @@ public:
       for(const auto&item:layer)
         str<<item<<"\n";
   }
-  virtual ~JPetMap(){}
   const size_t LayersCount()const{
     return f_data.size();
   }
@@ -40,19 +39,20 @@ public:
     if(layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
     return f_data[layer-1].size();
   }
-  const DataType&operator()(const size_t layer, const size_t slot)const{
-    if(layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
-    if(layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
-    if(slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
-    if(slot>f_data[layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
-    return f_data[layer-1][slot-1];
+  const DataType&item(const StripPos&pos)const{
+    if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+    if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+    if(pos.slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
+    if(pos.slot>f_data[pos.layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
+    return f_data[pos.layer-1][pos.slot-1];
   }
-  DataType&Item(const size_t layer, const size_t slot){
-    if(layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
-    if(layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
-    if(slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
-    if(slot>f_data[layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
-    return f_data[layer-1][slot-1];
+  const DataType&operator[](const StripPos&pos)const{return item(pos);}
+  DataType&var_item(const StripPos&pos){
+    if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+    if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+    if(pos.slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
+    if(pos.slot>f_data[pos.layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
+    return f_data[pos.layer-1][pos.slot-1];
   }
 };
 template<class DataType>
@@ -64,13 +64,5 @@ template<class DataType>
 inline std::ostream&operator<<(std::ostream&str,const JPetMap<DataType>&item){
   item.Save(str);
   return str;
-}
-template<class DataType>
-inline const std::shared_ptr<JPetMap<DataType>> make_JPetMap(){
-  return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({48,48,96}));
-}
-template<class DataType>
-inline const std::shared_ptr<JPetMap<DataType>> make_half_JPetMap(){
-  return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({24,24,48}));
 }
 #endif

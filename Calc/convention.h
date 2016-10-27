@@ -2,6 +2,7 @@
 #	define ___________CONV_JPET_TIME_SYNC________
 #include <iostream>
 #include <math_h/sigma.h>
+#include <j-pet-framework-extension/PetDict.h>
 const size_t thresholds_count=4;
 struct TOT_cut{
   double A[thresholds_count],B[thresholds_count];
@@ -15,6 +16,10 @@ inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
   for(size_t t=0;t<thresholds_count;t++)str<<item.A[t]<<" ";
   for(size_t t=0;t<thresholds_count;t++)str<<item.B[t]<<" ";
   return str;
+}
+template<class DataType>
+inline const std::shared_ptr<JPetMap<DataType>> make_JPetMap(){
+  return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({48,48,96}));
 }
 struct SyncAB_results{
   MathTemplates::value<double>peak;double chi_sq;
@@ -34,6 +39,11 @@ inline std::istream&operator>>(std::istream&str,SyncOposite_results&item){
 inline std::ostream&operator<<(std::ostream&str,const SyncOposite_results&item){
   return str<<item.peak<<"\t"<<item.chi_sq;
 }
+template<class DataType>
+inline const std::shared_ptr<JPetMap<DataType>> make_half_JPetMap(){
+  return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({24,24,48}));
+}
+
 const size_t neighbour_delta_id=3;
 struct SyncNeighbour_results{
   MathTemplates::value<double>left,right,assymetry;double chi_sq;

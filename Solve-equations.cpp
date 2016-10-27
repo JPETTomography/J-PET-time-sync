@@ -43,16 +43,16 @@ int main(int argc, char **argv) {
     auto DeltaT_D=make_JPetMap<DeltaT_results>();
     auto DeltaT=make_JPetMap<SynchroStrip>();
     Plotter::Instance().SetOutput(".","delta_t_sync");
-    for(size_t layer=1;layer<=DeltaT->LayersCount();layer++){
-	cerr<<"=======LAYER "<<layer<<" : "<<endl;
+    for(size_t L=1;L<=DeltaT->LayersCount();L++){
+	cerr<<"=======LAYER "<<L<<" : "<<endl;
 	list<InexactEquation> equations;
-	const size_t N=DeltaT->LayerSize(layer);
+	const size_t N=DeltaT->LayerSize(L);
 	for(size_t i=0;i<N;i++){
-	    const auto&neighbour_sync=Nei->Item(layer,i+1);
+	    const auto&neighbour_sync=Nei->item({.layer=L,.slot=i+1});
 	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+neighbour_delta_id)%N]-delta[i];}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
 	}
 	for(size_t i=0;i<(N/2);i++){
-	    const auto&opo_sync=Opo->Item(layer,i+1);
+	    const auto&opo_sync=Opo->item({.layer=L,.slot=i+1});
 	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];}, opo_sync.peak ));
 	}
 	cerr<<equations.size()<<" equations"<<endl;
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 	    opt_min << point<double>(solver_hits.iteration_count(),min);
 	    opt_max << point<double>(solver_hits.iteration_count(),max);
 	}
-	Plot<double>().Line(opt_min,"").Line(opt_max,"")<<"set xlabel 'layer "+to_string(layer)+"'";
+	Plot<double>().Line(opt_min,"").Line(opt_max,"")<<"set xlabel 'layer "+to_string(L)+"'";
 	Plotter::Instance()<<"unset log y";
 	cerr<<endl;
 	cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
@@ -88,13 +88,13 @@ int main(int argc, char **argv) {
 	    eq_right<<point<value<double>>(double(i),eq.second);
 	    i++;
 	}
-	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'"<<"unset log y";
-	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(layer)+"'";
+	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'"<<"unset log y";
+	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
 	
-	for(size_t i=1;i<=DeltaT->LayerSize(layer);i++){
-	    const auto& ab=AB->Item(layer,i);
-	    auto& delta=DeltaT_D->Item(layer,i)={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
-	    DeltaT->Item(layer,i)={.A=delta.A.val(),.B=delta.B.val()};
+	for(size_t i=1;i<=DeltaT->LayerSize(L);i++){
+	    const auto& ab=AB->item({.layer=L,.slot=i});
+	    const auto& delta=DeltaT_D->var_item({.layer=L,.slot=i})={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
+	    DeltaT->var_item({.layer=L,.slot=i})={.A=delta.A.val(),.B=delta.B.val()};
 	}
     }
     cout<<(*DeltaT);

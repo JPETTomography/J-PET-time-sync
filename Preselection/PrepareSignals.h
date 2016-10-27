@@ -17,11 +17,12 @@
 #define TASKA_H
 
 #include <vector>
+#include <memory>
 #include <JPetTask/JPetTask.h>
 #include <JPetTimeWindow/JPetTimeWindow.h>
 #include <JPetParamBank/JPetParamBank.h>
 #include <JPetParamManager/JPetParamManager.h>
-#include "LargeBarrelExtensions.h"
+class LargeBarrelMapping;
 class JPetWriter;
 class PrepareSignals: public JPetTask{
 public:
@@ -37,6 +38,6 @@ private:
   JPetWriter* fWriter;
   JPetParamManager* fParamManager;
   long long int fCurrEventNumber;
-  LargeBarrelMapping fBarrelMap;
+  std::shared_ptr<LargeBarrelMapping> fBarrelMap;
 };
 #endif
