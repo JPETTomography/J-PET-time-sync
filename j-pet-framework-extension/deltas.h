@@ -24,5 +24,5 @@ private:
   std::shared_ptr<JPetMap<SynchroStrip>> f_offsets;
   TimeCalculation f_time_calc;
 };
-double DefaultTimeCalculation(const std::vector<double>&P);
+const double DefaultTimeCalculation(const std::vector<double>&P);
 #endif

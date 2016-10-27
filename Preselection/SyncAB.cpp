@@ -1,17 +1,3 @@
-/**
- *  @copyright Copyright 2016 The J-PET Framework Authors. All rights reserved.
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may find a copy of the License in the LICENCE file.
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *  @file TaskE.cpp
- */
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <j-pet-framework-extension/BarrelExtensions.h>
@@ -35,11 +21,41 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	const auto times=fSync->GetTimes(*currHit);
-	const auto diff_AB=(times.A-times.B)/1000.0;
-	const auto strip=fBarrelMap->getStripPos(currHit->getBarrelSlot());
-	getStatistics().getHisto1D(LayerSlotThr(strip.layer,strip.slot,1).c_str()).Fill(diff_AB);
+	if (fHits.empty()) {
+	    fHits.push_back(*currHit);
+	} else {
+	    if (fHits[0].getTimeWindowIndex() == currHit->getTimeWindowIndex()) {
+		fHits.push_back(*currHit);
+	    } else {
+		fillCoincidenceHistos();
+		fHits.push_back(*currHit);
+	    }
+	}
     }
+}
+void TaskSyncAB::fillCoincidenceHistos(){
+    for (const auto&hit1:fHits){
+	const auto strip1=fBarrelMap->getStripPos(hit1.getBarrelSlot());
+	const auto times1=fSync->GetTimes(hit1);
+	const double diff_AB_1 =(times1.A-times1.B)/1000.0;
+	bool found=false;
+	for (const auto&hit2:fHits){
+	    const auto strip2=fBarrelMap->getStripPos(hit2.getBarrelSlot());
+	    if(strip1.layer == strip2.layer){
+		const int delta_ID = fBarrelMap->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
+		auto opa_delta_ID=fBarrelMap->getSlotsCount(strip1.layer)/2;
+		if(delta_ID==opa_delta_ID){
+		    found=true;
+		    break;
+		}
+	    }
+	}
+	if(found){
+	    const auto times=fSync->GetTimes(hit1);
+	    getStatistics().getHisto1D(LayerSlotThr(strip1.layer,strip1.slot,1).c_str()).Fill((times.A-times.B)/1000.0);
+	}
+    }
+    fHits.clear();
 }
 void TaskSyncAB::terminate(){}
 void TaskSyncAB::setWriter(JPetWriter* writer){fWriter =writer;}
