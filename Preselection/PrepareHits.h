@@ -20,7 +20,7 @@
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <j-pet-framework-extension/PetDict.h>
-#include <j-pet-framework-extension/deltas.h>
+#include <Calc/convention.h>
 #include "LargeBarrelExtensions.h"
 class JPetWriter;
 class PrepareHits:public JPetTask {

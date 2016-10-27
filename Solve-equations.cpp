@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <map>
 #include <gnuplot_wrap.h>
@@ -7,6 +8,7 @@
 #include <Genetic/initialconditions.h>
 #include <IO/gethist.h>
 #include <j-pet-framework-extension/PetDict.h>
+#include <j-pet-framework-extension/deltas.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;
@@ -38,7 +40,8 @@ int main(int argc, char **argv) {
     {ifstream file;file.open(filenames[1]);if(file){file>>(*Opo);file.close();}}
     auto Nei=make_JPetMap<SyncNeighbour_results>();
     {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
-    auto DeltaT=make_JPetMap<DeltaT_results>();
+    auto DeltaT_D=make_JPetMap<DeltaT_results>();
+    auto DeltaT=make_JPetMap<SynchroStrip>();
     Plotter::Instance().SetOutput(".","delta_t_sync");
     for(size_t layer=1;layer<=DeltaT->LayersCount();layer++){
 	cerr<<"=======LAYER "<<layer<<" : "<<endl;
@@ -90,8 +93,14 @@ int main(int argc, char **argv) {
 	
 	for(size_t i=1;i<=DeltaT->LayerSize(layer);i++){
 	    const auto& ab=AB->Item(layer,i);
-	    DeltaT->Item(layer,i)={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
+	    auto& delta=DeltaT_D->Item(layer,i)={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
+	    DeltaT->Item(layer,i)={.A=delta.A.val(),.B=delta.B.val()};
 	}
     }
     cout<<(*DeltaT);
+    ofstream file("deltas_debug.txt");
+    if(file){
+	file<<(*DeltaT_D);
+	file.close();
+    }
 }

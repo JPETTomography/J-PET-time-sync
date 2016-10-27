@@ -2,6 +2,20 @@
 #	define ___________CONV_JPET_TIME_SYNC________
 #include <iostream>
 #include <math_h/sigma.h>
+const size_t thresholds_count=4;
+struct TOT_cut{
+  double A[thresholds_count],B[thresholds_count];
+};
+inline std::istream&operator>>(std::istream&str,TOT_cut&item){
+  for(size_t t=0;t<thresholds_count;t++)str>>item.A[t];
+  for(size_t t=0;t<thresholds_count;t++)str>>item.B[t];
+  return str;
+}
+inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
+  for(size_t t=0;t<thresholds_count;t++)str<<item.A[t]<<" ";
+  for(size_t t=0;t<thresholds_count;t++)str<<item.B[t]<<" ";
+  return str;
+}
 struct SyncAB_results{
   MathTemplates::value<double>peak;double chi_sq;
 };

@@ -4,7 +4,7 @@
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
 #include <j-pet-framework-extension/PetDict.h>
-#include <j-pet-framework-extension/deltas.h>
+#include <Calc/convention.h>
 using namespace std;
 using namespace GnuplotWrap;
 using namespace MathTemplates;
