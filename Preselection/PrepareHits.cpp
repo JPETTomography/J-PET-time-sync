@@ -30,8 +30,8 @@ void PrepareHits::init(const JPetTaskInterface::Options& opts){
 	auto l_n=fBarrelMap->getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap->getSlotsCount(*layer.second);sl<=n;sl++){
 	    for(size_t thr=1;thr<=4;thr++){
-		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-A-before-cut").c_str(), "",500, 0.,100.));
-		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-B-before-cut").c_str(), "",500, 0.,100.));
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-A-after-cut").c_str(), "",500, 0.,100.));
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-B-after-cut").c_str(), "",500, 0.,100.));
 	    }
 	}
     }
@@ -43,6 +43,7 @@ void PrepareHits::exec(){
 	const auto strippos=fBarrelMap->getStripPos(bs);
 	const auto&item=f_map->item(strippos);
 	bool passed=true;
+	for(size_t thr=1;thr<4;thr++)passed&=(TOT[thr]>TOT[thr+1]);
 	for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
 	    case JPetPM::SideA:    
 		passed&=(TOT[thr]>item.A[thr-1]);
