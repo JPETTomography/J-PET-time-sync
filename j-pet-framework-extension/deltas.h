@@ -1,6 +1,8 @@
 #ifndef _________DELTAS_H_______
 #       define _________DELTAS_H_______
+#include <iostream>
 #include <memory>
+#include <functional>
 #include <JPetHit/JPetHit.h>
 #include "BarrelExtensions.h"
 #include "PetDict.h"
@@ -13,11 +15,14 @@ inline std::ostream&operator<<(std::ostream&str,const SynchroStrip&item){
 }
 class Synchronization{
 public:
-  Synchronization(const std::shared_ptr<AbstractBarrelMapping>map);
+  typedef std::function<double(const std::vector<double>&)> TimeCalculation;
+  Synchronization(const std::shared_ptr<AbstractBarrelMapping>map,std::istream&str,const TimeCalculation timecalc);
   virtual ~Synchronization();
   const SynchroStrip GetTimes(const JPetHit&hit)const;
 private:
   std::shared_ptr<AbstractBarrelMapping> f_mapping;
   std::shared_ptr<JPetMap<SynchroStrip>> f_offsets;
+  TimeCalculation f_time_calc;
 };
+double DefaultTimeCalculation(const std::vector<double>&P);
 #endif

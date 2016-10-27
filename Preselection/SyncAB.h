@@ -21,6 +21,7 @@
 #include <JPetRawSignal/JPetRawSignal.h>
 class LargeBarrelMapping;
 class JPetWriter;
+class Synchronization;
 class TaskSyncAB:public JPetTask {
 public:
 	TaskSyncAB(const char * name, const char * description);
@@ -31,6 +32,7 @@ public:
 	virtual void setWriter(JPetWriter* writer)override;
 protected:
 	std::shared_ptr<LargeBarrelMapping> fBarrelMap;
+        std::shared_ptr<Synchronization> fSync;
 	JPetWriter* fWriter;
 };
 #endif

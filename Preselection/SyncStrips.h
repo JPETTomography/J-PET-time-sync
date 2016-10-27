@@ -23,6 +23,7 @@
 class LargeBarrelMapping;
 class SyncAB_results;
 class JPetWriter;
+class Synchronization;
 class TaskSyncStrips:public JPetTask {
 public:
 	TaskSyncStrips(const char * name, const char * description);
@@ -36,5 +37,6 @@ protected:
 	JPetWriter* fWriter;
         std::shared_ptr<LargeBarrelMapping> fBarrelMap;
         std::shared_ptr<JPetMap<SyncAB_results>> f_AB_position;
+        std::shared_ptr<Synchronization> fSync;
 };
 #endif

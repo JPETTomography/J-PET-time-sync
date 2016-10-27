@@ -15,6 +15,7 @@
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <j-pet-framework-extension/BarrelExtensions.h>
+#include <j-pet-framework-extension/deltas.h>
 #include <IO/gethist.h>
 #include "SyncAB.h"
 using namespace std;
@@ -23,6 +24,7 @@ TaskSyncAB::TaskSyncAB(const char * name, const char * description)
 TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
     fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
+    fSync=make_shared<Synchronization>(fBarrelMap,cin,DefaultTimeCalculation);
     for(auto & layer : getParamBank().getLayers()){
 	const auto ln=fBarrelMap->getLayerNumber(*layer.second);
 	for(size_t sl=1,n=fBarrelMap->getSlotsCount(ln);sl<=n;sl++){
@@ -33,15 +35,10 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	map<int,double> lead_times_A = currHit->getSignalA().getRecoSignal().getRawSignal()
-	    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-	map<int,double> lead_times_B = currHit->getSignalB().getRecoSignal().getRawSignal()
-	    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-	if((lead_times_A.count(1)>0)&&(lead_times_B.count(1)>0)){
-	    auto diff_AB=(lead_times_A[1]-lead_times_B[1])/1000.0;
-	    const auto strip=fBarrelMap->getStripPos(currHit->getBarrelSlot());
-	    getStatistics().getHisto1D(LayerSlotThr(strip.layer,strip.slot,1).c_str()).Fill(diff_AB);
-	}
+	const auto times=fSync->GetTimes(*currHit);
+	const auto diff_AB=(times.A-times.B)/1000.0;
+	const auto strip=fBarrelMap->getStripPos(currHit->getBarrelSlot());
+	getStatistics().getHisto1D(LayerSlotThr(strip.layer,strip.slot,1).c_str()).Fill(diff_AB);
     }
 }
 void TaskSyncAB::terminate(){}

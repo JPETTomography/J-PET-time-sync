@@ -17,6 +17,7 @@
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <j-pet-framework-extension/PetDict.h>
 #include <j-pet-framework-extension/BarrelExtensions.h>
+#include <j-pet-framework-extension/deltas.h>
 #include <Calc/convention.h>
 #include <IO/gethist.h>
 #include "SyncStrips.h"
@@ -24,6 +25,7 @@ using namespace std;
 TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):JPetTask(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
+    fSync=make_shared<Synchronization>(fBarrelMap,cin,DefaultTimeCalculation);
     f_AB_position=make_shared<JPetMap<SyncAB_results>>(fBarrelMap->getLayersSizes());
     cin>>(*f_AB_position);
     for(auto & layer : getParamBank().getLayers()){
@@ -75,19 +77,11 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 	    const auto strip2=fBarrelMap->getStripPos(hit2.getBarrelSlot());
 	    if ((strip1.layer == strip2.layer)&&(strip1.slot!=strip2.slot)) {
 		const auto layer=strip1.layer;
-		map<int,double> lead_times_1_A = hit1.getSignalA().getRecoSignal().getRawSignal()
-		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-		map<int,double> lead_times_2_A = hit2.getSignalA().getRecoSignal().getRawSignal()
-		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-		map<int,double> lead_times_1_B = hit1.getSignalB().getRecoSignal().getRawSignal()
-		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-		map<int,double> lead_times_2_B = hit2.getSignalB().getRecoSignal().getRawSignal()
-		    .getTimesVsThresholdNumber(JPetSigCh::Leading);
-		auto hit_1=(lead_times_1_A[1]+lead_times_1_B[1])/2000.0,
-		hit_2=(lead_times_2_A[1]+lead_times_2_B[1])/2000.0,
+		const auto times1=fSync->GetTimes(hit1),times2=fSync->GetTimes(hit2);
+		auto hit_1=(times1.A+times1.B)/2000.0,hit_2=(times2.A+times2.B)/2000.0,
 		diff_1_2=hit_1-hit_2,
-		diff_AB_1 =(lead_times_1_A[1]-lead_times_1_B[1])/1000.0,
-		diff_AB_2 =(lead_times_2_A[1]-lead_times_2_B[1])/1000.0;
+		diff_AB_1 =(times1.A-times1.B)/1000.0,
+		diff_AB_2 =(times2.A-times2.B)/1000.0;
 		if(fabs(diff_1_2)<200.0){
 		    const int delta_ID = fBarrelMap->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 		    getStatistics().getHisto1D((
