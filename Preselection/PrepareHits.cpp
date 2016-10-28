@@ -28,7 +28,6 @@ void PrepareHits::exec(){
 	const auto strippos=fBarrelMap->getStripPos(bs);
 	const auto&item=f_map->item(strippos);
 	bool passed=true;
-	for(size_t thr=1;thr<4;thr++)passed&=(TOT[thr]>TOT[thr+1]);
 	for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
 	    case JPetPM::SideA:    
 		passed&=(TOT[thr]>item.A[thr-1]);
@@ -42,10 +41,10 @@ void PrepareHits::exec(){
 	if(passed){
 	    for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
 		case JPetPM::SideA:    
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-A-after-cut").c_str()).Fill(TOT[thr]);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-A-after-cut").c_str()).Fill(TOT[thr]/1000.);
 		    break;
 		case JPetPM::SideB: 
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-B-after-cut").c_str()).Fill(TOT[thr]);
+		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-B-after-cut").c_str()).Fill(TOT[thr]/1000.);
 		    break;
 		default: 
 		    throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
