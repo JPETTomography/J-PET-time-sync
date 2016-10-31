@@ -1,6 +1,6 @@
 [submodule "j-pet-framework"]
 	path = j-pet-framework
-	url = https://github.com/JPETTomography/j-pet-framework.git
+	url = https://github.com/alexkernphysiker/j-pet-framework.git
 [submodule "FitGen"]
 	path = FitGen
 	url = https://github.com/alexkernphysiker/FitGen.git
