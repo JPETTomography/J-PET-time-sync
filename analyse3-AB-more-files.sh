@@ -12,4 +12,5 @@ paramlist=""
 for X in `find $2|grep .root|grep .Stat4AB.`; do
 	paramlist=${paramlist}" "${X}
 done
+./TOT-hists -coincidence${paramlist} > /dev/null
 ./Fit-AB $1${paramlist} > ${2}/AB-center.txt

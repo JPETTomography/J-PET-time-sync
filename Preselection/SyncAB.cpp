@@ -16,6 +16,10 @@ void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
 	for(size_t sl=1,n=fBarrelMap->getSlotsCount(ln);sl<=n;sl++){
 	    auto histo_name = LayerSlotThr(ln,sl,1);
 	    getStatistics().createHistogram( new TH1F(histo_name.c_str(), "",1200, -60.,+60.));
+	    for(size_t thr=1;thr<=4;thr++){
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(ln,sl,thr)+"-A-coincidence").c_str(), "",500, 0.,100.));
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(ln,sl,thr)+"-B-coincidence").c_str(), "",500, 0.,100.));
+	    }
 	}
     }
 }
@@ -53,6 +57,14 @@ void TaskSyncAB::fillCoincidenceHistos(){
 	if(found){
 	    const auto times=fSync->GetTimes(hit1);
 	    getStatistics().getHisto1D(LayerSlotThr(strip1.layer,strip1.slot,1).c_str()).Fill((times.A-times.B)/1000.0);
+
+	    auto TOTA=hit1.getSignalA().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber(),
+		TOTB=hit1.getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber();
+	    for(size_t thr=1;thr<=4;thr++){
+		getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-A-coincidence").c_str()).Fill(TOTA[thr]/1000.);
+		getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-B-coincidence").c_str()).Fill(TOTB[thr]/1000.);
+	    }
+	    
 	}
     }
     fHits.clear();
