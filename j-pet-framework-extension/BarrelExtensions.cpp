@@ -1,8 +1,20 @@
 #include <algorithm>
+#include <sstream>
 #include <math_h/error.h>
 #include "BarrelExtensions.h"
 using namespace std;
 using namespace MathTemplates;
+const string LayerThr(const size_t layer, const size_t thr){
+    stringstream stream;
+    stream<<"layer"<<layer<<"-thr"<<thr;
+    return stream.str();
+}
+const string LayerSlotThr(const size_t layer, const size_t slot, const size_t thr){
+    stringstream stream;
+    stream<<"layer"<<layer<<"-slot"<<slot<<"-thr"<<thr;
+    return stream.str();
+}
+
 const StripPos AbstractBarrelMapping::getStripPos(const JPetBarrelSlot & slot) const {
     return {.layer=getLayerNumber(slot.getLayer()),.slot=getSlotNumber(slot)};
 }
@@ -73,3 +85,42 @@ const size_t LargeBarrelMapping::calcGlobalPMTNumber(const JPetPM & pmt) const {
     pmt_no += slot_number - 1;
     return pmt_no;
 }
+void LargeBarrelTask::init(const JPetTaskInterface::Options&){
+    fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
+}
+void LargeBarrelTask::setWriter(JPetWriter* writer){fWriter=writer;}
+JPetWriter&LargeBarrelTask::writter() const{
+    //ToDo: provide control
+    return *fWriter;
+}
+const LargeBarrelMapping & LargeBarrelTask::map() const{
+    return *fBarrelMap;
+}
+void TOT_Hists::init(const JPetTaskInterface::Options& opts){
+    LargeBarrelTask::init(opts);
+}
+
+void TOT_Hists::createHistos(const std::string& suffix){
+    for(auto & layer : getParamBank().getLayers()){
+	const auto ln=map().getLayerNumber(*layer.second);
+	for(size_t sl=1,n=map().getSlotsCount(ln);sl<=n;sl++){
+	    auto histo_name = LayerSlotThr(ln,sl,1);
+	    getStatistics().createHistogram( new TH1F(histo_name.c_str(), "",1200, -60.,+60.));
+	    for(size_t thr=1;thr<=4;thr++){
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(ln,sl,thr)+"-A-"+suffix).c_str(), "",500, 0.,100.));
+		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(ln,sl,thr)+"-B-"+suffix).c_str(), "",500, 0.,100.));
+	    }
+	}
+    }
+}
+void TOT_Hists::fillHistos(const JPetHit& hit, const std::string& suffix){
+    const auto strip1=map().getStripPos(hit.getBarrelSlot());
+    auto TOTA=hit.getSignalA().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber(),
+	TOTB=hit.getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber();
+    for(size_t thr=1;thr<=4;thr++){
+	getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-A-"+suffix).c_str()).Fill(TOTA[thr]/1000.);
+	getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-B-"+suffix).c_str()).Fill(TOTB[thr]/1000.);
+    }
+}
+
+

@@ -8,7 +8,7 @@ using namespace std;
 TaskSyncAB::TaskSyncAB(const char * name, const char * description)
 :JPetTask(name, description){}
 TaskSyncAB::~TaskSyncAB(){}
-void TaskSyncAB::init(const JPetTaskInterface::Options& opts){
+void TaskSyncAB::init(const JPetTaskInterface::Options&){
     fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
     fSync=make_shared<Synchronization>(fBarrelMap,cin,DefaultTimeCalculation);
     for(auto & layer : getParamBank().getLayers()){

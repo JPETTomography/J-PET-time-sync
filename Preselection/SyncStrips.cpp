@@ -66,7 +66,7 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 			"DeltaID-for-coincidences-"+LayerThr(layer,1)
 		    ).c_str()).Fill(delta_ID);
 		    auto opa_delta_ID=fBarrelMap->getSlotsCount(layer)/2;
-		    if(delta_ID==opa_delta_ID){    
+		    if(delta_ID==opa_delta_ID){
 			if(strip1.slot<=opa_delta_ID)
 			    getStatistics().getHisto1D(
 				("DeltaT-with-oposite-"+

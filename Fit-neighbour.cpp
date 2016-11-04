@@ -4,6 +4,7 @@
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
 #include <j-pet-framework-extension/PetDict.h>
+#include <j-pet-framework-extension/BarrelExtensions.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;

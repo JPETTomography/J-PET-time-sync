@@ -14,18 +14,6 @@
 #include "gethist.h"
 using namespace std;
 using namespace MathTemplates;
-const string LayerThr(const size_t layer, const size_t thr){
-    stringstream stream;
-    stream<<"layer"<<layer<<"-thr"<<thr;
-    return stream.str();
-}
-const string LayerSlotThr(const size_t layer, const size_t slot, const size_t thr){
-    stringstream stream;
-    stream<<"layer"<<layer<<"-slot"<<slot<<"-thr"<<thr;
-    return stream.str();
-}
-
-
 const hist<double> ReadHist(const string&filename,const string&histname){
     //ToDo: find and fix memory leak :(
     hist<double> points;

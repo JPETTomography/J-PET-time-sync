@@ -3,6 +3,7 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
+#include <j-pet-framework-extension/BarrelExtensions.h>
 #include <j-pet-framework-extension/PetDict.h>
 #include <Calc/convention.h>
 using namespace std;
