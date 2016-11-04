@@ -64,7 +64,6 @@ void TaskSyncAB::fillCoincidenceHistos(){
 		getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-A-coincidence").c_str()).Fill(TOTA[thr]/1000.);
 		getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-B-coincidence").c_str()).Fill(TOTB[thr]/1000.);
 	    }
-	    
 	}
     }
     fHits.clear();

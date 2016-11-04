@@ -22,17 +22,15 @@ add_library(preselectionlib STATIC ${PRESELECT})
 target_link_libraries(preselectionlib JPetFramework framework-extension timesyncio)
 file(GLOB CALC Calc/*.cpp)
 add_library(timesynccalc ${CALC})
-
-#Synchronizing
+#additional files
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/large_barrel.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/conf_trb3.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/analyse1-prepare.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/analyse2-tot.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/analyse2-tot-more-files.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/analyse3-AB.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/analyse3-AB-more-files.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/analyse4-final.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/RunSync.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#Synchronizing
 file(GLOB COLIMATOR *.cpp)
 foreach(example ${COLIMATOR})
     get_filename_component(ex_app ${example} NAME_WE)
