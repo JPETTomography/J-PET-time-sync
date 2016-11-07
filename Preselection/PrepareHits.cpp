@@ -1,71 +1,111 @@
 #include <iostream>
+#include <map>
 #include <math_h/error.h>
 #include <JPetWriter/JPetWriter.h>
+#include <JPetRawSignal/JPetRawSignal.h>
+#include <JPetPhysSignal/JPetPhysSignal.h>
+#include <JPetUnpacker/Unpacker2/EventIII.h>
 #include <j-pet-framework-extension/BarrelExtensions.h>
 #include <IO/gethist.h>
 #include "PrepareHits.h"
 using namespace std;
-PrepareHits::PrepareHits(const char * name, const char * description):JPetTask(name, description){}
+PrepareHits::PrepareHits(const char * name, const char * description)
+:TOT_Hists(name, description),fCurrEventNumber(0){}
 PrepareHits::~PrepareHits(){}
 void PrepareHits::init(const JPetTaskInterface::Options& opts){
-    fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
-    f_map=make_shared<JPetMap<TOT_cut>>(fBarrelMap->getLayersSizes());
-    cin>>(*f_map);
-    for(auto & layer : getParamBank().getLayers()){
-	auto l_n=fBarrelMap->getLayerNumber(*layer.second);
-	for(size_t sl=1,n=fBarrelMap->getSlotsCount(*layer.second);sl<=n;sl++){
-	    for(size_t thr=1;thr<=4;thr++){
-		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-A-after-cut").c_str(), "",500, 0.,100.));
-		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(l_n,sl,thr)+"-B-after-cut").c_str(), "",500, 0.,100.));
-	    }
-	}
-    }
+    TOT_Hists::init(opts);
+    createTOTHistos("hits");
 }
 void PrepareHits::exec(){
-    if(auto currSignal = dynamic_cast<const JPetRawSignal*const>(getEvent())){
-	auto TOT=currSignal->getTOTsVsThresholdNumber();
-	const auto&bs=currSignal->getPM().getScin().getBarrelSlot();
-	const auto strippos=fBarrelMap->getStripPos(bs);
-	const auto&item=f_map->item(strippos);
-	bool passed=true;
-	for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
-	    case JPetPM::SideA:    
-		passed&=(TOT[thr]>item.A[thr-1]);
-		break;
-	    case JPetPM::SideB: 
-		passed&=(TOT[thr]>item.B[thr-1]);
-		break;
-	    default: 
-		throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
-	}
-	if(passed){
-	    for(size_t thr=1;thr<=4;thr++)switch(currSignal->getPM().getSide()){
-		case JPetPM::SideA:    
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-A-after-cut").c_str()).Fill(TOT[thr]/1000.);
-		    break;
-		case JPetPM::SideB: 
-		    getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strippos.layer,strippos.slot,thr)+"-B-after-cut").c_str()).Fill(TOT[thr]/1000.);
-		    break;
-		default: 
-		    throw MathTemplates::Exception<PrepareHits>("signal has unknown side");
+    if(auto evt = reinterpret_cast</*const*/ EventIII*const>(getEvent())){
+	fCurrEventNumber++;
+	int ntdc = evt->GetTotalNTDCChannels();
+	JPetTimeWindow tslot;
+	tslot.setIndex(fCurrEventNumber);
+	TClonesArray* tdcHits = evt->GetTDCChannelsArray();
+	for (int i = 0; i < ntdc; ++i) {
+	    auto tdcChannel = dynamic_cast</*const*/ TDCChannel*const>(tdcHits->At(i));
+	    auto tomb_number =  tdcChannel->GetChannel();
+	    if (tomb_number % 65 == 0)continue;//skip trigger signals from TRB
+	    	    assert(0!=getParamBank().getTOMBChannels().count(tomb_number));
+	    JPetTOMBChannel& tomb_channel = getParamBank().getTOMBChannel(tomb_number);
+	    for(int j = tdcChannel->GetHitsNum()-1; j < tdcChannel->GetHitsNum(); ++j){
+		JPetSigCh sigChTmpLead,sigChTmpTrail;
+		sigChTmpLead.setDAQch(tomb_number);
+		sigChTmpTrail.setDAQch(tomb_number);
+		sigChTmpLead.setType(JPetSigCh::Leading);
+		sigChTmpTrail.setType(JPetSigCh::Trailing);
+		sigChTmpLead.setThresholdNumber(tomb_channel.getLocalChannelNumber());
+		sigChTmpTrail.setThresholdNumber(tomb_channel.getLocalChannelNumber());
+		sigChTmpLead.setPM(tomb_channel.getPM());
+		sigChTmpLead.setFEB(tomb_channel.getFEB());
+		sigChTmpLead.setTRB(tomb_channel.getTRB());
+		sigChTmpLead.setTOMBChannel(tomb_channel);
+		sigChTmpTrail.setPM(tomb_channel.getPM());
+		sigChTmpTrail.setFEB(tomb_channel.getFEB());
+		sigChTmpTrail.setTRB(tomb_channel.getTRB());
+		sigChTmpTrail.setTOMBChannel(tomb_channel);
+		sigChTmpLead.setThreshold(tomb_channel.getThreshold());
+		sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
+		if(tdcChannel->GetLeadTime (j)==-100000)continue;
+		if(tdcChannel->GetTrailTime(j)==-100000)continue;
+		if((tdcChannel->GetLeadTime (j)+0.1)>tdcChannel->GetTrailTime(j))continue;
+		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j));
+		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j));
+		tslot.addCh(sigChTmpLead);
+		tslot.addCh(sigChTmpTrail);
 	    }
+	}
+	std::map<int,JPetSigCh> leadSigChs;
+	std::map<int,JPetSigCh> trailSigChs;
+	std::map<int, JPetRawSignal> signals; 
+	const size_t nSigChs = tslot.getNumberOfSigCh();
+	for (size_t i = 0; i < nSigChs; i++) {
+	    JPetSigCh sigch = tslot.operator[](i);
+	    int daq_channel = sigch.getDAQch();
+	    if(sigch.getType()==JPetSigCh::Leading)
+		leadSigChs[daq_channel]=sigch;
+	    if(sigch.getType()==JPetSigCh::Trailing)
+		trailSigChs[daq_channel]=sigch;
+	}
+	for (auto & chSigPair : leadSigChs){
+	    int daq_channel = chSigPair.first;
+	    if( trailSigChs.count(daq_channel) != 0 ){ 
+		JPetSigCh & leadSigCh = chSigPair.second;
+		JPetSigCh & trailSigCh = trailSigChs.at(daq_channel);
+		double tot = trailSigCh.getValue() - leadSigCh.getValue();
+		if( trailSigCh.getPM()!=leadSigCh.getPM() )
+		    ERROR("Signals from same channel point to different PMTs! Check the setup mapping!!!");
+		const auto&pm=leadSigCh.getPM();
+		const auto layer=map()->getLayerNumber(pm.getBarrelSlot().getLayer());
+		const auto slot=map()->getSlotNumber(pm.getBarrelSlot());
+		const auto pmt_number = map()->calcGlobalPMTNumber(pm);
+		double pmt_id = pm.getID();
+		signals[pmt_id].addPoint( leadSigCh );
+		signals[pmt_id].addPoint( trailSigCh );
+	    }
+	}
+	for(auto & pmSignalPair : signals){
+	    JPetRawSignal & signal = pmSignalPair.second;
+	    signal.setTimeWindowIndex( tslot.getIndex() );
+	    const JPetPM & pmt = getParamBank().getPM(pmSignalPair.first);
+	    signal.setPM(pmt);
+	    signal.setBarrelSlot(pmt.getBarrelSlot());
 	    if (fSignals.empty()) {
-		fSignals.push_back(*currSignal);
+		fSignals.push_back(signal);
 	    } else {
-		if (fSignals[0].getTimeWindowIndex() == currSignal->getTimeWindowIndex()) {
-		    fSignals.push_back(*currSignal);
+		if (fSignals[0].getTimeWindowIndex() == signal.getTimeWindowIndex()) {
+		    fSignals.push_back(signal);
 		} else {
 		    createAndStoreHits();
-		    fSignals.push_back(*currSignal);
+		    fSignals.push_back(signal);
 		}
 	    }
 	}
     }
 }
-
 void PrepareHits::createAndStoreHits(){
     if(fSignals.empty())return;
-    assert(fWriter);
     for (size_t i=0,n=fSignals.size();i<n;i++) {
 	auto&pm_i=fSignals[i].getPM();
 	auto&scin=pm_i.getScin();
@@ -85,7 +125,8 @@ void PrepareHits::createAndStoreHits(){
 		    hit.setSignalB(physSignalB);
 		    hit.setScintillator(scin);
 		    hit.setBarrelSlot(scin.getBarrelSlot());
-		    fWriter->write(hit);
+		    writter().write(hit);
+		    fillTOTHistos(hit,"hits");
 		}
 	    }
 	}
@@ -93,4 +134,3 @@ void PrepareHits::createAndStoreHits(){
     fSignals.clear();
 }
 void PrepareHits::terminate(){}
-void PrepareHits::setWriter(JPetWriter* writer) {fWriter =writer;}

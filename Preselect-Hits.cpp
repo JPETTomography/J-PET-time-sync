@@ -4,6 +4,6 @@
 #include <Preselection/PrepareHits.h>
 void AddModules() {
 	JPetManager::getManager().registerTask([](){
-		return new JPetTaskLoader("Signals","Hits",new PrepareHits("TOF cut",""));
+		return new JPetTaskLoader("hld","Hits",new PrepareHits("Preparing hits",""));
 	});
 }

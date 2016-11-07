@@ -35,22 +35,28 @@ private:
   std::vector<std::vector<double>> fTheta;
 };
 class LargeBarrelTask:public JPetTask{
+protected:
+    LargeBarrelTask(const char * name, const char * description);
 public:
+    virtual ~LargeBarrelTask();
     virtual void init(const JPetTaskInterface::Options& opts)override;
     virtual void setWriter(JPetWriter* writer)override;
 protected:
     JPetWriter&writter()const;
-    const LargeBarrelMapping&map()const;
+    const std::shared_ptr<LargeBarrelMapping>map()const;
 private:
     std::shared_ptr<LargeBarrelMapping>fBarrelMap;
     JPetWriter*fWriter;
 };
 class TOT_Hists:public LargeBarrelTask{
+protected:
+    TOT_Hists(const char * name, const char * description);
 public:
+    virtual ~TOT_Hists();
     virtual void init(const JPetTaskInterface::Options& opts)override;
 protected:
-    void createHistos(const std::string&suffix);
-    void fillHistos(const JPetHit&hit,const std::string&suffix);
+    void createTOTHistos(const std::string&suffix);
+    void fillTOTHistos(const JPetHit&hit,const std::string&suffix);
 };
 
 

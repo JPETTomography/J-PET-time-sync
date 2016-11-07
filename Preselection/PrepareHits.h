@@ -5,21 +5,17 @@
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <Calc/convention.h>
-class LargeBarrelMapping;
-class JPetWriter;
-class PrepareHits:public JPetTask {
+#include <j-pet-framework-extension/BarrelExtensions.h>
+class PrepareHits:public TOT_Hists {
 public:
   PrepareHits(const char * name, const char * description);
   virtual ~PrepareHits();
   virtual void init(const JPetTaskInterface::Options& opts)override;
   virtual void exec()override;
   virtual void terminate()override;
-  virtual void setWriter(JPetWriter* writer)override;
 private:
   void createAndStoreHits();
   std::vector<JPetRawSignal> fSignals;
-  JPetWriter* fWriter;
-  std::shared_ptr<LargeBarrelMapping>fBarrelMap;
-  std::shared_ptr<JPetMap<TOT_cut>>f_map;
+  long long int fCurrEventNumber;
 };
 #endif

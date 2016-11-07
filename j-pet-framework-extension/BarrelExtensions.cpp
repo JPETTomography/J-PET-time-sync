@@ -85,6 +85,9 @@ const size_t LargeBarrelMapping::calcGlobalPMTNumber(const JPetPM & pmt) const {
     pmt_no += slot_number - 1;
     return pmt_no;
 }
+LargeBarrelTask::LargeBarrelTask(const char * name, const char * description)
+:JPetTask(name, description){}
+LargeBarrelTask::~LargeBarrelTask(){}
 void LargeBarrelTask::init(const JPetTaskInterface::Options&){
     fBarrelMap=make_shared<LargeBarrelMapping>(getParamBank());
 }
@@ -93,33 +96,32 @@ JPetWriter&LargeBarrelTask::writter() const{
     //ToDo: provide control
     return *fWriter;
 }
-const LargeBarrelMapping & LargeBarrelTask::map() const{
-    return *fBarrelMap;
+const std::shared_ptr<LargeBarrelMapping>LargeBarrelTask::map() const{
+    return fBarrelMap;
 }
 void TOT_Hists::init(const JPetTaskInterface::Options& opts){
     LargeBarrelTask::init(opts);
 }
-
-void TOT_Hists::createHistos(const std::string& suffix){
+TOT_Hists::TOT_Hists(const char* name, const char* description)
+:LargeBarrelTask(name,description){}
+TOT_Hists::~TOT_Hists(){}
+void TOT_Hists::createTOTHistos(const std::string& suffix){
     for(auto & layer : getParamBank().getLayers()){
-	const auto ln=map().getLayerNumber(*layer.second);
-	for(size_t sl=1,n=map().getSlotsCount(ln);sl<=n;sl++){
-	    auto histo_name = LayerSlotThr(ln,sl,1);
-	    getStatistics().createHistogram( new TH1F(histo_name.c_str(), "",1200, -60.,+60.));
+	const auto ln=map()->getLayerNumber(*layer.second);
+	for(size_t sl=1,n=map()->getSlotsCount(ln);sl<=n;sl++)
 	    for(size_t thr=1;thr<=4;thr++){
 		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(ln,sl,thr)+"-A-"+suffix).c_str(), "",500, 0.,100.));
 		getStatistics().createHistogram( new TH1F(("TOT-"+LayerSlotThr(ln,sl,thr)+"-B-"+suffix).c_str(), "",500, 0.,100.));
 	    }
-	}
     }
 }
-void TOT_Hists::fillHistos(const JPetHit& hit, const std::string& suffix){
-    const auto strip1=map().getStripPos(hit.getBarrelSlot());
+void TOT_Hists::fillTOTHistos(const JPetHit& hit, const std::string& suffix){
+    const auto strip1=map()->getStripPos(hit.getBarrelSlot());
     auto TOTA=hit.getSignalA().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber(),
 	TOTB=hit.getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber();
     for(size_t thr=1;thr<=4;thr++){
-	getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-A-"+suffix).c_str()).Fill(TOTA[thr]/1000.);
-	getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-B-"+suffix).c_str()).Fill(TOTB[thr]/1000.);
+	getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-A-"+suffix).c_str()).Fill(TOTA[thr]);
+	getStatistics().getHisto1D(("TOT-"+LayerSlotThr(strip1.layer,strip1.slot,thr)+"-B-"+suffix).c_str()).Fill(TOTB[thr]);
     }
 }
 
