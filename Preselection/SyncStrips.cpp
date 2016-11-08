@@ -68,45 +68,43 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		const auto layer=strip1.layer;
 		const auto times1=fSync->GetTimes(hit1),times2=fSync->GetTimes(hit2);
 		auto hit_1=(times1.A+times1.B)/2.,hit_2=(times2.A+times2.B)/2.,diff_1_2=hit_1-hit_2;
-		if(fabs(diff_1_2)<200.0){
-		    const int delta_ID = map()->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
-		    getStatistics().getHisto1D((
-			"DeltaID-for-coincidences-"+LayerThr(layer,1)
-		    ).c_str()).Fill(delta_ID);
-		    auto opa_delta_ID=map()->getSlotsCount(layer)/2;
-		    if(delta_ID==opa_delta_ID){
-			if(strip1.slot<=opa_delta_ID)
+		const int delta_ID = map()->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
+		getStatistics().getHisto1D((
+		    "DeltaID-for-coincidences-"+LayerThr(layer,1)
+		).c_str()).Fill(delta_ID);
+		auto opa_delta_ID=map()->getSlotsCount(layer)/2;
+		if(delta_ID==opa_delta_ID){
+		    if(strip1.slot<=opa_delta_ID)
+			getStatistics().getHisto1D(
+			    ("DeltaT-with-oposite-"+
+				LayerSlotThr(layer,strip1.slot,1)
+			    ).c_str()
+			).Fill(diff_1_2);
+		    else
+			getStatistics().getHisto1D(
+			    ("DeltaT-with-oposite-"+
+				LayerSlotThr(layer,strip2.slot,1)
+			    ).c_str()
+			).Fill(-diff_1_2);
+		}else{
+		    for(const size_t&delta:neighbour_delta_id)if(delta==delta_ID){
+			if(
+			    (delta_ID==(strip2.slot-strip1.slot))
+			    ||(delta_ID==((strip2.slot+map()->getSlotsCount(layer))-strip1.slot))
+			)
 			    getStatistics().getHisto1D(
-				("DeltaT-with-oposite-"+
-				    LayerSlotThr(layer,strip1.slot,1)
+				("DeltaT-with-neighbour-"+
+				    LayerSlotThr(layer,strip1.slot,1)+
+				    "-deltaid"+to_string(delta)
 				).c_str()
 			    ).Fill(diff_1_2);
 			else
 			    getStatistics().getHisto1D(
-				("DeltaT-with-oposite-"+
-				    LayerSlotThr(layer,strip2.slot,1)
+				("DeltaT-with-neighbour-"+
+				    LayerSlotThr(layer,strip2.slot,1)+
+				    "-deltaid"+to_string(delta)
 				).c_str()
 			    ).Fill(-diff_1_2);
-		    }else{
-			for(const size_t&delta:neighbour_delta_id)if(delta==delta_ID){
-			    if(
-				(delta_ID==(strip2.slot-strip1.slot))
-				||(delta_ID==((strip2.slot+map()->getSlotsCount(layer))-strip1.slot))
-			    )
-				getStatistics().getHisto1D(
-				    ("DeltaT-with-neighbour-"+
-					LayerSlotThr(layer,strip1.slot,1)+
-					"-deltaid"+to_string(delta)
-				    ).c_str()
-				).Fill(diff_1_2);
-			    else
-				getStatistics().getHisto1D(
-				    ("DeltaT-with-neighbour-"+
-					LayerSlotThr(layer,strip2.slot,1)+
-					"-deltaid"+to_string(delta)
-				    ).c_str()
-				).Fill(-diff_1_2);
-			}
 		    }
 		}
 	    }

@@ -33,7 +33,6 @@ int main(int argc, char **argv) {
     vector<string> filenames;
     for(int i=2;i<argc;i++)
 	filenames.push_back(string(argv[i]));
-
     auto AB=make_JPetMap<SyncAB_results>();
     {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
     auto Opo=make_half_JPetMap<SyncOposite_results>();
@@ -77,7 +76,8 @@ int main(int argc, char **argv) {
 	SortedPoints<double> opt_min,opt_max;
 	while(!solver_hits.AbsoluteOptimalityExitCondition(0.001)){
 	    solver_hits.Iterate(engine);
-	    auto min=solver_hits.Optimality(),max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
+	    auto min=solver_hits.Optimality(),
+	    max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
 	    cerr<<solver_hits.iteration_count()<<" iterations; "
 	    <<min<<"<chi^2<"<<max<<"                 \r";
 	    opt_min << point<double>(solver_hits.iteration_count(),min);
@@ -100,7 +100,6 @@ int main(int argc, char **argv) {
 	}
 	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'"<<"unset log y";
 	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
-	
 	for(size_t i=1;i<=DeltaT->LayerSize(L);i++){
 	    const auto& ab=AB->item({.layer=L,.slot=i});
 	    const auto& delta=DeltaT_D->var_item({.layer=L,.slot=i})={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
