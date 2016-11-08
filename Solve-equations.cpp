@@ -33,13 +33,18 @@ int main(int argc, char **argv) {
     vector<string> filenames;
     for(int i=2;i<argc;i++)
 	filenames.push_back(string(argv[i]));
-    
+
     auto AB=make_JPetMap<SyncAB_results>();
     {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
     auto Opo=make_half_JPetMap<SyncOposite_results>();
     {ifstream file;file.open(filenames[1]);if(file){file>>(*Opo);file.close();}}
-    auto Nei=make_JPetMap<SyncNeighbour_results>();
-    {ifstream file;file.open(filenames[2]);if(file){file>>(*Nei);file.close();}}
+    vector<shared_ptr<JPetMap<SyncNeighbour_results>>> Nei;
+    for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
+	Nei.push_back(make_JPetMap<SyncNeighbour_results>());
+    {ifstream file;file.open(filenames[2]);if(file){
+	for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
+	    file>>(*Nei[i]);file.close();
+    }}
     auto DeltaT_D=make_JPetMap<DeltaT_results>();
     auto DeltaT=make_JPetMap<SynchroStrip>();
     cin>>(*DeltaT);
@@ -48,13 +53,17 @@ int main(int argc, char **argv) {
 	cerr<<"=======LAYER "<<L<<" : "<<endl;
 	list<InexactEquation> equations;
 	const size_t N=DeltaT->LayerSize(L);
-	for(size_t i=0;i<N;i++){
-	    const auto&neighbour_sync=Nei->item({.layer=L,.slot=i+1});
-	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[(i+neighbour_delta_id)%N]-delta[i];}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
+	for(size_t i=0;i<N;i++)for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
+	    const auto&neighbour_sync=Nei[ii]->item({.layer=L,.slot=i+1});
+	    equations.push_back(in_eq([i,ii,N](const ParamSet&delta){
+		return delta[(i+neighbour_delta_id[ii])%N]-delta[i];
+	    }, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
 	}
 	for(size_t i=0;i<(N/2);i++){
 	    const auto&opo_sync=Opo->item({.layer=L,.slot=i+1});
-	    equations.push_back(in_eq([i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];}, opo_sync.peak ));
+	    equations.push_back(in_eq([i,N](const ParamSet&delta){
+		return delta[i+(N/2)]-delta[i];
+	    }, opo_sync.peak ));
 	}
 	cerr<<equations.size()<<" equations"<<endl;
 	cerr<<"hits:"<<endl;

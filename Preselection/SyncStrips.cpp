@@ -26,8 +26,8 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	    string histo_name = "DeltaT-with-oposite-"+LayerSlotThr(layer_n,slot,1);
 	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
 	}
-	for(size_t slot=1;slot<=map()->getSlotsCount(*layer.second);slot++){
-	    string histo_name = "DeltaT-with-neighbour-"+LayerSlotThr(layer_n,slot,1)+"-deltaid"+to_string(neighbour_delta_id);
+	for(size_t slot=1;slot<=map()->getSlotsCount(*layer.second);slot++)for(const size_t&delta:neighbour_delta_id){
+	    string histo_name = "DeltaT-with-neighbour-"+LayerSlotThr(layer_n,slot,1)+"-deltaid"+to_string(delta);
 	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
 	}
     }
@@ -88,7 +88,7 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 				).c_str()
 			    ).Fill(-diff_1_2);
 		    }else{
-			if(neighbour_delta_id==delta_ID){
+			for(const size_t&delta:neighbour_delta_id)if(delta==delta_ID){
 			    if(
 				(delta_ID==(strip2.slot-strip1.slot))
 				||(delta_ID==((strip2.slot+map()->getSlotsCount(layer))-strip1.slot))
@@ -96,14 +96,14 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 				getStatistics().getHisto1D(
 				    ("DeltaT-with-neighbour-"+
 					LayerSlotThr(layer,strip1.slot,1)+
-					"-deltaid"+to_string(neighbour_delta_id)
+					"-deltaid"+to_string(delta)
 				    ).c_str()
 				).Fill(diff_1_2);
 			    else
 				getStatistics().getHisto1D(
 				    ("DeltaT-with-neighbour-"+
 					LayerSlotThr(layer,strip2.slot,1)+
-					"-deltaid"+to_string(neighbour_delta_id)
+					"-deltaid"+to_string(delta)
 				    ).c_str()
 				).Fill(-diff_1_2);
 			}
