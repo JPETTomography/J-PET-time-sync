@@ -1,6 +1,6 @@
 #!/bin/bash
 paramlist=""
-for X in `find $1|grep .root|grep .Hits.`; do
+for X in `find $2|grep .root|grep .Hits.`; do
 	paramlist=${paramlist}" "${X}
 done
 ./TOT-hists -hits${paramlist} > ${2}/TOT-cut.txt
