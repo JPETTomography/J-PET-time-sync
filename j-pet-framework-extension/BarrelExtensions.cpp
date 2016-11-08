@@ -125,4 +125,14 @@ void TOT_Hists::fillTOTHistos(const JPetHit& hit, const std::string& suffix){
     }
 }
 
+const TOTs TOT_Hists::getTOTs(const JPetHit& hit) const{
+    auto TOTA=hit.getSignalA().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber(),
+    	TOTB=hit.getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber();
+    TOTs result;
+    for(size_t thr=1;thr<=4;thr++){
+	result.A[thr-1]=TOTA[thr];
+	result.B[thr-1]=TOTB[thr];
+    }
+    return result;
+}
 

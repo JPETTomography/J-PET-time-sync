@@ -10,10 +10,12 @@
 #include <IO/gethist.h>
 #include "SyncStrips.h"
 using namespace std;
-TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):LargeBarrelTask(name, description){}
+TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):TOT_Hists(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     LargeBarrelTask::init(opts);
     fSync=make_shared<Synchronization>(map(),cin,DefaultTimeCalculation);
+    fCut=make_JPetMap<TOT_cut>();
+    cin>>(*fCut);
     f_AB_position=make_shared<JPetMap<SyncAB_results>>(map()->getLayersSizes());
     cin>>(*f_AB_position);
     for(auto & layer : getParamBank().getLayers()){
@@ -32,17 +34,24 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 }
 void TaskSyncStrips::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
+	const auto tot=getTOTs(*currHit);
 	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
-	const auto times=fSync->GetTimes(*currHit);
-	if(f_AB_position->item(strip).peak.Contains(times.A-times.B)){
-	    if (fHits.empty()) {
-		fHits.push_back(*currHit);
-	    } else {
-		if (fHits[0].getTimeWindowIndex()==currHit->getTimeWindowIndex()) {
+	bool passed=true;
+	for(size_t thr=0;thr<4;thr++)
+	    passed&=(tot.A[thr]>fCut->item(strip).A[thr])&&
+	    (tot.B[thr]>fCut->item(strip).B[thr]);
+	if(passed){
+	    const auto times=fSync->GetTimes(*currHit);
+	    if(f_AB_position->item(strip).peak.Contains(times.A-times.B)){
+		if (fHits.empty()) {
 		    fHits.push_back(*currHit);
 		} else {
-		    fillCoincidenceHistos();
-		    fHits.push_back(*currHit);
+		    if (fHits[0].getTimeWindowIndex()==currHit->getTimeWindowIndex()) {
+			fHits.push_back(*currHit);
+		    } else {
+			fillCoincidenceHistos();
+			fHits.push_back(*currHit);
+		    }
 		}
 	    }
 	}

@@ -48,6 +48,16 @@ private:
     std::shared_ptr<LargeBarrelMapping>fBarrelMap;
     JPetWriter*fWriter;
 };
+struct TOTs{double A[4],B[4];};
+inline std::istream&operator>>(std::istream&str,TOTs&item){
+    return str>>item.A[0]>>item.A[1]>>item.A[2]>>item.A[3]
+	>>item.B[0]>>item.B[1]>>item.B[2]>>item.B[3];
+}
+inline std::ostream&operator<<(std::ostream&str,const TOTs&item){
+    return str<<item.A[0]<<" "<<item.A[1]<<" "<<item.A[2]<<" "<<item.A[3]<<" "
+    <<item.B[0]<<" "<<item.B[1]<<" "<<item.B[2]<<" "<<item.B[3]<<" ";
+}
+
 class TOT_Hists:public LargeBarrelTask{
 protected:
     TOT_Hists(const char * name, const char * description);
@@ -57,6 +67,7 @@ public:
 protected:
     void createTOTHistos(const std::string&suffix);
     void fillTOTHistos(const JPetHit&hit,const std::string&suffix);
+    const TOTs getTOTs(const JPetHit&hit)const;
 };
 
 

@@ -4,8 +4,10 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
+#include <j-pet-framework-extension/PetDict.h>
 #include <j-pet-framework-extension/BarrelExtensions.h>
 class Synchronization;
+class TOT_cut;
 class TaskSyncAB:public TOT_Hists {
 public:
   TaskSyncAB(const char * name, const char * description);
@@ -17,5 +19,6 @@ private:
   void fillCoincidenceHistos();
   std::vector<JPetHit>fHits;
   std::shared_ptr<Synchronization>fSync;
+  std::shared_ptr<JPetMap<TOT_cut>>fCut;
 };
 #endif

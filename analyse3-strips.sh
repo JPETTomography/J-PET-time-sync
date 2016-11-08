@@ -1,7 +1,7 @@
 #!/bin/bash
 for X in `find $2|grep .root|grep .Hits.`; do
 	echo "Stage Strips : ${X}"
-	(cat ${2}/Deltas.txt & cat ${2}/AB-center.txt)|./Preselect-StripsSync -t root -f ${X}
+	(cat ${2}/Deltas.txt  & cat ${2}/TOT-cut.txt & cat ${2}/AB-center.txt)|./Preselect-StripsSync -t root -f ${X}
 done
 paramlist=""
 for X in `find $2|grep .root|grep .Stat4Strips.`; do

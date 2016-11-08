@@ -3,6 +3,7 @@
 #include <j-pet-framework-extension/BarrelExtensions.h>
 #include <j-pet-framework-extension/deltas.h>
 #include <IO/gethist.h>
+#include <Calc/convention.h>
 #include "SyncAB.h"
 using namespace std;
 TaskSyncAB::TaskSyncAB(const char * name, const char * description)
@@ -11,6 +12,8 @@ TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
     TOT_Hists::init(opts);
     fSync=make_shared<Synchronization>(map(),cin,DefaultTimeCalculation);
+    fCut=make_JPetMap<TOT_cut>();
+    cin>>(*fCut);
     createTOTHistos("coincidence");
     for(auto & layer : getParamBank().getLayers()){
 	const auto ln=map()->getLayerNumber(*layer.second);
@@ -21,14 +24,22 @@ void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	if (fHits.empty()) {
-	    fHits.push_back(*currHit);
-	} else {
-	    if (fHits[0].getTimeWindowIndex() == currHit->getTimeWindowIndex()) {
+	const auto tot=getTOTs(*currHit);
+	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
+	bool passed=true;
+	for(size_t thr=0;thr<4;thr++)
+	    passed&=(tot.A[thr]>fCut->item(strip).A[thr])&&
+		(tot.B[thr]>fCut->item(strip).B[thr]);
+	if(passed){
+	    if (fHits.empty()) {
 		fHits.push_back(*currHit);
 	    } else {
-		fillCoincidenceHistos();
-		fHits.push_back(*currHit);
+		if (fHits[0].getTimeWindowIndex() == currHit->getTimeWindowIndex()) {
+		    fHits.push_back(*currHit);
+		} else {
+		    fillCoincidenceHistos();
+		    fHits.push_back(*currHit);
+		}
 	    }
 	}
     }

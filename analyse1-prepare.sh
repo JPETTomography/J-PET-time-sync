@@ -11,8 +11,3 @@ for X in `find $1|grep .hld|grep -v .root`; do
 	rm ${X%.*}.hld.raw.root
 	rm ${X%.*}.hld.root
 done
-paramlist=""
-for X in `find $1|grep .root|grep .Hits.`; do
-	paramlist=${paramlist}" "${X}
-done
-./TOT-hists -hits${paramlist} > ${1}/TOT-cut.txt
