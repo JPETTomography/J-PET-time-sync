@@ -38,17 +38,16 @@ int main(int argc, char **argv) {
 	for(size_t slot=1;slot<=Nei[i]->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name+"-deltaid"+to_string(neighbour_delta_id[i]));
-	    {
-		const auto& item=Nei[i]->var_item({.layer=layer,.slot=slot})=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
-		left<<point<value<double>>(double(slot),item.left);
-		right<<point<value<double>>(double(slot),item.right);
-		assym<<point<value<double>>(double(slot),item.assymetry);
-		chisq<<point<double>(double(slot),item.chi_sq);
-	    }
+	    const auto& item=Nei[i]->var_item({.layer=layer,.slot=slot})=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
+	    left<<point<value<double>>(double(slot),item.left);
+	    right<<point<value<double>>(double(slot),item.right);
+	    assym<<point<value<double>>(double(slot),item.assymetry);
+	    chisq<<point<double>(double(slot),item.chi_sq);
 	}
-	Plot<double>().Hist(left,"Position Left").Hist(right,"Position Right")<<"set key on";
-	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]";
-	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";
+	const string title="set title 'deltaID="+to_string(neighbour_delta_id[i])+"'";
+	Plot<double>().Hist(left,"Position Left").Hist(right,"Position Right")<<"set key on"<<title;
+	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]"<<title;
+	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<title;
     }
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)cout<<(*Nei[i]);
     return 0;
