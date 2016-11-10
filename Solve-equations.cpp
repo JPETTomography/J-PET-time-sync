@@ -14,6 +14,7 @@ using namespace std;
 using namespace GnuplotWrap;
 using namespace MathTemplates;
 using namespace Genetic;
+using namespace Graph;
 int main(int argc, char **argv) {
     cerr<<"=========== SOLVING EQUATIONS ==============="<<endl;
     RANDOM engine;
@@ -51,29 +52,45 @@ int main(int argc, char **argv) {
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
 	cerr<<"=======LAYER "<<L<<" : "<<endl;
 	list<InexactEquation> equations;
+	ConnectionChecker slots(DeltaT->LayerSize(L));
 	const size_t N=DeltaT->LayerSize(L);
 	for(size_t i=0;i<N;i++)for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
 	    const auto&neighbour_sync=Nei[ii]->item({.layer=L,.slot=i+1});
-	    if(neighbour_sync.chi_sq>=0)
+	    if(neighbour_sync.chi_sq>=0){
 		equations.push_back(in_eq([i,ii,N](const ParamSet&delta){
 		    return delta[(i+neighbour_delta_id[ii])%N]-delta[i];
 		}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
+		slots.Connect(i,(i+neighbour_delta_id[ii])%N);
+	    }
 	}
 	for(size_t i=0;i<(N/2);i++){
 	    const auto&opo_sync=Opo->item({.layer=L,.slot=i+1});
-	    if(opo_sync.chi_sq>=0)
+	    if(opo_sync.chi_sq>=0){
 		equations.push_back(in_eq([i,N](const ParamSet&delta){
 		    return delta[i+(N/2)]-delta[i];
 		}, opo_sync.peak ));
+		slots.Connect(i,i+(N/2));
+	    }
 	}
 	cerr<<equations.size()<<" equations"<<endl;
-	cerr<<"hits:"<<endl;
+	auto connectedslots=slots.connected_to(0);
+	if(connectedslots.size()<(N/2)){
+	    //ToDo: check another area
+	}
 	InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
 	auto init=make_shared<GenerateUniform>();
-	while(init->Count()<N)init<<make_pair(-100,100);
+	for(size_t i=0;i<N;i++){
+	    bool c=false;
+	    for(const size_t j:connectedslots)
+		if(i==j)c=true;
+	    if(c)init<<make_pair(-100,100);
+	    else init<<make_pair(0,0);
+	}
 	solver_hits.SetThreadCount(thr_cnt);
 	solver_hits.Init(N*10,init,engine);
+	cerr<<"hits:"<<endl;
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
+	cerr<<connectedslots.size()<<" connected"<<endl;
 	cerr<<solver_hits.PopulationSize()<<" points"<<endl;
 	SortedPoints<double> opt_min,opt_max;
 	while(!solver_hits.AbsoluteOptimalityExitCondition(0.001)){
