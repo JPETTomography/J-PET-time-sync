@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 		assym<<point<value<double>>(double(slot),item.assymetry);
 		chisq<<point<double>(double(slot),item.chi_sq);
 	    }else{
-		item={.left=0,.right=0,.assymetry=0,.chi_sq=0};
+		item={.left=0,.right=0,.assymetry=0,.chi_sq=-1};
 	    }
 	}
 	const string title="set title 'deltaID="+to_string(neighbour_delta_id[i])+"'";

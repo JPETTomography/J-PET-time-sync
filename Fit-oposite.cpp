@@ -35,10 +35,13 @@ int main(int argc, char **argv) {
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 	    const auto name=LayerSlotThr(layer,slot,1);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
-	    {
-		const auto& item=map->var_item({.layer=layer,.slot=slot})=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
+	    auto& item=map->var_item({.layer=layer,.slot=slot});
+	    if(shist.YRange(5.0,+INFINITY).size()>0){
+		item=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
 		position<<point<value<double>>(double(slot),item.peak);
 		chisq<<point<double>(slot,item.chi_sq);
+	    }else{
+		item={.peak=0,.chi_sq=-1};
 	    }
 	}
 	Plot<double>().Hist(position,"Position")<<"set key on";
