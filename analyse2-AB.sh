@@ -3,6 +3,7 @@ paramlist=""
 for X in `find $2|grep .root|grep .Hits.`; do
 	paramlist=${paramlist}" "${X}
 done
+echo "Building TOT hists"
 ./TOT-hists -hits${paramlist} > ${2}/TOT-cut.txt
 
 if [ -e $2/Deltas.txt ]; then
@@ -19,5 +20,7 @@ paramlist=""
 for X in `find $2|grep .root|grep .Stat4AB.`; do
 	paramlist=${paramlist}" "${X}
 done
+echo "Building TOT hists"
 ./TOT-hists -coincidence${paramlist} > /dev/null
+echo "Fitting A-B hists"
 ./Fit-AB $1${paramlist} > ${2}/AB-center.txt
