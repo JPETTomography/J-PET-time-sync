@@ -57,18 +57,20 @@ int main(int argc, char **argv) {
 	for(size_t i=0;i<N;i++)for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
 	    const auto&neighbour_sync=Nei[ii]->item({.layer=L,.slot=i+1});
 	    if(neighbour_sync.chi_sq>=0){
-		equations.push_back(in_eq([i,ii,N](const ParamSet&delta){
-		    return delta[(i+neighbour_delta_id[ii])%N]-delta[i];
-		}, (neighbour_sync.left+neighbour_sync.right)/2.0 ));
+		equations.push_back({
+		    .left=[i,ii,N](const ParamSet&delta){return delta[(i+neighbour_delta_id[ii])%N]-delta[i];},
+		    .right=(neighbour_sync.left+neighbour_sync.right)/2.0
+		});
 		slots.Connect(i,(i+neighbour_delta_id[ii])%N);
 	    }
 	}
 	for(size_t i=0;i<(N/2);i++){
 	    const auto&opo_sync=Opo->item({.layer=L,.slot=i+1});
 	    if(opo_sync.chi_sq>=0){
-		equations.push_back(in_eq([i,N](const ParamSet&delta){
-		    return delta[i+(N/2)]-delta[i];
-		}, opo_sync.peak ));
+		equations.push_back({
+		    .left=[i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];},
+		    .right=opo_sync.peak
+		});
 		slots.Connect(i,i+(N/2));
 	    }
 	}
@@ -113,12 +115,14 @@ int main(int argc, char **argv) {
 	    delta_hits<<point<value<double>>(double(i+1),solution[i]);
 	for(const auto&eq:equations){
 	    static size_t i=0;
-	    eq_left<<point<value<double>>(double(i),eq.first(solver_hits.Parameters()));
-	    eq_right<<point<value<double>>(double(i),eq.second);
+	    eq_left<<point<value<double>>(double(i),eq.left(solver_hits.Parameters()));
+	    eq_right<<point<value<double>>(double(i),eq.right);
 	    i++;
 	}
-	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'"<<"unset log y";
-	Plot<double>().Hist(delta_hits,"HITS")<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
+	Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")
+	<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'"<<"unset log y";
+	Plot<double>().Hist(delta_hits,"HITS")
+	<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
 	for(size_t i=1;i<=DeltaT->LayerSize(L);i++){
 	    const auto& ab=AB->item({.layer=L,.slot=i});
 	    const auto& delta=DeltaT_D->var_item({.layer=L,.slot=i})={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
