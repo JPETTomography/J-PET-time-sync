@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
 		assym<<point<value<double>>(double(slot),item.assymetry);
 		chisq<<point<double>(double(slot),item.chi_sq);
 	    }else{
+		Plot<double>().Hist(shist);
 		item={.left=0,.right=0,.assymetry=0,.chi_sq=-1};
 	    }
 	}
