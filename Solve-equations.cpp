@@ -34,9 +34,9 @@ int main(int argc, char **argv) {
     vector<string> filenames;
     for(int i=2;i<argc;i++)
 	filenames.push_back(string(argv[i]));
-    auto AB=make_JPetMap<SyncAB_results>();
+    const auto AB=make_JPetMap<SyncAB_results>();
     {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
-    auto Opo=make_half_JPetMap<SyncOposite_results>();
+    const auto Opo=make_half_JPetMap<SyncOposite_results>();
     {ifstream file;file.open(filenames[1]);if(file){file>>(*Opo);file.close();}}
     vector<shared_ptr<JPetMap<SyncNeighbour_results>>> Nei;
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
@@ -45,8 +45,8 @@ int main(int argc, char **argv) {
 	for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
 	    file>>(*Nei[i]);file.close();
     }}
-    auto DeltaT_D=make_JPetMap<DeltaT_results>();
-    auto DeltaT=make_JPetMap<SynchroStrip>();
+    const auto DeltaT_D=make_JPetMap<DeltaT_results>();
+    const auto DeltaT=make_JPetMap<SynchroStrip>();
     cin>>(*DeltaT);
     Plotter::Instance().SetOutput(".","delta_t_sync");
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
@@ -54,24 +54,42 @@ int main(int argc, char **argv) {
 	list<InexactEquation> equations;
 	ConnectionChecker slots(DeltaT->LayerSize(L));
 	const size_t N=DeltaT->LayerSize(L);
-	for(size_t i=0;i<N;i++)for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
-	    const auto&neighbour_sync=Nei[ii]->item({.layer=L,.slot=i+1});
-	    if(neighbour_sync.chi_sq>=0){
-		equations.push_back({
-		    .left=[i,ii,N](const ParamSet&delta){return delta[(i+neighbour_delta_id[ii])%N]-delta[i];},
-		    .right=(neighbour_sync.left+neighbour_sync.right)/2.0
-		});
-		slots.Connect(i,(i+neighbour_delta_id[ii])%N);
+	for(size_t i=0;i<N;i++){
+	    const StripPos pos1={.layer=L,.slot=i+1};
+	    if(AB->item(pos1).chi_sq<20.)
+	    for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
+		const auto&neighbour_sync=Nei[ii]->item(pos1);
+		auto i2=(i+neighbour_delta_id[ii])%N;
+		const StripPos pos2={.layer=L,.slot=i2+1};
+		if(
+		    (AB->item(pos2).chi_sq<20.)&&
+		    (neighbour_sync.chi_sq<20.)&&
+		    (neighbour_sync.chi_sq>=0.)
+		){
+		    equations.push_back({
+			.left=[i,i2](const ParamSet&delta){return delta[i2]-delta[i];},
+			.right=(neighbour_sync.left+neighbour_sync.right)/2.0
+		    });
+		    slots.Connect(i,i2);
+		}
 	    }
 	}
 	for(size_t i=0;i<(N/2);i++){
+	    const auto i2=i+(N/2);
 	    const auto&opo_sync=Opo->item({.layer=L,.slot=i+1});
-	    if(opo_sync.chi_sq>=0){
+	    const StripPos pos1={.layer=L,.slot=i+1};
+	    const StripPos pos2={.layer=L,.slot=i2+1};
+	    if(
+		(AB->item(pos1).chi_sq<20.)&&
+		(AB->item(pos2).chi_sq<20.)&&
+		(opo_sync.chi_sq<20.)&&
+		(opo_sync.chi_sq>=0.)
+	    ){
 		equations.push_back({
-		    .left=[i,N](const ParamSet&delta){return delta[i+(N/2)]-delta[i];},
+		    .left=[i,i2](const ParamSet&delta){return delta[i2]-delta[i];},
 		    .right=opo_sync.peak
 		});
-		slots.Connect(i,i+(N/2));
+		slots.Connect(i,i2);
 	    }
 	}
 	cerr<<equations.size()<<" equations"<<endl;
@@ -83,8 +101,8 @@ int main(int argc, char **argv) {
 	auto init=make_shared<GenerateUniform>();
 	for(size_t i=0;i<N;i++){
 	    bool c=false;
-	    for(const size_t j:connectedslots)
-		if(i==j)c=true;
+	    for(size_t j=0;(!c)&&(j<connectedslots.size());j++)
+		if(connectedslots[j]==i)c=true;
 	    if(c)init<<make_pair(-100,100);
 	    else init<<make_pair(0,0);
 	}
