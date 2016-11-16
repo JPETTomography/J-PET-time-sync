@@ -34,10 +34,15 @@ int main(int argc, char **argv) {
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			const auto name=LayerSlotThr(layer,slot,1);
 			const auto shist=ReadHist(root_filenames,name);
-			const auto&item=map->var_item({.layer=layer,.slot=slot})
-			    =Sync::Fit4SyncAB(shist,"SyncAB "+name,thr_cnt);
-			position<<point<value<double>>(double(slot),item.peak);
-			chisq<<point<double>(double(slot),item.chi_sq);
+			auto&item=map->var_item({.layer=layer,.slot=slot});
+			if(shist.TotalSum().val()>=100.){
+			    item=Sync::Fit4SyncAB(shist,"SyncAB "+name,thr_cnt);
+			    position<<point<value<double>>(double(slot),item.peak);
+			    chisq<<point<double>(double(slot),item.chi_sq);
+			}else{
+			    Plot<double>().Hist(shist);
+			    item={.peak=0,.chi_sq=-1};
+			}
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on";
 		Plot<double>().Line(chisq,"Chi^2")<<"set key on";

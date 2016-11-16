@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 	    if(
 		(AB->item(pos1).chi_sq<20.)&&
 		(AB->item(pos2).chi_sq<20.)&&
-		(opo_sync.chi_sq<10.)&&
+		(opo_sync.chi_sq<1.5)&&
 		(opo_sync.chi_sq>=0.)
 	    ){
 		equations.push_back({
