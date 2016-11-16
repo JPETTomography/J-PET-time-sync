@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
 	auto init=make_shared<GenerateUniform>();
 	for(size_t i=0;i<N;i++){
 	    bool c=false;
-	    for(size_t j=0;(!c)&&(j<connectedslots.size());j++)
+	    for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 		if(connectedslots[j]==i)c=true;
 	    if(c)init<<make_pair(-100,100);
 	    else init<<make_pair(0,0);
@@ -142,10 +142,13 @@ int main(int argc, char **argv) {
 	Plot<double>().Hist(delta_hits,"HITS")
 	<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
 	for(size_t i=1;i<=DeltaT->LayerSize(L);i++){
-	    const auto& ab=AB->item({.layer=L,.slot=i});
-	    const auto& delta=DeltaT_D->var_item({.layer=L,.slot=i})
+	    const StripPos slot={.layer=L,.slot=i};
+	    const auto& ab=AB->item(slot);
+	    const auto&delta=DeltaT_D->var_item(slot)
 		={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
-	    DeltaT->var_item({.layer=L,.slot=i})={.A=delta.A.val(),.B=delta.B.val()};
+	    auto&Delta=DeltaT->var_item(slot);
+	    Delta.A+=delta.A.val();
+	    Delta.B+=delta.B.val();
 	}
     }
     cout<<(*DeltaT);

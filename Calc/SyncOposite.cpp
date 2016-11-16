@@ -31,9 +31,9 @@ namespace Sync{
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	const auto deltas=parEq(fit.ParamCount(),0.01);
+	const auto deltas=parEq(fit.ParamCount(),0.001);
 	while(
-	    (!fit.AbsoluteOptimalityExitCondition(0.0001))&&
+	    (!fit.AbsoluteOptimalityExitCondition(0.00001))&&
 	    (!fit.ParametersDispersionExitCondition(deltas))
 	){
 	    fit.Iterate(r);
