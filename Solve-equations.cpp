@@ -143,7 +143,8 @@ int main(int argc, char **argv) {
 	<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
 	for(size_t i=1;i<=DeltaT->LayerSize(L);i++){
 	    const auto& ab=AB->item({.layer=L,.slot=i});
-	    const auto& delta=DeltaT_D->var_item({.layer=L,.slot=i})={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
+	    const auto& delta=DeltaT_D->var_item({.layer=L,.slot=i})
+		={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
 	    DeltaT->var_item({.layer=L,.slot=i})={.A=delta.A.val(),.B=delta.B.val()};
 	}
     }

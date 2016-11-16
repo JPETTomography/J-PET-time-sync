@@ -24,14 +24,18 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(500,make_shared<GenerateByGauss>()
+	fit.Init(400,make_shared<GenerateByGauss>()
 	    <<make_pair(total,total*30.0)
 	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
 	    <<make_pair(0.5,0.2)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	while(!fit.AbsoluteOptimalityExitCondition(0.0001)){
+	const auto deltas=parEq(fit.ParamCount(),0.01);
+	while(
+	    (!fit.AbsoluteOptimalityExitCondition(0.0001))&&
+	    (!fit.ParametersDispersionExitCondition(deltas))
+	){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
 	    <<fit.Optimality()<<"<chi^2<"
@@ -46,6 +50,5 @@ namespace Sync{
 	const auto&P=fit.Parameters();
 	for(const auto&p:P)cerr<<p<<endl;
 	return {.peak={P[1],P[2]},.chi_sq=chi_sq_norm};
-	
     }
 }
