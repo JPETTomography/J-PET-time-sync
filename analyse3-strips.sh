@@ -12,3 +12,6 @@ echo ${paramlist}
 ./Fit-neighbour $1${paramlist} > ${2}/Neighbour-strips.txt
 
 (cat ${2}/Deltas.txt)|./Solve-equations $1 ${2}/AB-center.txt ${2}/Oposite-strips.txt ${2}/Neighbour-strips.txt > ${2}/Deltas.new.txt
+echo "replacing deltas"
+rm ${2}/Deltas.txt
+mv ${2}/Deltas.new.txt ${2}/Deltas.txt
