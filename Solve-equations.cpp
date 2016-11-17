@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
 	}
 	InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
 	auto init=make_shared<GenerateUniform>();
-	for(size_t i=0;i<N;i++){
+	for(size_t i=1;i<N;i++){
 	    bool c=false;
 	    for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 		if(connectedslots[j]==i)c=true;
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 	    else init<<make_pair(0,0);
 	}
 	solver_hits.SetThreadCount(thr_cnt);
-	solver_hits.Init(N*10,init,engine);
+	solver_hits.Init(N*12,init,engine);
 	cerr<<"hits:"<<endl;
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
 	cerr<<connectedslots.size()<<" connected"<<endl;
@@ -122,7 +122,8 @@ int main(int argc, char **argv) {
 	    opt_min << point<double>(solver_hits.iteration_count(),min);
 	    opt_max << point<double>(solver_hits.iteration_count(),max);
 	}
-	Plot<double>().Line(opt_min,"").Line(opt_max,"")<<"set xlabel 'layer "+to_string(L)+"'";
+	Plot<double>().Line(opt_min,"").Line(opt_max,"")
+	<<"set log y"<<"set xlabel 'layer "+to_string(L)+"'";
 	Plotter::Instance()<<"unset log y";
 	cerr<<endl;
 	cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
