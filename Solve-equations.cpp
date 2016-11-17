@@ -68,7 +68,8 @@ int main(int argc, char **argv) {
 		    (neighbour_sync.chi_sq>=0.)&&
 		    (neighbour_sync.assymetry<=4.0)&&
 		    (neighbour_sync.assymetry>=0.25)&&
-		    (!(neighbour_sync.right-neighbour_sync.left).Above(5.0))
+		    (!(neighbour_sync.right-neighbour_sync.left).Above(5.0))&&
+		    ((neighbour_sync.left+neighbour_sync.right).uncertainty()<2.5)
 		){
 		    equations.push_back({
 			.left=[i,i2](const ParamSet&delta){return delta[i2]-delta[i];},
@@ -87,7 +88,8 @@ int main(int argc, char **argv) {
 		(AB->item(pos1).chi_sq<20.)&&
 		(AB->item(pos2).chi_sq<20.)&&
 		(opo_sync.chi_sq<1.5)&&
-		(opo_sync.chi_sq>=0.)
+		(opo_sync.chi_sq>=0.)&&
+		(opo_sync.peak.uncertainty<2.5)
 	    ){
 		equations.push_back({
 		    .left=[i,i2](const ParamSet&delta){return delta[i2]-delta[i];},

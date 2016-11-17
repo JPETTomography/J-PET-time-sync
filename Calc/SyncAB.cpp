@@ -70,6 +70,6 @@ namespace Sync{
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	const auto&P=fit.Parameters();
 	for(const auto&p:P)cerr<<p<<endl;
-	return {.peak={P[1],P[2]},.chi_sq=chi_sq_norm};
+	return {.peak={P[1],P[2]*1.5},.chi_sq=chi_sq_norm};
     }
 };
