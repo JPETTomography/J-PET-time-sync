@@ -61,10 +61,14 @@ int main(int argc, char **argv) {
 		const auto&neighbour_sync=Nei[ii]->item(pos1);
 		auto i2=(i+neighbour_delta_id[ii])%N;
 		const StripPos pos2={.layer=L,.slot=i2+1};
-		if(
+		if(//set of conditions for accepting the fit
+		    //for neighbour coincidences spectrum
 		    (AB->item(pos2).chi_sq<20.)&&
-		    (neighbour_sync.chi_sq<10.)&&
-		    (neighbour_sync.chi_sq>=0.)
+		    (neighbour_sync.chi_sq<1.)&&
+		    (neighbour_sync.chi_sq>=0.)&&
+		    (neighbour_sync.assymetry<=4.0)&&
+		    (neighbour_sync.assymetry>=0.25)&&
+		    (!(neighbour_sync.right-neighbour_sync.left).Above(5.0))
 		){
 		    equations.push_back({
 			.left=[i,i2](const ParamSet&delta){return delta[i2]-delta[i];},

@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlotThr(layer,slot,1)+"-deltaid"+to_string(neighbour_delta_id[i]);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name);
 	    auto& item=Nei[i]->var_item({.layer=layer,.slot=slot});
-	    if(shist.TotalSum().val()>=6.){
+	    if(shist.TotalSum().val()>=5.){
 		item=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);
