@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 		(AB->item(pos2).chi_sq<20.)&&
 		(opo_sync.chi_sq<1.5)&&
 		(opo_sync.chi_sq>=0.)&&
-		(opo_sync.peak.uncertainty<2.5)
+		(opo_sync.peak.uncertainty()<2.5)
 	    ){
 		equations.push_back({
 		    .left=[i,i2](const ParamSet&delta){return delta[i2]-delta[i];},
