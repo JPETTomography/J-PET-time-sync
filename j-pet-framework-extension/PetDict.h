@@ -7,38 +7,63 @@ struct StripPos{size_t layer,slot;};
 template<class DataType>
 class JPetMap{
 private:
-  std::vector<std::vector<DataType>> f_data;
+    std::vector<std::vector<DataType>> f_data;
 public:
-  JPetMap(const std::vector<size_t>&layer_sizes){
-    size_t layer_index=0;
-    for(const size_t&item:layer_sizes){
-      f_data.push_back(std::vector<DataType>());
-      for(size_t slot=1;slot<=item;slot++){
-        DataType v;
-        f_data[layer_index].push_back(v);
-      }
-      layer_index++;
+    JPetMap(const std::vector<size_t>&layer_sizes){
+	size_t layer_index=0;
+	for(const size_t&item:layer_sizes){
+	    f_data.push_back(std::vector<DataType>());
+	    for(size_t slot=1;slot<=item;slot++){
+		DataType v;
+		f_data[layer_index].push_back(v);
+	    }
+	          layer_index++;
+	}
     }
-  }
-  virtual ~JPetMap(){}
-  void Read(std::istream&str){
-    for(auto&layer:f_data)
-      for(auto&item:layer)
-        str>>item;
-  }
-  void Save(std::ostream&str)const{
-    for(const auto&layer:f_data)
-      for(const auto&item:layer)
-        str<<item<<"\n";
-  }
-  const size_t LayersCount()const{
-    return f_data.size();
-  }
-  const size_t LayerSize(const size_t layer)const{
-    if(layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
-    if(layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
-    return f_data[layer-1].size();
-  }
+    virtual ~JPetMap(){}
+    void Read(std::istream&str){
+	for(auto&layer:f_data)
+	    for(auto&item:layer)
+		str>>item;
+    }
+    void Save(std::ostream&str)const{
+	for(const auto&layer:f_data)
+	    for(const auto&item:layer)
+		str<<item<<"\n";
+    }
+    const size_t LayersCount()const{
+	return f_data.size();
+    }
+    const size_t LayerSize(const size_t layer)const{
+	if(layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+	if(layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+	return f_data[layer-1].size();
+    }
+    const size_t SlotsCount()const{
+	size_t res=0;
+	for(const auto&L:f_data)
+	    res+=L.size();
+	return res;
+    }
+    const size_t GlobalSlotNumber(const StripPos&pos)const{
+	if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+	if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
+	if(pos.slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
+	if(pos.slot>f_data[pos.layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
+	size_t res=0;
+	for(size_t i=1;i<pos.layer;i++)
+	    res+=f_data[i-1].size();
+	return res+pos.slot-1;
+    }
+    const StripPos PositionOfGlobalNumber(const size_t gl_num)const{
+	size_t index=gl_num;
+	size_t l=1;
+	while(LayerSize(l)<index){
+	    index-=LayerSize(l);l++;
+	}
+	return {.layer=l,.slot=index+1};
+    }
+
   const DataType&item(const StripPos&pos)const{
     if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
     if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");

@@ -56,14 +56,14 @@ int main(int argc, char **argv) {
 	const size_t N=DeltaT->LayerSize(L);
 	for(size_t i=0;i<N;i++){
 	    const StripPos pos1={.layer=L,.slot=i+1};
-	    if(AB->item(pos1).chi_sq<20.)
+	    if(AB->item(pos1).chi_sq<40.)
 	    for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
 		const auto&neighbour_sync=Nei[ii]->item(pos1);
 		auto i2=(i+neighbour_delta_id[ii])%N;
 		const StripPos pos2={.layer=L,.slot=i2+1};
 		if(//set of conditions for accepting the fit
 		    //for neighbour coincidences spectrum
-		    (AB->item(pos2).chi_sq<20.)&&
+		    (AB->item(pos2).chi_sq<40.)&&
 		    (neighbour_sync.chi_sq<1.)&&
 		    (neighbour_sync.chi_sq>=0.)&&
 		    (neighbour_sync.assymetry<=4.0)&&
@@ -85,8 +85,8 @@ int main(int argc, char **argv) {
 	    const StripPos pos1={.layer=L,.slot=i+1};
 	    const StripPos pos2={.layer=L,.slot=i2+1};
 	    if(
-		(AB->item(pos1).chi_sq<20.)&&
-		(AB->item(pos2).chi_sq<20.)&&
+		(AB->item(pos1).chi_sq<40.)&&
+		(AB->item(pos2).chi_sq<40.)&&
 		(opo_sync.chi_sq<1.5)&&
 		(opo_sync.chi_sq>=0.)&&
 		(opo_sync.peak.uncertainty()<2.5)
