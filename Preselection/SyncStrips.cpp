@@ -66,9 +66,11 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 	    const auto strip1=map()->getStripPos(hit1.getBarrelSlot());
 	    const auto strip2=map()->getStripPos(hit2.getBarrelSlot());
 	    if ((strip1.layer == strip2.layer)&&(strip1.slot!=strip2.slot)) {
-		const auto layer=strip1.layer;
-		const auto times1=fSync->GetTimes(hit1),times2=fSync->GetTimes(hit2);
-		auto hit_1=(times1.A+times1.B)/2.,hit_2=(times2.A+times2.B)/2.,diff_1_2=hit_1-hit_2;
+		const auto&layer=strip1.layer;
+		const auto times1=fSync->GetTimes(hit1),
+		    times2=fSync->GetTimes(hit2);
+		auto hit_1=(times1.A+times1.B)/2.,
+		    hit_2=(times2.A+times2.B)/2.;
 		const int delta_ID = map()->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
 		getStatistics().getHisto1D((
 		    "DeltaID-for-coincidences-"+LayerThr(layer,1)
@@ -80,13 +82,13 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 			    ("DeltaT-with-oposite-"+
 				LayerSlotThr(layer,strip1.slot,1)
 			    ).c_str()
-			).Fill(diff_1_2);
+			).Fill(hit_1-hit_2);
 		    else
 			getStatistics().getHisto1D(
 			    ("DeltaT-with-oposite-"+
 				LayerSlotThr(layer,strip2.slot,1)
 			    ).c_str()
-			).Fill(-diff_1_2);
+			).Fill(hit_2-hit_1);
 		}else{
 		    for(const size_t&delta:neighbour_delta_id)if(delta==delta_ID){
 			if(
@@ -98,14 +100,14 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 				    LayerSlotThr(layer,strip1.slot,1)+
 				    "-deltaid"+to_string(delta)
 				).c_str()
-			    ).Fill(diff_1_2);
+			    ).Fill(hit_1-hit_2);
 			else
 			    getStatistics().getHisto1D(
 				("DeltaT-with-neighbour-"+
 				    LayerSlotThr(layer,strip2.slot,1)+
 				    "-deltaid"+to_string(delta)
 				).c_str()
-			    ).Fill(-diff_1_2);
+			    ).Fill(hit_2-hit_1);
 		    }
 		}
 	    }

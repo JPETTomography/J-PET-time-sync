@@ -47,8 +47,6 @@ void TaskSyncAB::exec(){
 void TaskSyncAB::fillCoincidenceHistos(){
     for (const auto&hit1:fHits){
 	const auto strip1=map()->getStripPos(hit1.getBarrelSlot());
-	const auto times1=fSync->GetTimes(hit1);
-	const double diff_AB_1 =(times1.A-times1.B);
 	bool found=false;
 	for (const auto&hit2:fHits){
 	    const auto strip2=map()->getStripPos(hit2.getBarrelSlot());
@@ -62,7 +60,10 @@ void TaskSyncAB::fillCoincidenceHistos(){
 	    }
 	}
 	if(found){
-	    getStatistics().getHisto1D(LayerSlotThr(strip1.layer,strip1.slot,1).c_str()).Fill(diff_AB_1);
+	    const auto times1=fSync->GetTimes(hit1);
+	    getStatistics()
+		.getHisto1D(LayerSlotThr(strip1.layer,strip1.slot,1).c_str())
+		.Fill(times1.A-times1.B);
 	    fillTOTHistos(hit1,"coincidence");
 	}
     }

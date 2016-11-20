@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 			num+=p.X().val()*p.Y().val();
 			denom+=p.Y().val();
 		    }
-		    output[t]= 0;//num/denom;
+		    output[t]= num/denom;
 		}
 	    };
 	    auto&item=map->item({.layer=layer,.slot=slot});

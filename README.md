@@ -71,11 +71,7 @@ The commands needed to perform the analysis look so:
 
 	./analyse1-prepare /path/to/the/data
 
-	./analyse2-tot /path/to/the/data
+	./analyse2-sync 1 /path/to/the/data
 
-	./analyse3-AB 1 /path/to/the/data
-
-	./analyse4-final 1 /path/to/the/data
-
-The parameter '1' in last two lines means that when the genetic algorithm will run in one thread.
+The parameter '1' in the last line means that the genetic algorithms will run in one thread.
 One can increase this parameter for parallelizing it if the processor has more than one core.
