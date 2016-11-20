@@ -61,8 +61,8 @@ void TaskSyncStrips::exec(){
 void TaskSyncStrips::fillCoincidenceHistos(){
     for (auto i = fHits.begin(); i != fHits.end(); ++i){
 	for (auto j = i; ++j != fHits.end(); ){
-	    auto& hit1 = *i;
-	    auto& hit2 = *j;
+	    const auto& hit1 = *i;
+	    const auto& hit2 = *j;
 	    const auto strip1=map()->getStripPos(hit1.getBarrelSlot());
 	    const auto strip2=map()->getStripPos(hit2.getBarrelSlot());
 	    if ((strip1.layer == strip2.layer)&&(strip1.slot!=strip2.slot)) {

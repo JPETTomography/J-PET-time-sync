@@ -16,7 +16,10 @@ const SynchroStrip Synchronization::GetTimes(const JPetHit & hit) const{
 	A.push_back(lead_times_A[thr]);
 	B.push_back(lead_times_B[thr]);
     }
-    return {.A=f_time_calc(A)+offsets.A,.B=f_time_calc(B)+offsets.B};
+    SynchroStrip res;
+    res.A=f_time_calc(A)+offsets.A;
+    res.B=f_time_calc(B)+offsets.B;
+    return res;
 }
 const double DefaultTimeCalculation(const vector<double>&P){
     return P[0];
