@@ -28,8 +28,8 @@ void TaskSyncAB::exec(){
 	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
 	bool passed=true;
 	for(size_t thr=0;thr<4;thr++)
-	    passed&=(tot.A[thr]>fCut->item(strip).A[thr])&&
-		(tot.B[thr]>fCut->item(strip).B[thr]);
+	    passed&=(tot.A[thr]>fCut->operator[](strip).A[thr])&&
+		(tot.B[thr]>fCut->operator[](strip).B[thr]);
 	if(passed){
 	    if (fHits.empty()) {
 		fHits.push_back(*currHit);

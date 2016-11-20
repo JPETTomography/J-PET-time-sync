@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			const auto name=LayerSlotThr(layer,slot,1);
 			const auto shist=ReadHist(root_filenames,name);
-			auto&item=map->var_item({.layer=layer,.slot=slot});
+			auto&item=map->item({.layer=layer,.slot=slot});
 			if(shist.TotalSum().val()>=100.){
 			    item=Sync::Fit4SyncAB(shist,"SyncAB "+name,thr_cnt);
 			    position<<point<value<double>>(double(slot),item.peak);

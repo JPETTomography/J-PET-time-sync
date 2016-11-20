@@ -45,6 +45,7 @@ public:
 	    res+=L.size();
 	return res;
     }
+    inline const size_t size()const{return SlotsCount();}
     const size_t GlobalSlotNumber(const StripPos&pos)const{
 	if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
 	if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
@@ -58,27 +59,29 @@ public:
     const StripPos PositionOfGlobalNumber(const size_t gl_num)const{
 	size_t index=gl_num;
 	size_t l=1;
-	while(LayerSize(l)<index){
+	while(LayerSize(l)<=index){
 	    index-=LayerSize(l);l++;
 	}
 	return {.layer=l,.slot=index+1};
     }
 
-  const DataType&item(const StripPos&pos)const{
+  const DataType&operator[](const StripPos&pos)const{
     if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
     if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
     if(pos.slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
     if(pos.slot>f_data[pos.layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
     return f_data[pos.layer-1][pos.slot-1];
   }
-  const DataType&operator[](const StripPos&pos)const{return item(pos);}
-  DataType&var_item(const StripPos&pos){
+  const DataType&operator[](const size_t&pos)const{return operator[](PositionOfGlobalNumber(pos));}
+  DataType&item(const StripPos&pos){
     if(pos.layer==0)throw MathTemplates::Exception<JPetMap>("Invalid layer index");
     if(pos.layer>f_data.size())throw MathTemplates::Exception<JPetMap>("Invalid layer index");
     if(pos.slot==0)throw MathTemplates::Exception<JPetMap>("Invalid slot index");
     if(pos.slot>f_data[pos.layer-1].size())throw MathTemplates::Exception<JPetMap>("Invalid slot index");
     return f_data[pos.layer-1][pos.slot-1];
   }
+  DataType&item(const size_t&pos){return item(PositionOfGlobalNumber(pos));}
+
 };
 template<class DataType>
 inline std::istream&operator>>(std::istream&str,JPetMap<DataType>&item){

@@ -57,14 +57,14 @@ int main(int argc, char **argv) {
 	const size_t N=DeltaT->LayerSize(L);
 	for(size_t i=0;i<N;i++){
 	    const StripPos pos1={.layer=L,.slot=i+1};
-	    if(AB->item(pos1).chi_sq<AB_chisq_thr)
+	    if(AB->operator[](pos1).chi_sq<AB_chisq_thr)
 	    for(size_t ii=0,n=neighbour_delta_id.size();ii<n;ii++){
-		const auto&neighbour_sync=Nei[ii]->item(pos1);
+		const auto&neighbour_sync=Nei[ii]->operator[](pos1);
 		auto i2=(i+neighbour_delta_id[ii])%N;
 		const StripPos pos2={.layer=L,.slot=i2+1};
 		if(//set of conditions for accepting the fit
 		    //for neighbour coincidences spectrum
-		    (AB->item(pos2).chi_sq<AB_chisq_thr)&&
+		    (AB->operator[](pos2).chi_sq<AB_chisq_thr)&&
 		    (neighbour_sync.chi_sq<1.)&&
 		    (neighbour_sync.chi_sq>=0.)&&
 		    (neighbour_sync.assymetry<=4.0)&&
@@ -82,12 +82,12 @@ int main(int argc, char **argv) {
 	}
 	for(size_t i=0;i<(N/2);i++){
 	    const auto i2=i+(N/2);
-	    const auto&opo_sync=Opo->item({.layer=L,.slot=i+1});
+	    const auto&opo_sync=Opo->operator[]({.layer=L,.slot=i+1});
 	    const StripPos pos1={.layer=L,.slot=i+1};
 	    const StripPos pos2={.layer=L,.slot=i2+1};
 	    if(
-		(AB->item(pos1).chi_sq<AB_chisq_thr)&&
-		(AB->item(pos2).chi_sq<AB_chisq_thr)&&
+		(AB->operator[](pos1).chi_sq<AB_chisq_thr)&&
+		(AB->operator[](pos2).chi_sq<AB_chisq_thr)&&
 		(opo_sync.chi_sq<1.5)&&
 		(opo_sync.chi_sq>=0.)&&
 		(opo_sync.peak.uncertainty()<2.5)
@@ -151,10 +151,10 @@ int main(int argc, char **argv) {
 	<<"set key on"<<"set xlabel 'layer "+to_string(L)+"'";
 	for(size_t i=1;i<=DeltaT->LayerSize(L);i++){
 	    const StripPos slot={.layer=L,.slot=i};
-	    const auto& ab=AB->item(slot);
-	    const auto&delta=DeltaT_D->var_item(slot)
+	    const auto& ab=AB->operator[](slot);
+	    const auto&delta=DeltaT_D->item(slot)
 		={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
-	    auto&Delta=DeltaT->var_item(slot);
+	    auto&Delta=DeltaT->item(slot);
 	    Delta.A+=delta.A.val();
 	    Delta.B+=delta.B.val();
 	}

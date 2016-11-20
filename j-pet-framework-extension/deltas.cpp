@@ -8,7 +8,7 @@ Synchronization::Synchronization(const shared_ptr < AbstractBarrelMapping > map,
 }
 Synchronization::~Synchronization(){}
 const SynchroStrip Synchronization::GetTimes(const JPetHit & hit) const{
-    const auto& offsets=f_offsets->item(f_mapping->getStripPos(hit.getBarrelSlot()));
+    const auto& offsets=f_offsets->operator[](f_mapping->getStripPos(hit.getBarrelSlot()));
     map<int,double> lead_times_A = hit.getSignalA().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
     map<int,double> lead_times_B = hit.getSignalB().getRecoSignal().getRawSignal().getTimesVsThresholdNumber(JPetSigCh::Leading);
     vector<double> A,B;

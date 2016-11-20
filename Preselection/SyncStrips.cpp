@@ -38,11 +38,11 @@ void TaskSyncStrips::exec(){
 	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
 	bool passed=true;
 	for(size_t thr=0;thr<4;thr++)
-	    passed&=(tot.A[thr]>fCut->item(strip).A[thr])&&
-	    (tot.B[thr]>fCut->item(strip).B[thr]);
+	    passed&=(tot.A[thr]>fCut->operator[](strip).A[thr])&&
+	    (tot.B[thr]>fCut->operator[](strip).B[thr]);
 	if(passed){
 	    const auto times=fSync->GetTimes(*currHit);
-	    const auto&AB=f_AB_position->item(strip);
+	    const auto&AB=f_AB_position->operator[](strip);
 	    if((AB.chi_sq>=0)&&(AB.peak.Contains(times.A-times.B))){
 		if (fHits.empty()) {
 		    fHits.push_back(*currHit);
