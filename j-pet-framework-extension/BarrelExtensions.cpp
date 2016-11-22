@@ -4,9 +4,14 @@
 #include "BarrelExtensions.h"
 using namespace std;
 using namespace MathTemplates;
-const string LayerThr(const size_t layer, const size_t thr){
+const string Layer(const size_t layer){
     stringstream stream;
-    stream<<"layer"<<layer<<"-thr"<<thr;
+    stream<<"layer"<<layer;
+    return stream.str();
+}
+const string LayerSlot(const size_t layer, const size_t slot){
+    stringstream stream;
+    stream<<"layer"<<layer<<"-slot"<<slot;
     return stream.str();
 }
 const string LayerSlotThr(const size_t layer, const size_t slot, const size_t thr){

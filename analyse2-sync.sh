@@ -4,7 +4,7 @@ for X in `find $2|grep .root|grep .Hits.`; do
 	paramlist=${paramlist}" "${X}
 done
 echo "Building TOT hists"
-./TOT-hists -hits${paramlist} > $2/TOT-cut.txt
+./TOT-hists -hits${paramlist} > /dev/null
 
 if [ -e $2/Deltas.txt ]; then
     echo "Deltas.txt exists"
@@ -14,7 +14,7 @@ else
 fi
 for X in `find $2|grep .root|grep .Hits.`; do
 	echo "Stage AB : ${X}"
-	(cat $2/Deltas.txt & cat $2/TOT-cut.txt)| ./Preselect-AB -t root -f ${X}
+	(cat $2/Deltas.txt)| ./Preselect-AB -t root -f ${X}
 done
 paramlist=""
 for X in `find $2|grep .root|grep .Stat4AB.`; do
@@ -27,7 +27,7 @@ echo "Fitting A-B hists"
 
 for X in `find $2|grep .root|grep .Hits.`; do
 	echo "Stage Strips : ${X}"
-	(cat $2/Deltas.txt  & cat $2/TOT-cut.txt & cat $2/AB-center.txt)|./Preselect-StripsSync -t root -f ${X}
+	(cat $2/Deltas.txt & cat $2/AB-center.txt)|./Preselect-StripsSync -t root -f ${X}
 done
 paramlist=""
 for X in `find $2|grep .root|grep .Stat4Strips.`; do

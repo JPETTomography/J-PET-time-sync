@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 	hist<double> left,right,assym;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=Nei[i]->LayerSize(layer);slot++){
-	    const auto name=LayerSlotThr(layer,slot,1)+"-deltaid"+to_string(neighbour_delta_id[i]);
+	    const auto name=LayerSlot(layer,slot)+"-deltaid"+to_string(neighbour_delta_id[i]);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name);
 	    auto& item=Nei[i]->item({.layer=layer,.slot=slot});
 	    if(shist.TotalSum().val()>=5.){

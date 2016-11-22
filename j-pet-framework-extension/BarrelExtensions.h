@@ -7,7 +7,8 @@
 #include <JPetHit/JPetHit.h>
 #include <JPetTask/JPetTask.h>
 #include "PetDict.h"
-const std::string LayerThr(const size_t layer, const size_t thr);
+const std::string Layer(const size_t layer);
+const std::string LayerSlot(const size_t layer,const size_t slot);
 const std::string LayerSlotThr(const size_t layer,const size_t slot, const size_t thr);
 class AbstractBarrelMapping{
 public:

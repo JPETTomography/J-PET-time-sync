@@ -12,25 +12,17 @@ TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
     TOT_Hists::init(opts);
     fSync=make_shared<Synchronization>(map(),cin,DefaultTimeCalculation);
-    fCut=make_JPetMap<TOT_cut>();
-    cin>>(*fCut);
     createTOTHistos("coincidence");
     for(auto & layer : getParamBank().getLayers()){
 	const auto ln=map()->getLayerNumber(*layer.second);
 	for(size_t sl=1,n=map()->getSlotsCount(ln);sl<=n;sl++){
-	    getStatistics().createHistogram( new TH1F(LayerSlotThr(ln,sl,1).c_str(), "",1200, -60.,+60.));
+	    getStatistics().createHistogram( new TH1F(LayerSlot(ln,sl).c_str(), "",1200, -60.,+60.));
 	}
     }
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	const auto tot=getTOTs(*currHit);
-	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
-	bool passed=true;
-	for(size_t thr=0;thr<4;thr++)
-	    passed&=(tot.A[thr]>fCut->operator[](strip).A[thr])&&
-		(tot.B[thr]>fCut->operator[](strip).B[thr]);
-	if(passed){
+	{
 	    if (fHits.empty()) {
 		fHits.push_back(*currHit);
 	    } else {
@@ -56,12 +48,12 @@ void TaskSyncAB::fillCoincidenceHistos(){
 		if(delta_ID==(map()->getSlotsCount(strip1.layer)/2)){
 		    const auto times1=fSync->GetTimes(hit1);
 		    getStatistics()
-			.getHisto1D(LayerSlotThr(strip1.layer,strip1.slot,1).c_str())
+			.getHisto1D(LayerSlot(strip1.layer,strip1.slot).c_str())
 			.Fill(times1.A-times1.B);
 		    fillTOTHistos(hit1,"coincidence");
 		    const auto times2=fSync->GetTimes(hit2);
 		    getStatistics()
-			.getHisto1D(LayerSlotThr(strip2.layer,strip2.slot,1).c_str())
+			.getHisto1D(LayerSlot(strip2.layer,strip2.slot).c_str())
 			.Fill(times2.A-times2.B);
 		    fillTOTHistos(hit2,"coincidence");
 		}

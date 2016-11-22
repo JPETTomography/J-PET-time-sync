@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	hist<double> position;
 	SortedPoints<double> chisq;
 	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
-	    const auto name=LayerSlotThr(layer,slot,1);
+	    const auto name=LayerSlot(layer,slot);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
 	    auto& item=map->item({.layer=layer,.slot=slot});
 	    if(shist.TotalSum().val()>=10.){
