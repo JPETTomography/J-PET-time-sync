@@ -15,8 +15,6 @@ public:
   virtual void exec()override;
   virtual void terminate()override;
 private:
-  void fillCoincidenceHistos();
-  std::vector<JPetHit>fHits;
   std::shared_ptr<Synchronization>fSync;
 };
 #endif

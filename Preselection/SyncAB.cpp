@@ -22,44 +22,12 @@ void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	{
-	    if (fHits.empty()) {
-		fHits.push_back(*currHit);
-	    } else {
-		if (fHits[0].getTimeWindowIndex() == currHit->getTimeWindowIndex()) {
-		    fHits.push_back(*currHit);
-		} else {
-		    fillCoincidenceHistos();
-		    fHits.push_back(*currHit);
-		}
-	    }
-	}
+	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
+	const auto times=fSync->GetTimes(*currHit);
+	getStatistics()
+	    .getHisto1D(LayerSlot(strip.layer,strip.slot).c_str())
+	    .Fill(times.A-times.B);
+	fillTOTHistos(*currHit,"coincidence");
     }
-}
-void TaskSyncAB::fillCoincidenceHistos(){
-    for (auto i = fHits.begin(); i != fHits.end(); ++i){
-	for (auto j = i; ++j != fHits.end(); ){
-	    const auto& hit1 = *i;
-	    const auto& hit2 = *j;
-	    const auto strip1=map()->getStripPos(hit1.getBarrelSlot());
-	    const auto strip2=map()->getStripPos(hit2.getBarrelSlot());
-	    if(strip1.layer == strip2.layer){
-		const int delta_ID = map()->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
-		if(delta_ID==(map()->getSlotsCount(strip1.layer)/2)){
-		    const auto times1=fSync->GetTimes(hit1);
-		    getStatistics()
-			.getHisto1D(LayerSlot(strip1.layer,strip1.slot).c_str())
-			.Fill(times1.A-times1.B);
-		    fillTOTHistos(hit1,"coincidence");
-		    const auto times2=fSync->GetTimes(hit2);
-		    getStatistics()
-			.getHisto1D(LayerSlot(strip2.layer,strip2.slot).c_str())
-			.Fill(times2.A-times2.B);
-		    fillTOTHistos(hit2,"coincidence");
-		}
-	    }
-	}
-    }
-    fHits.clear();
 }
 void TaskSyncAB::terminate(){}
