@@ -44,7 +44,7 @@ inline const std::shared_ptr<JPetMap<DataType>> make_half_JPetMap(){
   return std::shared_ptr<JPetMap<DataType>>(new JPetMap<DataType>({24,24,48}));
 }
 
-const std::vector<size_t> neighbour_delta_id{2,3};
+const std::vector<size_t> neighbour_delta_id{1,2};
 struct SyncNeighbour_results{
   MathTemplates::value<double>left,right,assymetry;double chi_sq;
 };
