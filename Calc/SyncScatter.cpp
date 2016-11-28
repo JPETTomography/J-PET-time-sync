@@ -12,7 +12,7 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 using namespace Genetic;
 namespace Sync{
-    const SyncNeighbour_results Fit4SyncNeighbour(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
+    const SyncScatter_results Fit4SyncScatter(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef Add2<

@@ -36,11 +36,11 @@ int main(int argc, char **argv) {
 	filenames.push_back(string(argv[i]));
     const auto AB=make_JPetMap<SyncAB_results>();
     {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
-    const auto Opo=make_half_JPetMap<SyncOposite_results>();
+    const auto Opo=make_OpoCoiMap();
     {ifstream file;file.open(filenames[1]);if(file){file>>(*Opo);file.close();}}
-    vector<shared_ptr<JPetMap<SyncNeighbour_results>>> Nei;
+    vector<shared_ptr<JPetMap<SyncScatter_results>>> Nei;
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
-	Nei.push_back(make_JPetMap<SyncNeighbour_results>());
+	Nei.push_back(make_JPetMap<SyncScatter_results>());
     {ifstream file;file.open(filenames[2]);if(file){
 	for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
 	    file>>(*Nei[i]);file.close();

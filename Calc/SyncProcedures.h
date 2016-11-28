@@ -10,7 +10,7 @@
 namespace Sync{
     const SyncAB_results Fit4SyncAB(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads);
     const SyncOposite_results Fit4SyncOposite(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads);
-    const SyncNeighbour_results Fit4SyncNeighbour(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads);
+    const SyncScatter_results Fit4SyncScatter(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads);
 };
 namespace Graph{
     class ConnectionChecker{

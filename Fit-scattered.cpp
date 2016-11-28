@@ -27,9 +27,9 @@ int main(int argc, char **argv) {
     vector<string> root_filenames;
     for(int i=2;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
-    vector<shared_ptr<JPetMap<SyncNeighbour_results>>> Nei;
+    vector<shared_ptr<JPetMap<SyncScatter_results>>> Nei;
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
-	Nei.push_back(make_JPetMap<SyncNeighbour_results>());
+	Nei.push_back(make_JPetMap<SyncScatter_results>());
     Plotter::Instance().SetOutput(".","strips-neighbour");
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
     for(size_t layer=1;layer <= Nei[i]->LayersCount();layer++){
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name);
 	    auto& item=Nei[i]->item({.layer=layer,.slot=slot});
 	    if(shist.TotalSum().val()>=5.){
-		item=Sync::Fit4SyncNeighbour(shist,"Neighbour "+name,thr_cnt);
+		item=Sync::Fit4SyncScatter(shist,"Neighbour "+name,thr_cnt);
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);
 		assym<<point<value<double>>(double(slot),item.assymetry);

@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     vector<string> root_filenames;
     for(int i=2;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
-    auto map=make_half_JPetMap<SyncOposite_results>();
+    auto map=make_OpoCoiMap();
     Plotter::Instance().SetOutput(".","strips-oposite");
     for(size_t layer=1;layer <= map->LayersCount();layer++){
 	hist<double> position;
