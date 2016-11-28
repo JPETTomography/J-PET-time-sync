@@ -24,9 +24,7 @@ void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
 	const auto times=fSync->GetTimes(*currHit);
-	getStatistics()
-	    .getHisto1D(LayerSlot(strip.layer,strip.slot).c_str())
-	    .Fill(times.A-times.B);
+	getStatistics().getHisto1D(LayerSlot(strip).c_str()).Fill(times.A-times.B);
 	fillTOTHistos(*currHit,"coincidence");
     }
 }

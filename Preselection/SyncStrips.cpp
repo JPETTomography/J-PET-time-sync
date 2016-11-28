@@ -28,6 +28,14 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	    string histo_name = "DeltaT-with-neighbour-"+LayerSlot(layer_n,slot)+"-deltaid"+to_string(delta);
 	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
 	}
+	if((layer_n-1) < SyncLayerIndices.size()){
+	    for(size_t i=0;i<SyncLayerIndices[layer_n-1].size();i++){
+		for(size_t slot=1;slot<=map()->getSlotsCount(*layer.second);slot++){
+		    string histo_name = "Inter-layer-"+LayerSlot(layer_n,slot)+"-"+to_string(i);
+		    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
+		}
+	    }
+	}
     }
 }
 void TaskSyncStrips::exec(){
@@ -73,13 +81,13 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		    if(strip1.slot<=opa_delta_ID)
 			getStatistics().getHisto1D(
 			    ("DeltaT-with-oposite-"+
-				LayerSlot(layer,strip1.slot)
+				LayerSlot(strip1)
 			    ).c_str()
 			).Fill(hit_1-hit_2);
 		    else
 			getStatistics().getHisto1D(
 			    ("DeltaT-with-oposite-"+
-				LayerSlot(layer,strip2.slot)
+				LayerSlot(strip2)
 			    ).c_str()
 			).Fill(hit_2-hit_1);
 		}else{
@@ -90,19 +98,40 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 			)
 			    getStatistics().getHisto1D(
 				("DeltaT-with-neighbour-"+
-				    LayerSlot(layer,strip1.slot)+
+				    LayerSlot(strip1)+
 				    "-deltaid"+to_string(delta)
 				).c_str()
 			    ).Fill(hit_1-hit_2);
 			else
 			    getStatistics().getHisto1D(
 				("DeltaT-with-neighbour-"+
-				    LayerSlot(layer,strip2.slot)+
+				    LayerSlot(strip2)+
 				    "-deltaid"+to_string(delta)
 				).c_str()
 			    ).Fill(hit_2-hit_1);
 		    }
 		}
+	    }else{
+		auto placehits=[this](const JPetHit&prev_hit,const JPetHit&suc_hit){
+		    const auto pr_strip=map()->getStripPos(prev_hit.getBarrelSlot());
+		    const auto su_strip=map()->getStripPos(suc_hit.getBarrelSlot());
+		    const size_t L=pr_strip.layer-1;
+		    const size_t index1=pr_strip.slot-1,index2=su_strip.slot-1;
+	    	    for(size_t i=0;i<SyncLayerIndices[L].size();i++){
+			const auto item=SyncLayerIndices[L][i];
+			if(((index1*item.coef+item.offs)%f_AB_position->LayerSize(su_strip.layer))==index2){
+			    const auto times1=fSync->GetTimes(prev_hit),
+				times2=fSync->GetTimes(suc_hit);
+			    auto hit_1=(times1.A+times1.B)/2.,
+				hit_2=(times2.A+times2.B)/2.;
+			    getStatistics().getHisto1D(
+				("Inter-layer-"+LayerSlot(pr_strip)+"-"+to_string(i)).c_str()
+			    ).Fill(hit_2-hit_1);
+			}
+		    }
+		};
+		if (strip1.layer == (strip2.layer +1))placehits(hit1,hit2);
+		if ((strip1.layer+1) == strip2.layer)placehits(hit2,hit1);
 	    }
 	}
     }

@@ -9,6 +9,7 @@
 #include "PetDict.h"
 const std::string Layer(const size_t layer);
 const std::string LayerSlot(const size_t layer,const size_t slot);
+inline const std::string LayerSlot(const StripPos&pos){return LayerSlot(pos.layer,pos.slot);}
 const std::string LayerSlotThr(const size_t layer,const size_t slot, const size_t thr);
 class AbstractBarrelMapping{
 public:
