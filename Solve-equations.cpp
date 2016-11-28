@@ -110,20 +110,20 @@ int main(int argc, char **argv) {
 	if(connectedslots.size()<(N/2)){
 	    //ToDo: check another area
 	}
+	cerr<<connectedslots.size()<<" connected"<<endl;
 	InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
 	auto init=make_shared<GenerateUniform>();
-	for(size_t i=1;i<N;i++){
+	for(size_t i=0;i<N;i++){
 	    bool c=false;
 	    for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 		if(connectedslots[j]==i)c=true;
-	    if(c)init<<make_pair(-100,100);
-	    else init<<make_pair(0,0);
+	    if(c)init<<make_pair(-100.,100.);
+	    else init<<make_pair(-0.,0.);
 	}
 	solver_hits.SetThreadCount(thr_cnt);
-	solver_hits.Init(N*12,init,engine);
+	solver_hits.Init(N*15,init,engine);
 	cerr<<"hits:"<<endl;
 	cerr<<solver_hits.ParamCount()<<" variables"<<endl;
-	cerr<<connectedslots.size()<<" connected"<<endl;
 	cerr<<solver_hits.PopulationSize()<<" points"<<endl;
 	SortedPoints<double> opt_min,opt_max;
 	while(!solver_hits.AbsoluteOptimalityExitCondition(0.001)){
