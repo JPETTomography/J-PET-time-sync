@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
 	Nei.push_back(make_JPetMap<SyncScatter_results>());
     auto IL=make_InterLayerMap();
     Plotter::Instance().SetOutput(".","strips-neighbour");
+    //Neighbour strips
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
     for(size_t layer=1;layer <= Nei[i]->LayersCount();layer++){
 	hist<double> left,right,assym;
@@ -56,7 +57,7 @@ int main(int argc, char **argv) {
 	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]"<<title;
 	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<title;
     }
-
+    //Inter-layer
     for(size_t layer=1;layer <= IL->LayersCount();layer++)for(size_t i=0;i<2;i++){
 	hist<double> left,right,assym;
 	SortedPoints<double> chisq;
