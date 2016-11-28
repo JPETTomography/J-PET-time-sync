@@ -41,9 +41,12 @@ int main(int argc, char **argv) {
     vector<shared_ptr<JPetMap<SyncScatter_results>>> Nei;
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
 	Nei.push_back(make_JPetMap<SyncScatter_results>());
+    auto IL=make_InterLayerMap();
     {ifstream file;file.open(filenames[2]);if(file){
 	for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
-	    file>>(*Nei[i]);file.close();
+	    file>>(*Nei[i]);
+	file>>(*IL);
+	file.close();
     }}
     const auto DeltaT_D=make_JPetMap<DeltaT_results>();
     const auto DeltaT=make_JPetMap<SynchroStrip>();

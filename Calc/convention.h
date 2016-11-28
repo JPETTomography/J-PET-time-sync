@@ -76,7 +76,13 @@ const std::vector<std::vector<SyncLayerIndex>> SyncLayerIndices{
     {{.coef=1,.offs=1},{.coef=1,.offs=48-2}},
     {{.coef=2,.offs=4},{.coef=2,.offs=96-4}}
 };
-struct SyncLayer{SyncScatter_results left,right;};
+struct SyncLayer{SyncScatter_results zero,one;};
+inline std::istream&operator>>(std::istream&str,SyncLayer&item){
+  return str>>item.zero>>item.one;
+}
+inline std::ostream&operator<<(std::ostream&str,const SyncLayer&item){
+  return str<<item.zero<<"\n"<<item.one;
+}
 inline const std::shared_ptr<JPetMap<SyncLayer>> make_InterLayerMap(){
   return std::shared_ptr<JPetMap<SyncLayer>>(new JPetMap<SyncLayer>({48,48}));
 }
