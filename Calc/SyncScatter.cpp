@@ -13,6 +13,10 @@ using namespace MathTemplates;
 using namespace Genetic;
 namespace Sync{
     const SyncScatter_results Fit4SyncScatter(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
+	if(hist.TotalSum().val()<7.){
+	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
+	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
+	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef Add2<
@@ -53,7 +57,7 @@ namespace Sync{
 	}
 	auto chain=ChainWithCount(1000,hist.left().X().min(),hist.right().X().max());
 	SortedPoints<double> totalfit([&fit](double x)->double{return fit({x});},chain);
-	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]";
+	Plot<double>().Hist(hist).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	const auto& P=fit.Parameters();

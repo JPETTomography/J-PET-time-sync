@@ -13,6 +13,10 @@ using namespace MathTemplates;
 using namespace Genetic;
 namespace Sync{
     const SyncAB_results Fit4SyncAB(const hist<double>&hist, const string&displayname,const size_t threads){
+	if(hist.TotalSum().val()<100.){
+	    Plot<double>().Hist(hist)<<"set title'"+displayname+"'"<<"set xrange [-30:30]";
+	    return {.peak=0,.chi_sq=-1};
+	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef 
@@ -65,7 +69,8 @@ namespace Sync{
 	SortedPoints<double>
 	totalfit([&fit](double x)->double{return fit({x});},chain),
 	background([&fit](double x)->double{return Background()({x},fit.Parameters());},chain);
-	Plot<double>().Hist(hist,displayname).Line(totalfit,"Fit").Line(background,"Background")<<"set key on"<<"set xrange [-30:30]";
+	Plot<double>().Hist(hist).Line(totalfit,"Fit").Line(background,"Background")
+	<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	const auto&P=fit.Parameters();

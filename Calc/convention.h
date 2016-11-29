@@ -67,7 +67,7 @@ inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){
 inline std::ostream&operator<<(std::ostream&str,const SyncScatter_results&item){
   return str<<item.left<<"\t"<<item.right<<"\t"<<item.assymetry<<"\t"<<item.chi_sq;
 }
-const std::vector<size_t> neighbour_delta_id{1,2,3};
+const std::vector<size_t> neighbour_delta_id{1,2};
 
 
 //hit-hit inter-layer coincidences

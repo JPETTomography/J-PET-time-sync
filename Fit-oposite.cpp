@@ -36,16 +36,12 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlot(layer,slot);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
 	    auto& item=map->item({.layer=layer,.slot=slot});
-	    if(shist.TotalSum().val()>=10.){
-		item=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
-		position<<point<value<double>>(double(slot),item.peak);
-		chisq<<point<double>(slot,item.chi_sq);
-	    }else{
-		item={.peak=0,.chi_sq=-1};
-	    }
+	    item=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
+	    position<<point<value<double>>(double(slot),item.peak);
+	    chisq<<point<double>(slot,item.chi_sq);
 	}
-	Plot<double>().Hist(position,"Position")<<"set key on";
-	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]";
+	Plot<double>().Hist(position,"Position")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
+	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<"set title 'Layer "+to_string(layer)+"'";
     }
     cout<<(*map);
     return 0;

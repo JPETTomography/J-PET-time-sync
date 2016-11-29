@@ -33,7 +33,7 @@ paramlist=""
 for X in `find $2|grep .root|grep .Stat4Strips.`; do
 	paramlist=${paramlist}" "${X}
 done
-echo ${paramlist}
+echo "Fitting coincidences spectra"
 ./Fit-oposite $1${paramlist} > $2/Oposite-strips.txt
 ./Fit-scattered $1${paramlist} > $2/Scattered.txt
 
