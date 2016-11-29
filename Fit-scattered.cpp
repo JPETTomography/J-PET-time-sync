@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
 	Nei.push_back(make_JPetMap<SyncScatter_results>());
     auto IL=make_InterLayerMap();
-    Plotter::Instance().SetOutput(".","strips-neighbour");
+    Plotter::Instance().SetOutput(".","Scattered");
     //Neighbour strips
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
     for(size_t layer=1;layer <= Nei[i]->LayersCount();layer++){

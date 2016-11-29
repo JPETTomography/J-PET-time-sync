@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 	vector<string> root_filenames;
 	for(int i=2;i<argc;i++)
 		root_filenames.push_back(string(argv[i]));
-	Plotter::Instance().SetOutput(".","AB-synchro");
+	Plotter::Instance().SetOutput(".","AB");
 	auto map=make_JPetMap<SyncAB_results>();
 	for(size_t layer=1;layer<=map->LayersCount();layer++){
 		hist<double> position;

@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     const auto DeltaT_D=make_JPetMap<DeltaT_results>();
     const auto DeltaT=make_JPetMap<SynchroStrip>();
     cin>>(*DeltaT);
-    Plotter::Instance().SetOutput(".","delta_t_sync");
+    Plotter::Instance().SetOutput(".","Delta");
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
 	cerr<<"=======LAYER "<<L<<" : "<<endl;
 	list<InexactEquation> equations;

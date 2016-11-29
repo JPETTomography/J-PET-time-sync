@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     for(int i=2;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
     auto map=make_OpoCoiMap();
-    Plotter::Instance().SetOutput(".","strips-oposite");
+    Plotter::Instance().SetOutput(".","Oposite");
     for(size_t layer=1;layer <= map->LayersCount();layer++){
 	hist<double> position;
 	SortedPoints<double> chisq;
