@@ -118,7 +118,7 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		    const size_t L=pr_strip.layer-1;
 		    const size_t index1=pr_strip.slot-1,index2=su_strip.slot-1;
 	    	    for(size_t i=0;i<SyncLayerIndices[L].size();i++){
-			const auto item=SyncLayerIndices[L][i];
+			const auto&item=SyncLayerIndices[L][i];
 			if(((index1*item.coef+item.offs)%f_AB_position->LayerSize(su_strip.layer))==index2){
 			    const auto times1=fSync->GetTimes(prev_hit),
 				times2=fSync->GetTimes(suc_hit);
