@@ -34,7 +34,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(600,make_shared<GenerateByGauss>()
+	fit.Init(80,make_shared<GenerateByGauss>()
 	    <<make_pair(total,total*30.0)
 	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
 	    <<make_pair(0.5,0.3)
@@ -46,7 +46,7 @@ namespace Sync{
 	cerr<<fit.PopulationSize()<<" points"<<endl;
 	const auto deltas=parEq(fit.ParamCount(),0.001);
 	while(
-	    (!fit.AbsoluteOptimalityExitCondition(0.001))&&
+	    (!fit.AbsoluteOptimalityExitCondition(0.01))&&
 	    (!fit.ParametersDispersionExitCondition(deltas))
 	){
 	    fit.Iterate(r);
