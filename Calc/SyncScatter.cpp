@@ -46,7 +46,7 @@ namespace Sync{
 	cerr<<fit.PopulationSize()<<" points"<<endl;
 	const auto deltas=parEq(fit.ParamCount(),0.001);
 	while(
-	    (!fit.AbsoluteOptimalityExitCondition(0.01))&&
+	    (!fit.AbsoluteOptimalityExitCondition(0.001))&&
 	    (!fit.ParametersDispersionExitCondition(deltas))
 	){
 	    fit.Iterate(r);
