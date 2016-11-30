@@ -6,6 +6,7 @@
 #include <j-pet-framework-extension/PetDict.h>
 #include <j-pet-framework-extension/BarrelExtensions.h>
 #include <j-pet-framework-extension/deltas.h>
+#include <math_h/error.h>
 #include <Calc/convention.h>
 #include <IO/gethist.h>
 #include "SyncStrips.h"
@@ -116,6 +117,8 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		    const auto pr_strip=map()->getStripPos(prev_hit.getBarrelSlot());
 		    const auto su_strip=map()->getStripPos(suc_hit.getBarrelSlot());
 		    const size_t L=pr_strip.layer-1;
+		    if(L>=SyncLayerIndices.size())
+			return;//ToDo: understand the reason of the 'effect'
 		    const size_t index1=pr_strip.slot-1,index2=su_strip.slot-1;
 	    	    for(size_t i=0;i<SyncLayerIndices[L].size();i++){
 			const auto&item=SyncLayerIndices[L][i];
