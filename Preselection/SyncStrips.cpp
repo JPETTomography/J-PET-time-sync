@@ -117,8 +117,6 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		    const auto pr_strip=map()->getStripPos(prev_hit.getBarrelSlot());
 		    const auto su_strip=map()->getStripPos(suc_hit.getBarrelSlot());
 		    const size_t L=pr_strip.layer-1;
-		    if(L>=SyncLayerIndices.size())
-			return;//ToDo: understand the reason of the 'effect'
 		    const size_t index1=pr_strip.slot-1,index2=su_strip.slot-1;
 	    	    for(size_t i=0;i<SyncLayerIndices[L].size();i++){
 			const auto&item=SyncLayerIndices[L][i];
@@ -133,8 +131,8 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 			}
 		    }
 		};
-		if (strip1.layer == (strip2.layer +1))placehits(hit1,hit2);
-		if ((strip1.layer+1) == strip2.layer)placehits(hit2,hit1);
+		if (strip1.layer == (strip2.layer +1))placehits(hit2,hit1);
+		if ((strip1.layer+1) == strip2.layer)placehits(hit1,hit2);
 	    }
 	}
     }
