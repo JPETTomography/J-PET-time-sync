@@ -53,7 +53,6 @@ namespace Sync{
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	const auto&P=fit.Parameters();
-	for(const auto&p:P)cerr<<p<<endl;
 	return {.peak={P[1],P[2]},.chi_sq=chi_sq_norm};
     }
 }

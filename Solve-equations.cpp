@@ -166,8 +166,8 @@ int main(int argc, char **argv) {
 	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
     ){
 	solver_hits.Iterate(engine);
-	auto min=solver_hits.Optimality(),
-	max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
+	auto &min=solver_hits.Optimality(),
+	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
 	cerr<<solver_hits.iteration_count()<<" iterations; "
 	<<min<<"<chi^2<"<<max<<"                 \r";
 	opt_min << point<double>(solver_hits.iteration_count(),min);
