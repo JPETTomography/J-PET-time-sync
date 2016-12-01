@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
 
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
 	const size_t N=DeltaT->LayerSize(L);
+	
 	for(size_t i1=0;i1<N;i1++){
 	    const StripPos pos1={.layer=L,.slot=i1+1};
 	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
@@ -84,6 +85,7 @@ int main(int argc, char **argv) {
 		}
 	    }
 	}
+	
 	for(size_t i1=0;i1<(N/2);i1++){
 	    const auto i2=i1+(N/2);
 	    const auto&Item=Opo->operator[]({.layer=L,.slot=i1+1});
@@ -155,7 +157,7 @@ int main(int argc, char **argv) {
 	deltas<<0.001;
     }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(totalN*10,init,engine);
+    solver_hits.Init(connectedslots.size()*15,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;

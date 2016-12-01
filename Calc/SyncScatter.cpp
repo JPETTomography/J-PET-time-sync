@@ -29,8 +29,8 @@ namespace Sync{
 	    &&(P[1]>hist.left().X().max())&&(P[4]<hist.right().X().min())
 	    &&((P[4]-P[1])>((P[2]+P[5])/2.0))
 	    &&((P[4]-P[1])<((P[2]+P[5])*10.0))
-	    &&((P[2]/P[5])<4.0)&&((P[5]/P[2])<4.0)
-	    &&((P[0]/P[3])<5.0)&&((P[3]/P[0])<5.0);
+	    &&((P[2]/P[5])<8.0)&&((P[5]/P[2])<8.0)
+	    &&((P[0]/P[3])<8.0)&&((P[3]/P[0])<8.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
@@ -46,7 +46,7 @@ namespace Sync{
 	cerr<<fit.PopulationSize()<<" points"<<endl;
 	const auto deltas=parEq(fit.ParamCount(),0.0001);
 	while(
-	    (!fit.AbsoluteOptimalityExitCondition(0.0001))&&
+	    (!fit.AbsoluteOptimalityExitCondition(0.00001))&&
 	    (!fit.ParametersDispersionExitCondition(deltas))
 	){
 	    fit.Iterate(r);
