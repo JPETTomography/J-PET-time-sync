@@ -13,7 +13,7 @@ using namespace MathTemplates;
 using namespace Genetic;
 namespace Sync{
     const SyncAB_results Fit4SyncAB(const hist<double>&source, const string&displayname,const size_t threads){
-	const hist<double> hist=source.YRange(0.5,+INFINITY);
+	const hist<double> hist=source.YRange(1.0,+INFINITY);
 	if(hist.TotalSum().val()<100.){
 	    Plot<double>().Hist(source)<<"set title'"+displayname+"'"<<"set xrange [-30:30]";
 	    return {.peak=0,.chi_sq=-1};
@@ -55,9 +55,9 @@ namespace Sync{
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
-	const auto deltas=parEq(fit.ParamCount(),0.001);
+	const auto deltas=parEq(fit.ParamCount(),0.0001);
 	while(
-	    (!fit.AbsoluteOptimalityExitCondition(0.001))&&
+	    (!fit.AbsoluteOptimalityExitCondition(0.0001))&&
 	    (!fit.ParametersDispersionExitCondition(deltas))
 	){
 	    fit.Iterate(r);
