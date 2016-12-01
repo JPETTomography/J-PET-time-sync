@@ -106,12 +106,11 @@ int main(int argc, char **argv) {
 	if(L<=IL->LayersCount()){
 	    for(size_t i1=0;i1<N;i1++){
 		const StripPos pos1={.layer=L,.slot=i1+1};
-		{
-		    const auto&item=SyncLayerIndices[L][0];
+		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&slots,&equations](const SyncScatter_results&Item,const size_t coinc_index){
+		    const auto&item=SyncLayerIndices[L][coinc_index];
 		    const StripPos pos2={.layer=L+1,.slot=(i1*item.coef+item.offs)%DeltaT->LayerSize(L+1)+1};
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
 		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
-		    const auto&Item=IL->operator[](pos1).zero;
 		    if(
 			(AB->operator[](pos1).chi_sq>=0)&&
 			(AB->operator[](pos2).chi_sq>=0)&&
@@ -123,27 +122,9 @@ int main(int argc, char **argv) {
 			});
 			slots.Connect(gl1,gl2);
 		    }
-		}{
-		    const auto&item=SyncLayerIndices[L][1];
-		    const StripPos pos2={.layer=L+1,.slot=(i1*item.coef+item.offs)%DeltaT->LayerSize(L+1)+1};
-		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
-		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
-		    const auto&Item=IL->operator[](pos1).one;
-		    if(
-			(AB->operator[](pos1).chi_sq>=0)&&
-			(AB->operator[](pos2).chi_sq>=0)&&
-			(Item.chi_sq>=0.)&&
-			(Item.assymetry<=5.0)&&(Item.assymetry>=0.2)&&
-			((Item.right-Item.left).Below(15.0))&&
-			((Item.right-Item.left).Above(2.0))
-		    ){
-			equations.push_back({
-			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
-			    .right=(Item.left+Item.right)/2.0
-			});
-			slots.Connect(gl1,gl2);
-		    }
-		}
+		};
+		process(IL->operator[](pos1).zero,0);
+		process(IL->operator[](pos1).one,1);
 	    }
 	}
     }
@@ -154,7 +135,7 @@ int main(int argc, char **argv) {
 		res+=pow(d,2);
 	    return res;
 	},
-	.right={0.0,double(equations.size())*1000.0}
+	.right={0.0,1000.0*totalN}
     });
     cerr<<equations.size()<<" equations"<<endl;
 
@@ -171,7 +152,7 @@ int main(int argc, char **argv) {
 	    if(connectedslots[j]==i)c=true;
 	if(c)init<<make_pair(-100.,100.);
 	else init<<make_pair(-0.,0.);
-	deltas<<0.01;
+	deltas<<0.0001;
     }
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(totalN*10,init,engine);
@@ -182,7 +163,7 @@ int main(int argc, char **argv) {
     while(
 	!solver_hits.ParametersDispersionExitCondition(deltas)
 	&&
-	!solver_hits.AbsoluteOptimalityExitCondition(0.01)
+	!solver_hits.AbsoluteOptimalityExitCondition(0.0001)
     ){
 	solver_hits.Iterate(engine);
 	auto min=solver_hits.Optimality(),
