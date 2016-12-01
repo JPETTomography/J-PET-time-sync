@@ -12,9 +12,10 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 using namespace Genetic;
 namespace Sync{
-    const SyncOposite_results Fit4SyncOposite(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
+    const SyncOposite_results Fit4SyncOposite(const MathTemplates::hist<double>&source, const std::string&displayname,const size_t threads){
+	const hist<double> hist=source.YRange(0.5,+INFINITY);
 	if(hist.TotalSum().val()<10.){
-	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
+	    Plot<double>().Hist(source)<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
 	    return {.peak=0,.chi_sq=-1};
 	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
@@ -28,7 +29,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(300,make_shared<GenerateByGauss>()
+	fit.Init(40,make_shared<GenerateByGauss>()
 	    <<make_pair(total,total*30.0)
 	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
 	    <<make_pair(0.5,0.2)
@@ -48,7 +49,7 @@ namespace Sync{
 	}
 	auto chain=ChainWithCount(1000,hist.left().X().min(),hist.right().X().max());
 	SortedPoints<double> totalfit([&fit](double x)->double{return fit({x});},chain);
-	Plot<double>().Hist(hist).Line(totalfit,"Fit")
+	Plot<double>().Hist(source).Line(totalfit,"Fit")
 	<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
