@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 		res+=pow(d,2);
 	    return res;
 	},
-	.right={0.0,1000.0*totalN}
+	.right={0.0,10000.0*totalN}
     });
     cerr<<equations.size()<<" equations"<<endl;
 
@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
 	    if(connectedslots[j]==i)c=true;
 	if(c)init<<make_pair(-100.,100.);
 	else init<<make_pair(-0.,0.);
-	deltas<<0.0001;
+	deltas<<0.001;
     }
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(totalN*10,init,engine);
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
     while(
 	!solver_hits.ParametersDispersionExitCondition(deltas)
 	&&
-	!solver_hits.AbsoluteOptimalityExitCondition(0.0001)
+	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
     ){
 	solver_hits.Iterate(engine);
 	auto min=solver_hits.Optimality(),
