@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
 			(AB->operator[](pos1).chi_sq>=0)&&
 			(AB->operator[](pos2).chi_sq>=0)&&
 			(Item.chi_sq>=0.)&&
-			(Item.assymetry<=4.0)&&(Item.assymetry>=0.25)&&
+			(Item.assymetry<=10.0)&&(Item.assymetry>=0.1)&&
 			((Item.right-Item.left).Below(7.0))&&
 			((Item.right-Item.left).Above(1.0))
 		    ){
@@ -156,11 +156,11 @@ int main(int argc, char **argv) {
 	for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 	    if(connectedslots[j]==i)c=true;
 	if(c)init<<make_pair(-100.,100.);
-	else init<<make_pair(-0.,0.);
+	else init<<make_pair(0.,0.);
 	deltas<<0.001;
     }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connectedslots.size()*10,init,engine);
+    solver_hits.Init(connectedslots.size()*7,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
