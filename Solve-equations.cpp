@@ -109,14 +109,17 @@ int main(int argc, char **argv) {
 	    for(size_t i1=0;i1<N;i1++){
 		const StripPos pos1={.layer=L,.slot=i1+1};
 		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&slots,&equations](const SyncScatter_results&Item,const size_t coinc_index){
-		    const auto&item=SyncLayerIndices[L][coinc_index];
-		    const StripPos pos2={.layer=L+1,.slot=(i1*item.coef+item.offs)%DeltaT->LayerSize(L+1)+1};
+		    const auto&item=SyncLayerIndices[L-1][coinc_index];
+		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->LayerSize(L+1))+1};
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
 		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		    if(
 			(AB->operator[](pos1).chi_sq>=0)&&
 			(AB->operator[](pos2).chi_sq>=0)&&
-			(Item.chi_sq>=0.)
+			(Item.chi_sq>=0.)&&
+			(Item.assymetry<=4.0)&&(Item.assymetry>=0.25)&&
+			((Item.right-Item.left).Below(7.0))&&
+			((Item.right-Item.left).Above(1.0))
 		    ){
 			equations.push_back({
 			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
@@ -157,7 +160,7 @@ int main(int argc, char **argv) {
 	deltas<<0.001;
     }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connectedslots.size()*15,init,engine);
+    solver_hits.Init(connectedslots.size()*10,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
