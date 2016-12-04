@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 	file>>(*IL);
 	file.close();
     }}
-    const auto DeltaT_D=make_JPetMap<DeltaT_results>();
+    //const auto DeltaT_D=make_JPetMap<DeltaT_results>();
     const auto DeltaT=make_JPetMap<SynchroStrip>();
     cin>>(*DeltaT);
     Plotter::Instance().SetOutput(".","Delta");
@@ -184,13 +184,13 @@ int main(int argc, char **argv) {
     cerr<<endl;
     cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
     solver_hits.SetUncertaintyCalcDeltas(deltas);
-    const auto&solution=solver_hits.ParametersWithUncertainties();
+    const auto&P=solver_hits.Parameters();
     hist<double> eq_left,eq_right,delta_hits;
     for(size_t i=0;i<totalN;i++)
-	delta_hits<<point<value<double>>(double(i),solution[i]);
+	delta_hits<<point<value<double>>(double(i),P[i]);
     for(const auto&eq:equations){
 	static size_t i=0;
-	eq_left<<point<value<double>>(double(i),eq.left(solver_hits.Parameters()));
+	eq_left<<point<value<double>>(double(i),eq.left(P));
 	eq_right<<point<value<double>>(double(i),eq.right);
 	i++;
     }
@@ -199,18 +199,11 @@ int main(int argc, char **argv) {
     Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-30:30]";
     for(size_t i=0;i<totalN;i++){
 	const StripPos slot=DeltaT->PositionOfGlobalNumber(i);
-	const auto& ab=AB->operator[](slot);
-	const auto&delta=DeltaT_D->item(slot)
-	    ={.A=solution[i-1]-(ab.peak/2.0),.B=solution[i-1]+(ab.peak/2.0)};
+	const auto& ab=AB->operator[](slot).peak.val();
 	auto&Delta=DeltaT->item(slot);
-	Delta.A+=delta.A.val();
-	Delta.B+=delta.B.val();
+	Delta.A+=P[i-1]-(ab/2.0);
+	Delta.B+=P[i-1]+(ab/2.0);
     }
 
     cout<<(*DeltaT);
-    ofstream file("deltas_debug.txt");
-    if(file){
-	file<<(*DeltaT_D);
-	file.close();
-    }
 }
