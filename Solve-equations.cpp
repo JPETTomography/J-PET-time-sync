@@ -48,7 +48,6 @@ int main(int argc, char **argv) {
 	file>>(*IL);
 	file.close();
     }}
-    //const auto DeltaT_D=make_JPetMap<DeltaT_results>();
     const auto DeltaT=make_JPetMap<SynchroStrip>();
     cin>>(*DeltaT);
     Plotter::Instance().SetOutput(".","Delta");
