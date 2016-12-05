@@ -34,13 +34,13 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(400,make_shared<GenerateByGauss>()
-	    <<make_pair(total,total*30.0)
-	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
-	    <<make_pair(0.5,0.3)
-	    <<make_pair(total,total*30.0)
-	    <<make_pair((hist.left().X().min()+hist.right().X().max())/2.0,(hist.right().X().max()-hist.left().X().min())/2.0)
-	    <<make_pair(0.5,0.3)
+	fit.Init(400,make_shared<InitialDistributions>()
+	    <<make_shared<DistribUniform>(0,total*30.0)
+	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
+	    <<make_shared<DistribGauss>(0.5,0.3)
+	    <<make_shared<DistribUniform>(0,total*30.0)
+	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
+	    <<make_shared<DistribGauss>(0.5,0.3)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;

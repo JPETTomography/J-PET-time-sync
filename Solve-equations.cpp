@@ -149,14 +149,14 @@ int main(int argc, char **argv) {
     cerr<<connectedslots.size()<<" connected"<<endl;
 
     InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
-    auto init=make_shared<GenerateUniform>();
+    auto init=make_shared<InitialDistributions>();
     ParamSet deltas;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 	    if(connectedslots[j]==i)c=true;
-	if(c)init<<make_pair(-100.,100.);
-	else init<<make_pair(0.,0.);
+	if(c)init<<make_shared<DistribUniform>(-100.,100.);
+	else init<<make_shared<FixParam>(0);
 	deltas<<0.001;
     }
     solver_hits.SetThreadCount(thr_cnt);
