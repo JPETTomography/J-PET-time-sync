@@ -182,7 +182,6 @@ int main(int argc, char **argv) {
     Plotter::Instance()<<"unset log y";
     cerr<<endl;
     cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
-    solver_hits.SetUncertaintyCalcDeltas(deltas);
     const auto&P=solver_hits.Parameters();
     hist<double> eq_left,eq_right,delta_hits;
     for(size_t i=0;i<totalN;i++)
