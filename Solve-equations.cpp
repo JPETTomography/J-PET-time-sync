@@ -159,7 +159,7 @@ int main(int argc, char **argv) {
 	deltas<<0.01;
     }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connectedslots.size()*7,init,engine);
+    solver_hits.Init(connectedslots.size()*5,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
     while(
 	!solver_hits.ParametersDispersionExitCondition(deltas)
 	&&
-	!solver_hits.AbsoluteOptimalityExitCondition(0.01)
+	!solver_hits.RelativeOptimalityExitCondition(0.0001)
     ){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
