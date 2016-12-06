@@ -55,7 +55,6 @@ int main(int argc, char **argv) {
 
     list<InexactEquation> equations;
     const auto totalN=DeltaT->SlotsCount();
-    ConnectionChecker slots(totalN);
 
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
 	const size_t N=DeltaT->LayerSize(L);
@@ -80,7 +79,6 @@ int main(int argc, char **argv) {
 			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
 			.right=(Item.left+Item.right)/2.0
 		    });
-		    slots.Connect(gl1,gl2);
 		}
 	    }
 	}
@@ -101,13 +99,12 @@ int main(int argc, char **argv) {
 		    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
 		    .right=Item.peak
 		});
-		slots.Connect(gl1,gl2);
 	    }
 	}
 	if(L<=IL->LayersCount()){
 	    for(size_t i1=0;i1<N;i1++){
 		const StripPos pos1={.layer=L,.slot=i1+1};
-		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&slots,&equations](const SyncScatter_results&Item,const size_t coinc_index){
+		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&equations](const SyncScatter_results&Item,const size_t coinc_index){
 		    const auto&item=SyncLayerIndices[L-1][coinc_index];
 		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->LayerSize(L+1))+1};
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
@@ -124,7 +121,6 @@ int main(int argc, char **argv) {
 			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
 			    .right=(Item.left+Item.right)/2.0
 			});
-			slots.Connect(gl1,gl2);
 		    }
 		};
 		process(IL->operator[](pos1).zero,0);
@@ -134,21 +130,14 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations"<<endl;
 
-    //ToDo: Take into account case when slot 1:1 isn't connected
-    auto connectedslots=slots.connected_to(0);
-    cerr<<connectedslots.size()<<" connected"<<endl;
 
     InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
     for(size_t i=0;i<totalN;i++){
-	bool c=false;
-	for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
-	    if(connectedslots[j]==i)c=true;
-	if(c)init<<make_shared<DistribGauss>(0.,40.);
-	else init<<make_shared<FixParam>(0);
+	init<<make_shared<DistribGauss>(0.,50.);
    }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connectedslots.size()*5,init,engine);
+    solver_hits.Init(totalN*15,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
