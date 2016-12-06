@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     while(
-	!solver_hits.RelativeOptimalityExitCondition(0.0001)
+	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
     ){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
@@ -186,8 +186,8 @@ int main(int argc, char **argv) {
 	const StripPos slot=DeltaT->PositionOfGlobalNumber(i);
 	const auto& ab=AB->operator[](slot).peak.val();
 	auto&Delta=DeltaT->item(slot);
-	Delta.A+=P[i-1]-(ab/2.0);
-	Delta.B+=P[i-1]+(ab/2.0);
+	Delta.A+=P[i]-(ab/2.0);
+	Delta.B+=P[i]+(ab/2.0);
     }
 
     cout<<(*DeltaT);
