@@ -132,15 +132,6 @@ int main(int argc, char **argv) {
 	    }
 	}
     }
-    equations.push_back({
-	.left=[](const ParamSet&delta){
-	    double res=0;
-	    for(const double&d:delta)
-		res+=pow(d,2);
-	    return res;
-	},
-	.right={0.0,10000.0*totalN}
-    });
     cerr<<equations.size()<<" equations"<<endl;
 
     //ToDo: Take into account case when slot 1:1 isn't connected
@@ -154,7 +145,7 @@ int main(int argc, char **argv) {
 	bool c=false;
 	for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 	    if(connectedslots[j]==i)c=true;
-	if(c)init<<make_shared<DistribUniform>(-100.,100.);
+	if(c)init<<make_shared<DistribGauss>(0.,40.);
 	else init<<make_shared<FixParam>(0);
 	deltas<<0.01;
     }
