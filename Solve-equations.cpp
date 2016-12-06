@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
 	    if(connectedslots[j]==i)c=true;
 	if(c)init<<make_shared<DistribUniform>(-100.,100.);
 	else init<<make_shared<FixParam>(0);
-	deltas<<0.001;
+	deltas<<0.01;
     }
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(connectedslots.size()*7,init,engine);
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
     while(
 	!solver_hits.ParametersDispersionExitCondition(deltas)
 	&&
-	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
+	!solver_hits.AbsoluteOptimalityExitCondition(0.01)
     ){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
