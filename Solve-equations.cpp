@@ -140,15 +140,13 @@ int main(int argc, char **argv) {
 
     InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
-    ParamSet deltas;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(size_t j=1;(!c)&&(j<connectedslots.size());j++)
 	    if(connectedslots[j]==i)c=true;
 	if(c)init<<make_shared<DistribGauss>(0.,40.);
 	else init<<make_shared<FixParam>(0);
-	deltas<<0.01;
-    }
+   }
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(connectedslots.size()*5,init,engine);
     cerr<<"hits:"<<endl;
@@ -156,8 +154,6 @@ int main(int argc, char **argv) {
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     while(
-	!solver_hits.ParametersDispersionExitCondition(deltas)
-	&&
 	!solver_hits.RelativeOptimalityExitCondition(0.0001)
     ){
 	solver_hits.Iterate(engine);
