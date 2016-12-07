@@ -53,36 +53,12 @@ int main(int argc, char **argv) {
     Plotter::Instance().SetOutput(".","Delta");
 
 
-    list<InexactEquation> equations;
     const auto totalN=DeltaT->SlotsCount();
+    list<InexactEquation> equations;
+    ConnectionChecker graph(totalN);
 
     for(size_t L=1;L<=DeltaT->LayersCount();L++){
 	const size_t N=DeltaT->LayerSize(L);
-	
-	for(size_t i1=0;i1<N;i1++){
-	    const StripPos pos1={.layer=L,.slot=i1+1};
-	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
-	    if(AB->operator[](pos1).chi_sq>=0)
-	    for(size_t di=0;di<neighbour_delta_id.size();di++){
-		const auto&Item=Nei[di]->operator[](pos1);
-		const auto i2=(i1+neighbour_delta_id[di])%N;
-		const StripPos pos2={.layer=L,.slot=i2+1};
-		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
-		if(
-		    (AB->operator[](pos2).chi_sq>=0)&&
-		    (Item.chi_sq>=0.)&&
-		    (Item.assymetry<=4.0)&&(Item.assymetry>=0.25)&&
-		    ((Item.right-Item.left).Below(7.0))&&
-		    ((Item.right-Item.left).Above(1.0))
-		){
-		    equations.push_back({
-			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
-			.right=(Item.left+Item.right)/2.0
-		    });
-		}
-	    }
-	}
-	
 	for(size_t i1=0;i1<(N/2);i1++){
 	    const auto i2=i1+(N/2);
 	    const auto&Item=Opo->operator[]({.layer=L,.slot=i1+1});
@@ -99,12 +75,37 @@ int main(int argc, char **argv) {
 		    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
 		    .right=Item.peak
 		});
+		graph.Connect(gl1,gl2);
+	    }
+	}
+	for(size_t i1=0;i1<N;i1++){
+	    const StripPos pos1={.layer=L,.slot=i1+1};
+	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
+	    if(AB->operator[](pos1).chi_sq>=0)
+	    for(size_t di=0;di<neighbour_delta_id.size();di++){
+		const auto&Item=Nei[di]->operator[](pos1);
+		const auto i2=(i1+neighbour_delta_id[di])%N;
+		const StripPos pos2={.layer=L,.slot=i2+1};
+		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
+		if(
+		    (AB->operator[](pos2).chi_sq>=0)&&
+		    (Item.chi_sq>=0.)&&
+		    (Item.assymetry<=4.0)&&(Item.assymetry>=0.25)&&
+		    ((Item.right-Item.left).Below(10.0))&&
+		    ((Item.right-Item.left).Above(2.0))
+		){
+		    equations.push_back({
+			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
+			.right=(Item.left+Item.right)/2.0
+		    });
+		    graph.Connect(gl1,gl2);
+		}
 	    }
 	}
 	if(L<=IL->LayersCount()){
 	    for(size_t i1=0;i1<N;i1++){
 		const StripPos pos1={.layer=L,.slot=i1+1};
-		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&equations](const SyncScatter_results&Item,const size_t coinc_index){
+		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&equations,&graph](const SyncScatter_results&Item,const size_t coinc_index){
 		    const auto&item=SyncLayerIndices[L-1][coinc_index];
 		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->LayerSize(L+1))+1};
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
@@ -113,14 +114,15 @@ int main(int argc, char **argv) {
 			(AB->operator[](pos1).chi_sq>=0)&&
 			(AB->operator[](pos2).chi_sq>=0)&&
 			(Item.chi_sq>=0.)&&
-			(Item.assymetry<=10.0)&&(Item.assymetry>=0.1)&&
-			((Item.right-Item.left).Below(7.0))&&
-			((Item.right-Item.left).Above(1.0))
+			(Item.assymetry<=5.0)&&(Item.assymetry>=0.2)&&
+			((Item.right-Item.left).Below(20.0))&&
+			((Item.right-Item.left).Above(3.0))
 		    ){
 			equations.push_back({
 			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
 			    .right=(Item.left+Item.right)/2.0
 			});
+			graph.Connect(gl1,gl2);
 		    }
 		};
 		process(IL->operator[](pos1).zero,0);
@@ -130,14 +132,17 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations"<<endl;
 
-
+    const auto connected=graph.connected_to(0);
     InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
     for(size_t i=0;i<totalN;i++){
-	init<<make_shared<DistribGauss>(0.,50.);
+	bool c=false;
+	for(const size_t ii:connected)if(ii==i)c=true;
+	if(c)init<<make_shared<DistribGauss>(0,50);
+	else init<<make_shared<FixParam>(0);
    }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(totalN*15,init,engine);
+    solver_hits.Init(connected.size()*15,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
