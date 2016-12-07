@@ -19,10 +19,9 @@ namespace Sync{
 	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
-	typedef Add2<
-	    Mul2<Par<0>,Func3<Gaussian,Arg<0>,Par<1>,Par<2>>>,
-	    Mul2<Par<3>,Func3<Gaussian,Arg<0>,Par<4>,Par<5>>>
-	> TotalFunc;
+	typedef Mul2<Par<0>,Func3<Gaussian,Arg<0>,Par<1>,Par<2>>> Left;
+	typedef Mul2<Par<3>,Func3<Gaussian,Arg<0>,Par<4>,Par<5>>> Right;
+	typedef Add2<Left,Right> TotalFunc;
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[2]>0)&&(P[3]>0)&&(P[5]>0)
@@ -34,7 +33,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(200,make_shared<InitialDistributions>()
+	fit.Init(100,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,total*30.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
 	    <<make_shared<DistribGauss>(0.5,0.3)
@@ -57,7 +56,17 @@ namespace Sync{
 	}
 	auto chain=ChainWithCount(1000,hist.left().X().min(),hist.right().X().max());
 	SortedPoints<double> totalfit([&fit](double x)->double{return fit({x});},chain);
-	Plot<double>().Hist(hist).Line(totalfit,"Fit")<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
+	SortedPoints<double> left([&fit](double x)->double{
+	    static const Left L;
+	    return L({x},fit.Parameters());
+	},chain);
+	SortedPoints<double> right([&fit](double x)->double{
+	    static const Right R;
+	    return R({x},fit.Parameters());
+	},chain);
+	Plot<double>().Hist(hist).Line(totalfit,"Fit")
+	.Line(left).Line(right)<<"set key on"<<"set xrange [-30:30]"
+	<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	const auto& P=fit.Parameters();

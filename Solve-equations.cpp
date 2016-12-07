@@ -92,8 +92,8 @@ int main(int argc, char **argv) {
 		    (AB->operator[](pos2).chi_sq>=0)&&
 		    (Item.chi_sq>=0.)&&
 		    (Item.assymetry<=2)&&(Item.assymetry>=0.5)&&
-		    ((Item.left.uncertainty()/Item.right.uncertainty())<3.0)&&
-		    ((Item.right.uncertainty()/Item.left.uncertainty())<3.0)&&
+		    ((Item.left.uncertainty()/Item.right.uncertainty())<2.0)&&
+		    ((Item.right.uncertainty()/Item.left.uncertainty())<2.0)&&
 		    ((Item.right-Item.left).Below(5.0*double(DI)))&&
 		    ((Item.right-Item.left).Above(1.0))
 		){
@@ -118,8 +118,8 @@ int main(int argc, char **argv) {
 			(AB->operator[](pos2).chi_sq>=0)&&
 			(Item.chi_sq>=0.)&&
 			(Item.assymetry<=10)&&(Item.assymetry>=10)&&
-			((Item.left.uncertainty()/Item.right.uncertainty())<3.0)&&
-			((Item.right.uncertainty()/Item.left.uncertainty())<3.0)&&
+			((Item.left.uncertainty()/Item.right.uncertainty())<2.0)&&
+			((Item.right.uncertainty()/Item.left.uncertainty())<2.0)&&
 			((Item.right-Item.left).Above(1.5))
 		    ){
 			equations.push_back({
