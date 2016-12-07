@@ -84,14 +84,15 @@ int main(int argc, char **argv) {
 	    if(AB->operator[](pos1).chi_sq>=0)
 	    for(size_t di=0;di<neighbour_delta_id.size();di++){
 		const auto&Item=Nei[di]->operator[](pos1);
-		const auto i2=(i1+neighbour_delta_id[di])%N;
+		const auto DI=neighbour_delta_id[di];
+		const auto i2=(i1+DI)%N;
 		const StripPos pos2={.layer=L,.slot=i2+1};
 		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		if(
 		    (AB->operator[](pos2).chi_sq>=0)&&
 		    (Item.chi_sq>=0.)&&
-		    (Item.assymetry<=2.0)&&(Item.assymetry>=0.5)&&
-		    ((Item.right-Item.left).Below(10.0))&&
+		    (Item.assymetry<=1.5)&&(Item.assymetry>=0.666)&&
+		    ((Item.right-Item.left).Below(5.0*double(DI)))&&
 		    ((Item.right-Item.left).Above(1.0))
 		){
 		    equations.push_back({
@@ -114,8 +115,6 @@ int main(int argc, char **argv) {
 			(AB->operator[](pos1).chi_sq>=0)&&
 			(AB->operator[](pos2).chi_sq>=0)&&
 			(Item.chi_sq>=0.)&&
-			(Item.assymetry<=5.0)&&(Item.assymetry>=0.2)&&
-			((Item.right-Item.left).Below(20.0))&&
 			((Item.right-Item.left).Above(3.0))
 		    ){
 			equations.push_back({
@@ -130,9 +129,9 @@ int main(int argc, char **argv) {
 	    }
 	}
     }
-    cerr<<equations.size()<<" equations"<<endl;
-
     const auto connected=graph.connected_to(0);
+    cerr<<equations.size()<<" equations"<<endl;
+    cerr<<connected.size()<<" variables connected with the first one"<<endl;
     InexactEquationSolver<
 	DifferentialMutations<AbsoluteMutations<>>
     > solver_hits(equations);
@@ -188,8 +187,8 @@ int main(int argc, char **argv) {
 	i++;
     }
     Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"
-    <<"set xlabel 'equation index'"<<"unset log y"<<"set yrange [-60:60]";
-    Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-60:60]";
+    <<"set xlabel 'equation index'"<<"unset log y"<<"set yrange [-30:30]";
+    Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-30:30]";
     for(size_t i=0;i<totalN;i++){
 	const StripPos slot=DeltaT->PositionOfGlobalNumber(i);
 	const auto& ab=AB->operator[](slot).peak.val();
