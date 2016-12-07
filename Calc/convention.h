@@ -66,11 +66,11 @@ inline const std::shared_ptr<JPetMap<SyncOposite_results>> make_OpoCoiMap(){
 struct SyncScatter_results{
   MathTemplates::value<double>left,right,assymetry;double chi_sq;
     inline const bool valid()const{
-      return (chi_sq>=0)&&
+    return (chi_sq>=0)&&
 	(assymetry<=10)&&(assymetry>=10)&&
-	((left.uncertainty()/right.uncertainty())<2.0)&&
-	((right.uncertainty()/left.uncertainty())<2.0)&&
-	((right-left).Above(1.0));
+	(left.uncertainty()<=1.0)&&(left.uncertainty()>=0.1)&&
+	(right.uncertainty()<=1.0)&&(right.uncertainty()>=0.1)&&
+	(right-left).Above(1.0);
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){

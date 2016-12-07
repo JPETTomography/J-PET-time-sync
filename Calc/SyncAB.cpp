@@ -33,7 +33,8 @@ namespace Sync{
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    static const Background bg_test;
-	    return (P[0]>0)&&(P[2]>0)&&(P[4]<0)&&(P[6]>0)
+	    return (P[0]>0)&&(P[4]<0)&&(P[6]>0)
+	    &&(P[2]>0)&&(P[2]<2)
 	    &&(-(P[4]/P[6])<5.0)&&(-(P[6]/P[4])<4.0)
 	    &&((P[3]+P[4])<(P[1]-P[2]))&&((P[1]+P[2])<(P[5]-P[6]))
 	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min())
@@ -41,7 +42,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(200,make_shared<InitialDistributions>()
+	fit.Init(100,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,total*30.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
 	    <<make_shared<DistribGauss>(0.5,0.3)
