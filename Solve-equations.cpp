@@ -89,8 +89,7 @@ int main(int argc, char **argv) {
 		const StripPos pos2={.layer=L,.slot=i2+1};
 		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		if(
-		    AB->operator[](pos2).valid()&&
-		    Item.valid()&&
+		    AB->operator[](pos2).valid()&&Item.valid()&&
 		    (Item.assymetry<=2)&&(Item.assymetry>=0.5)&&
 		    (Item.right-Item.left).Below(5.0*double(DI))
 		){
@@ -111,8 +110,7 @@ int main(int argc, char **argv) {
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
 		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		    if(
-			AB->operator[](pos1).valid()&&
-			AB->operator[](pos2).valid()&&
+			AB->operator[](pos1).valid()&&AB->operator[](pos2).valid()&&
 			Item.valid()&&(Item.right-Item.left).Above(1.5)
 		    ){
 			equations.push_back({
