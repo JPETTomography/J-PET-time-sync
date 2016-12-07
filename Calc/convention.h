@@ -31,7 +31,10 @@ inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
 
 //Sync AB
 struct SyncAB_results{
-  MathTemplates::value<double>peak;double chi_sq;
+    MathTemplates::value<double>peak;double chi_sq;
+    inline const bool valid()const{
+      return (chi_sq>=0)&&(peak.uncertainty()<=1.0)&&(peak.uncertainty()>=0.1);
+    }
 };
 inline std::istream&operator>>(std::istream&str,SyncAB_results&item){
   return str>>item.peak>>item.chi_sq;
@@ -40,10 +43,12 @@ inline std::ostream&operator<<(std::ostream&str,const SyncAB_results&item){
   return str<<item.peak<<"\t"<<item.chi_sq;
 }
 
-
 //Hit-hit coincidences: oposite
 struct SyncOposite_results{
-  MathTemplates::value<double>peak;double chi_sq;
+    MathTemplates::value<double>peak;double chi_sq;
+    inline const bool valid()const{
+      return (chi_sq>=0)&&(peak.uncertainty()<=1.0)&&(peak.uncertainty()>=0.1);
+    }
 };
 inline std::istream&operator>>(std::istream&str,SyncOposite_results&item){
   return str>>item.peak>>item.chi_sq;
@@ -60,6 +65,13 @@ inline const std::shared_ptr<JPetMap<SyncOposite_results>> make_OpoCoiMap(){
 //Hit-hit coincidences for neighbour strips in layer
 struct SyncScatter_results{
   MathTemplates::value<double>left,right,assymetry;double chi_sq;
+    inline const bool valid()const{
+      return (chi_sq>=0)&&
+	(assymetry<=10)&&(assymetry>=10)&&
+	((left.uncertainty()/right.uncertainty())<2.0)&&
+	((right.uncertainty()/left.uncertainty())<2.0)&&
+	((right-left).Above(1.0));
+    }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){
   return str>>item.left>>item.right>>item.assymetry>>item.chi_sq;
@@ -85,18 +97,5 @@ inline std::ostream&operator<<(std::ostream&str,const SyncLayer&item){
 }
 inline const std::shared_ptr<JPetMap<SyncLayer>> make_InterLayerMap(){
   return std::shared_ptr<JPetMap<SyncLayer>>(new JPetMap<SyncLayer>({48,48}));
-}
-
-
-
-// final results
-struct DeltaT_results{
-  MathTemplates::value<double> A,B;
-};
-inline std::istream&operator>>(std::istream&str,DeltaT_results&item){
-  return str>>item.A>>item.B;
-}
-inline std::ostream&operator<<(std::ostream&str,const DeltaT_results&item){
-  return str<<item.A<<"\t"<<item.B;
 }
 #endif

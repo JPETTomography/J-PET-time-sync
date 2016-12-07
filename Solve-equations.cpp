@@ -67,9 +67,9 @@ int main(int argc, char **argv) {
 	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
 	    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 	    if(
-		(AB->operator[](pos1).chi_sq>=0)&&
-		(AB->operator[](pos2).chi_sq>=0)&&
-		(Item.chi_sq>=0.)
+		AB->operator[](pos1).valid()&&
+		AB->operator[](pos2).valid()&&
+		Item.valid()
 	    ){
 		equations.push_back({
 		    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
 	for(size_t i1=0;i1<N;i1++){
 	    const StripPos pos1={.layer=L,.slot=i1+1};
 	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
-	    if(AB->operator[](pos1).chi_sq>=0)
+	    if(AB->operator[](pos1).valid())
 	    for(size_t di=0;di<neighbour_delta_id.size();di++){
 		const auto&Item=Nei[di]->operator[](pos1);
 		const auto DI=neighbour_delta_id[di];
@@ -89,13 +89,10 @@ int main(int argc, char **argv) {
 		const StripPos pos2={.layer=L,.slot=i2+1};
 		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		if(
-		    (AB->operator[](pos2).chi_sq>=0)&&
-		    (Item.chi_sq>=0.)&&
+		    AB->operator[](pos2).valid()&&
+		    Item.valid()&&
 		    (Item.assymetry<=2)&&(Item.assymetry>=0.5)&&
-		    ((Item.left.uncertainty()/Item.right.uncertainty())<2.0)&&
-		    ((Item.right.uncertainty()/Item.left.uncertainty())<2.0)&&
-		    ((Item.right-Item.left).Below(5.0*double(DI)))&&
-		    ((Item.right-Item.left).Above(1.0))
+		    (Item.right-Item.left).Below(5.0*double(DI))
 		){
 		    equations.push_back({
 			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
@@ -114,13 +111,9 @@ int main(int argc, char **argv) {
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
 		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		    if(
-			(AB->operator[](pos1).chi_sq>=0)&&
-			(AB->operator[](pos2).chi_sq>=0)&&
-			(Item.chi_sq>=0.)&&
-			(Item.assymetry<=10)&&(Item.assymetry>=10)&&
-			((Item.left.uncertainty()/Item.right.uncertainty())<2.0)&&
-			((Item.right.uncertainty()/Item.left.uncertainty())<2.0)&&
-			((Item.right-Item.left).Above(1.5))
+			AB->operator[](pos1).valid()&&
+			AB->operator[](pos2).valid()&&
+			Item.valid()&&(Item.right-Item.left).Above(1.5)
 		    ){
 			equations.push_back({
 			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},

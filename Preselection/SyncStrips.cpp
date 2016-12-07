@@ -45,7 +45,7 @@ void TaskSyncStrips::exec(){
 	{
 	    const auto times=fSync->GetTimes(*currHit);
 	    const auto&AB=f_AB_position->operator[](strip);
-	    if((AB.chi_sq>=0)&&(AB.peak.Contains(times.A-times.B))){
+	    if(AB.valid()&&AB.peak.Contains(times.A-times.B)){
 		if (fHits.empty()) {
 		    fHits.push_back(*currHit);
 		} else {
