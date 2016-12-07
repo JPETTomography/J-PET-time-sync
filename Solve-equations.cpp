@@ -90,9 +90,9 @@ int main(int argc, char **argv) {
 		if(
 		    (AB->operator[](pos2).chi_sq>=0)&&
 		    (Item.chi_sq>=0.)&&
-		    (Item.assymetry<=4.0)&&(Item.assymetry>=0.25)&&
+		    (Item.assymetry<=2.0)&&(Item.assymetry>=0.5)&&
 		    ((Item.right-Item.left).Below(10.0))&&
-		    ((Item.right-Item.left).Above(2.0))
+		    ((Item.right-Item.left).Above(1.0))
 		){
 		    equations.push_back({
 			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
@@ -133,16 +133,26 @@ int main(int argc, char **argv) {
     cerr<<equations.size()<<" equations"<<endl;
 
     const auto connected=graph.connected_to(0);
-    InexactEquationSolver<DifferentialMutations<>> solver_hits(equations);
+    InexactEquationSolver<
+	DifferentialMutations<AbsoluteMutations<>>
+    > solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
+    ParamSet M;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
-	if(c)init<<make_shared<DistribGauss>(0,50);
-	else init<<make_shared<FixParam>(0);
-   }
+	if(c){
+	    init<<make_shared<DistribGauss>(0,50);
+	    M<<0.01;
+	}else{
+	    init<<make_shared<FixParam>(0);
+	    M<<0;
+	}
+    }
+    solver_hits.SetAbsoluteMutationCoefficients(M);
+    solver_hits.SetAbsoluteMutationsProbability(0.1);
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connected.size()*15,init,engine);
+    solver_hits.Init(connected.size()*7,init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
@@ -178,8 +188,8 @@ int main(int argc, char **argv) {
 	i++;
     }
     Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"
-    <<"set xlabel 'equation index'"<<"unset log y"<<"set yrange [-30:30]";
-    Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-30:30]";
+    <<"set xlabel 'equation index'"<<"unset log y"<<"set yrange [-60:60]";
+    Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-60:60]";
     for(size_t i=0;i<totalN;i++){
 	const StripPos slot=DeltaT->PositionOfGlobalNumber(i);
 	const auto& ab=AB->operator[](slot).peak.val();
