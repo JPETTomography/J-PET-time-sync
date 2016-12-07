@@ -148,20 +148,24 @@ int main(int argc, char **argv) {
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     while(
-	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
+	!solver_hits.AbsoluteOptimalityExitCondition(0.01)
     ){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
 	cerr<<solver_hits.iteration_count()<<" iterations; "
-	<<min<<"<chi^2<"<<max<<"                 \r";
+	<<min<<"<chi^2<"<<max<<" ; ";
 	opt_min << point<double>(solver_hits.iteration_count(),min);
 	opt_max << point<double>(solver_hits.iteration_count(),max);
+	double d=0;
+	for(const auto&p:solver_hits.ParametersStatistics())d+=p.uncertainty();
+	d/=solver_hits.ParamCount();
+	cerr<<"<dispersion>="<<d<<"             \r";
     }
+    cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")
     <<"set log y"<<"set xlabel 'Iteration index'";
     Plotter::Instance()<<"unset log y";
-    cerr<<endl;
     cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
     const auto&P=solver_hits.Parameters();
     hist<double> eq_left,eq_right,delta_hits;
