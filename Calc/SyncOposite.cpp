@@ -29,7 +29,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(200,make_shared<InitialDistributions>()
+	fit.Init(400,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,30.0*total)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
 	    <<make_shared<DistribGauss>(0.5,0.2)
@@ -39,7 +39,8 @@ namespace Sync{
 	const auto deltas=parEq(fit.ParamCount(),0.0001);
 	while(
 	    (!fit.AbsoluteOptimalityExitCondition(0.0001))&&
-	    (!fit.ParametersDispersionExitCondition(deltas))
+	    (!fit.ParametersDispersionExitCondition(deltas))&&
+	    (fit.iteration_count()<1000)
 	){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
@@ -53,6 +54,7 @@ namespace Sync{
 	<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
+	if(fit.iteration_count()>=1000)return {.peak=0,.chi_sq=-1};
 	const auto&P=fit.Parameters();
 	return {.peak={P[1],P[2]},.chi_sq=chi_sq_norm};
     }

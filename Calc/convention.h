@@ -67,9 +67,9 @@ struct SyncScatter_results{
   MathTemplates::value<double>left,right,assymetry;double chi_sq;
     inline const bool valid()const{
     return (chi_sq>=0)&&
-	(assymetry<=10)&&(assymetry>=10)&&
-	(left.uncertainty()<=1.5)&&(left.uncertainty()>=0.15)&&
-	(right.uncertainty()<=1.5)&&(right.uncertainty()>=0.15)&&
+	(assymetry<=10)&&(assymetry>=0.1)&&
+	(left.uncertainty()<=1.5)&&(left.uncertainty()>=0.2)&&
+	(right.uncertainty()<=1.5)&&(right.uncertainty()>=0.2)&&
 	(right-left).Above(1.0);
     }
 };

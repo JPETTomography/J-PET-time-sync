@@ -30,7 +30,7 @@ namespace Sync{
 	    >
 	Background;
 	typedef Add<Foreground,Background> TotalFunc;
-	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
+	FitFunction<DifferentialMutations<>,TotalFunc> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    static const Background bg_test;
 	    return (P[0]>0)&&(P[4]<0)&&(P[6]>0)
@@ -58,7 +58,8 @@ namespace Sync{
 	const auto deltas=parEq(fit.ParamCount(),0.0001);
 	while(
 	    (!fit.AbsoluteOptimalityExitCondition(0.0001))&&
-	    (!fit.ParametersDispersionExitCondition(deltas))
+	    (!fit.ParametersDispersionExitCondition(deltas))&&
+	    (fit.iteration_count()<1000)
 	){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
@@ -74,6 +75,7 @@ namespace Sync{
 	<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
+	if(fit.iteration_count()>=1000)return {.peak=0,.chi_sq=-1};
 	const auto&P=fit.Parameters();
 	return {.peak={P[1],P[2]},.chi_sq=chi_sq_norm};
     }

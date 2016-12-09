@@ -25,16 +25,16 @@ namespace Sync{
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[3]>0)
-	    &&(P[2]>0.1)&&(P[5]>0.1)
-	    &&(P[2]<2.0)&&(P[5]<2.0)
+	    &&(P[2]>0.2)&&(P[5]>0.2)
+	    &&(P[2]<5.0)&&(P[5]<5.0)
 	    &&(P[1]>hist.left().X().max())&&(P[4]<hist.right().X().min())
-	    &&((P[4]-P[1])>((P[2]+P[5])/1.5))
-	    &&((P[4]-P[1])<15.0)
+	    &&((P[4]-P[1])>((P[2]+P[5])/3.0))
+	    &&((P[4]-P[1])<20.0)
 	    &&((P[0]/P[3])<15.0)&&((P[3]/P[0])<15.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(200,make_shared<InitialDistributions>()
+	fit.Init(400,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,total*30.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
 	    <<make_shared<DistribGauss>(0.5,0.3)
@@ -47,7 +47,8 @@ namespace Sync{
 	const auto deltas=parEq(fit.ParamCount(),0.0001);
 	while(
 	    (!fit.AbsoluteOptimalityExitCondition(0.00001))&&
-	    (!fit.ParametersDispersionExitCondition(deltas))
+	    (!fit.ParametersDispersionExitCondition(deltas))&&
+	    (fit.iteration_count()<1000)
 	){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "
@@ -70,6 +71,7 @@ namespace Sync{
 	<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
+	if(fit.iteration_count()>=1000)return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
 	const auto& P=fit.Parameters();
 	return {.left={P[1],P[2]},.right={P[4],P[5]},.assymetry=P[3]/P[0],.chi_sq=chi_sq_norm};
     }
