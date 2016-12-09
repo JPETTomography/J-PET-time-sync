@@ -35,22 +35,23 @@ int main(int argc, char **argv) {
     //Neighbour strips
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
     for(size_t layer=1;layer <= Nei[i]->LayersCount();layer++){
-	hist<double> left,right,assym;
-	SortedPoints<double> chisq;
+	hist<double> left,right,assym,chisq;
 	for(size_t slot=1;slot<=Nei[i]->LayerSize(layer);slot++){
 	    const auto name=LayerSlot(layer,slot)+"-deltaid"+to_string(neighbour_delta_id[i]);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name);
 	    auto& item=Nei[i]->item({.layer=layer,.slot=slot});
 	    item=Sync::Fit4SyncScatter(shist,"Neighbour "+name,thr_cnt);
-	    left<<point<value<double>>(double(slot),item.left);
-	    right<<point<value<double>>(double(slot),item.right);
-	    assym<<point<value<double>>(double(slot),item.assymetry);
-	    chisq<<point<double>(double(slot),item.chi_sq);
+	    if(item.valid()){
+		left<<point<value<double>>(double(slot),item.left);
+		right<<point<value<double>>(double(slot),item.right);
+		assym<<point<value<double>>(double(slot),item.assymetry);
+		chisq<<point<value<double>>(double(slot),item.chi_sq);
+	    }
 	}
 	const string title="set title 'L="+to_string(layer)+";deltaID="+to_string(neighbour_delta_id[i])+"'";
 	Plot<double>().Hist(left,"Position Left").Hist(right,"Position Right")<<"set key on"<<title;
 	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]"<<title;
-	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<title;
+	Plot<double>().Hist(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<title;
     }
     //Inter-layer
     for(size_t layer=1;layer <= IL->LayersCount();layer++)for(size_t i=0;i<2;i++){

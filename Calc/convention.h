@@ -68,8 +68,10 @@ struct SyncScatter_results{
     inline const bool valid()const{
     return (chi_sq>=0)&&
 	(assymetry<=10)&&(assymetry>=0.1)&&
-	(left.uncertainty()<=1.5)&&(left.uncertainty()>=0.2)&&
-	(right.uncertainty()<=1.5)&&(right.uncertainty()>=0.2)&&
+	(left.uncertainty()<=2.0)&&(left.uncertainty()>=0.2)&&
+	(right.uncertainty()<=2.0)&&(right.uncertainty()>=0.2)&&
+	((left.uncertainty()/right.uncertainty())<=2.0)&&
+	((right.uncertainty()/left.uncertainty())<=2.0)&&
 	(right-left).Above(1.0);
     }
 };

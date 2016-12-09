@@ -29,18 +29,19 @@ int main(int argc, char **argv) {
 	Plotter::Instance().SetOutput(".","AB");
 	auto map=make_JPetMap<SyncAB_results>();
 	for(size_t layer=1;layer<=map->LayersCount();layer++){
-		hist<double> position;
-		SortedPoints<double> chisq;
+		hist<double> position,chisq;
 		for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
 			const auto name=LayerSlot(layer,slot);
 			const auto shist=ReadHist(root_filenames,name);
 			auto&item=map->item({.layer=layer,.slot=slot});
 			item=Sync::Fit4SyncAB(shist,"SyncAB "+name,thr_cnt);
-			position<<point<value<double>>(double(slot),item.peak);
-			chisq<<point<double>(double(slot),item.chi_sq);
+			if(item.valid()){
+			    position<<point<value<double>>(double(slot),item.peak);
+			    chisq<<point<value<double>>(double(slot),item.chi_sq);
+			}
 		}
 		Plot<double>().Hist(position,"Position")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
-		Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
+		Plot<double>().Hist(chisq,"Chi^2")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
 	}
 	cout<<(*map);
 	return 0;
