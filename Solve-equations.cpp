@@ -110,8 +110,7 @@ int main(int argc, char **argv) {
 		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
 		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		    if(
-			AB->operator[](pos1).valid()&&AB->operator[](pos2).valid()&&
-			Item.valid()&&(Item.right-Item.left).Above(1.5)
+			AB->operator[](pos1).valid()&&AB->operator[](pos2).valid()&&Item.valid()
 		    ){
 			equations.push_back({
 			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
