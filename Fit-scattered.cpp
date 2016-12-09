@@ -55,16 +55,17 @@ int main(int argc, char **argv) {
     }
     //Inter-layer
     for(size_t layer=1;layer <= IL->LayersCount();layer++)for(size_t i=0;i<2;i++){
-	hist<double> left,right,assym;
-	SortedPoints<double> chisq;
+	hist<double> left,right,assym,chisq;
 	for(size_t slot=1;slot<=IL->LayerSize(layer);slot++){
 	    const auto name="Inter-layer-"+LayerSlot(layer,slot)+"-"+to_string(i);
 	    const auto shist=ReadHist(root_filenames,name);
 	    SyncScatter_results res=Sync::Fit4SyncScatter(shist,"IL "+name,thr_cnt);
-	    left<<point<value<double>>(double(slot),res.left);
-	    right<<point<value<double>>(double(slot),res.right);
-	    assym<<point<value<double>>(double(slot),res.assymetry);
-	    chisq<<point<double>(double(slot),res.chi_sq);
+	    if(res.valid()){
+		left<<point<value<double>>(double(slot),res.left);
+		right<<point<value<double>>(double(slot),res.right);
+		assym<<point<value<double>>(double(slot),res.assymetry);
+		chisq<<point<value<double>>(double(slot),res.chi_sq);
+	    }
 	    switch(i){
 		case 0: 
 		    IL->item({.layer=layer,.slot=slot}).zero=res;
@@ -77,7 +78,7 @@ int main(int argc, char **argv) {
 	const string title="set title 'L="+to_string(layer)+";i="+to_string(i)+"'";
 	Plot<double>().Hist(left,"Position Left").Hist(right,"Position Right")<<"set key on"<<title;
 	Plot<double>().Hist(assym,"Assymetry of peaks height")<<"set key on"<<"set yrange [0:]"<<title;
-	Plot<double>().Line(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<title;
+	Plot<double>().Hist(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<title;
     }
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)cout<<(*Nei[i]);
     cout<<(*IL);
