@@ -5,7 +5,7 @@
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <Calc/convention.h>
-#include <j-pet-framework-extension/BarrelExtensions.h>
+#include <LargeBarrelExtensions/BarrelExtensions.h>
 class PrepareHits:public TOT_Hists {
 public:
   PrepareHits(const char * name, const char * description);

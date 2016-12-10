@@ -1,7 +1,7 @@
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
-#include <j-pet-framework-extension/BarrelExtensions.h>
-#include <j-pet-framework-extension/deltas.h>
+#include <LargeBarrelExtensions/BarrelExtensions.h>
+#include <LargeBarrelExtensions/TimeSyncDeltas.h>
 #include <IO/gethist.h>
 #include <Calc/convention.h>
 #include "SyncAB.h"

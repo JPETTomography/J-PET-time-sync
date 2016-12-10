@@ -1,10 +1,8 @@
 // this file is distributed under 
 // MIT license
 #include <iostream>
-#include <math_h/error.h>
 #include "SyncProcedures.h"
 using namespace std;
-using namespace MathTemplates;
 namespace Graph{
     ConnectionChecker::ConnectionChecker(const size_t count){
 	for(size_t i=0;i<count;i++)

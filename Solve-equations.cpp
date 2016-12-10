@@ -7,8 +7,8 @@
 #include <Genetic/genetic.h>
 #include <Genetic/initialconditions.h>
 #include <IO/gethist.h>
-#include <j-pet-framework-extension/PetDict.h>
-#include <j-pet-framework-extension/deltas.h>
+#include <LargeBarrelExtensions/PetDict.h>
+#include <LargeBarrelExtensions/TimeSyncDeltas.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;

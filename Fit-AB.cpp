@@ -3,8 +3,8 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
-#include <j-pet-framework-extension/PetDict.h>
-#include <j-pet-framework-extension/BarrelExtensions.h>
+#include <LargeBarrelExtensions/PetDict.h>
+#include <LargeBarrelExtensions/BarrelExtensions.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;

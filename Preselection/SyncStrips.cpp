@@ -3,9 +3,9 @@
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <JPetHit/JPetHit.h>
-#include <j-pet-framework-extension/PetDict.h>
-#include <j-pet-framework-extension/BarrelExtensions.h>
-#include <j-pet-framework-extension/deltas.h>
+#include <LargeBarrelExtensions/PetDict.h>
+#include <LargeBarrelExtensions/BarrelExtensions.h>
+#include <LargeBarrelExtensions/TimeSyncDeltas.h>
 #include <math_h/error.h>
 #include <Calc/convention.h>
 #include <IO/gethist.h>

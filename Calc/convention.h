@@ -2,7 +2,7 @@
 #	define ___________CONV_JPET_TIME_SYNC________
 #include <iostream>
 #include <math_h/sigma.h>
-#include <j-pet-framework-extension/PetDict.h>
+#include <LargeBarrelExtensions/PetDict.h>
 
 
 // Size of J-PET detector
