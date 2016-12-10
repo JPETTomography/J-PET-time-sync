@@ -11,7 +11,7 @@ This software can be used for measurements with PET detector that consists of sc
 When two strips register gamma-quanta from one positron anihillation one can determine each gamma-quantum hit position and time from the times of signals from photomultipliers installed at the edges of the scintillator strips.
 The hits positions and times allow give enough information for reconstruction of the anihillation point position.
 
-For performing such reconstruction one needs to synchronize all photomultipliers with each other i.e. to obtains the time offsets created by electronics that one needs to substract. 
+For performing such reconstruction one needs to synchronize all photomultipliers with each other i.e. to obtains the time offsets created by electronics that one needs to substract.
 This software calculates the set of offsets one needs to add but they can have any sign.
 
 For the synchronization one needs the data from measurements performed with point-like beta-plus active source placed in the colimator that allows the direct anihillation gamma-quanta to hit only into the middles of the strips.
@@ -69,9 +69,9 @@ The commands needed to perform the analysis look so:
 
 	cd J-PET-time-sync-build
 
-	./analyse1-prepare /path/to/the/data
+	./analyse1-prepare.sh /path/to/the/data
 
-	./analyse2-sync 1 /path/to/the/data
+	./analyse2-sync.sh 1 /path/to/the/data
 
 The parameter '1' in the last line means that the genetic algorithms will run in one thread.
 One can increase this parameter for parallelizing it if the processor has more than one core.
