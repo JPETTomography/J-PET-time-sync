@@ -69,7 +69,7 @@ const size_t LargeBarrelMapping::getSlotNumber(const JPetBarrelSlot& slot) const
     return res+1;
 }
 const size_t LargeBarrelMapping::calcDeltaID(const JPetBarrelSlot& slot1,const JPetBarrelSlot& slot2) const{
-    if(slot1.getLayer().getId()==slot2.getLayer().getId()){
+    if(slot1.getLayer().getID()==slot2.getLayer().getID()){
 	auto delta_ID = size_t(abs(int(getSlotNumber(slot1))-int(getSlotNumber(slot2))));
 	auto layer_size = getSlotsCount(slot1.getLayer());
 	auto half_layer_size = layer_size/2;
