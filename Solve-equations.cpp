@@ -89,9 +89,7 @@ int main(int argc, char **argv) {
 		const StripPos pos2={.layer=L,.slot=i2+1};
 		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
 		if(
-		    AB->operator[](pos2).valid()&&Item.valid()&&
-		    (Item.assymetry<=2)&&(Item.assymetry>=0.5)&&
-		    (Item.right-Item.left).Below(5.0*double(DI))
+		    AB->operator[](pos2).valid()&&Item.valid()
 		){
 		    equations.push_back({
 			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
