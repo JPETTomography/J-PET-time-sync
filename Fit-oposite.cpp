@@ -3,8 +3,8 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
-#include <LargeBarrelExtensions/PetDict.h>
-#include <LargeBarrelExtensions/BarrelExtensions.h>
+#include <JPetLargeBarrelExtensions/PetDict.h>
+#include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;
@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
 	root_filenames.push_back(string(argv[i]));
     auto map=make_OpoCoiMap();
     Plotter::Instance().SetOutput(".","Oposite");
-    for(size_t layer=1;layer <= map->LayersCount();layer++){
+    for(size_t layer=1;layer <= map->layersCount();layer++){
 	hist<double> position,chisq;
-	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
+	for(size_t slot=1;slot<=map->layerSize(layer);slot++){
 	    const auto name=LayerSlot(layer,slot);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
 	    auto& item=map->item({.layer=layer,.slot=slot});

@@ -3,8 +3,8 @@
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
-#include <LargeBarrelExtensions/BarrelExtensions.h>
-#include <LargeBarrelExtensions/PetDict.h>
+#include <JPetLargeBarrelExtensions/BarrelExtensions.h>
+#include <JPetLargeBarrelExtensions/PetDict.h>
 #include <Calc/convention.h>
 using namespace std;
 using namespace GnuplotWrap;
@@ -20,8 +20,8 @@ int main(int argc, char **argv) {
     string postfix=argv[1];
     Plotter::Instance().SetOutput(".","TOF-hists"+postfix);
     auto map=make_JPetMap<TOT_cut>();
-    for(size_t layer=1;layer<=map->LayersCount();layer++){
-	for(size_t slot=1;slot<=map->LayerSize(layer);slot++){
+    for(size_t layer=1;layer<=map->layersCount();layer++){
+	for(size_t slot=1;slot<=map->layerSize(layer);slot++){
 	    auto action=[&root_filenames,layer,slot,&postfix](const string&letter,double*output){
 		Plot<double> plot;
 		plot<<"set key on"<<"set xrange [30:80]";

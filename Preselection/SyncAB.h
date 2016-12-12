@@ -4,8 +4,8 @@
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>
-#include <LargeBarrelExtensions/PetDict.h>
-#include <LargeBarrelExtensions/BarrelExtensions.h>
+#include <JPetLargeBarrelExtensions/PetDict.h>
+#include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 class Synchronization;
 class TaskSyncAB:public TOT_Hists {
 public:

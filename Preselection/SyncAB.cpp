@@ -1,7 +1,7 @@
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
-#include <LargeBarrelExtensions/BarrelExtensions.h>
-#include <LargeBarrelExtensions/TimeSyncDeltas.h>
+#include <JPetLargeBarrelExtensions/BarrelExtensions.h>
+#include <JPetLargeBarrelExtensions/TimeSyncDeltas.h>
 #include <IO/gethist.h>
 #include <Calc/convention.h>
 #include "SyncAB.h"
@@ -11,7 +11,7 @@ TaskSyncAB::TaskSyncAB(const char * name, const char * description)
 TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
     TOT_Hists::init(opts);
-    fSync=make_shared<Synchronization>(map(),cin,DefaultTimeCalculation);
+    fSync=make_shared<Synchronization>(map(),cin,defaultTimeCalculation);
     createTOTHistos("coincidence");
     for(auto & layer : getParamBank().getLayers()){
 	const auto ln=map()->getLayerNumber(*layer.second);
@@ -23,7 +23,7 @@ void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
-	const auto times=fSync->GetTimes(*currHit);
+	const auto times=fSync->get_times(*currHit);
 	getStatistics().getHisto1D(LayerSlot(strip).c_str()).Fill(times.A-times.B);
 	fillTOTHistos(*currHit,"coincidence");
     }

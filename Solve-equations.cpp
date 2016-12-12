@@ -7,8 +7,8 @@
 #include <Genetic/genetic.h>
 #include <Genetic/initialconditions.h>
 #include <IO/gethist.h>
-#include <LargeBarrelExtensions/PetDict.h>
-#include <LargeBarrelExtensions/TimeSyncDeltas.h>
+#include <JPetLargeBarrelExtensions/PetDict.h>
+#include <JPetLargeBarrelExtensions/TimeSyncDeltas.h>
 #include <Calc/SyncProcedures.h>
 using namespace std;
 using namespace GnuplotWrap;
@@ -53,19 +53,19 @@ int main(int argc, char **argv) {
     Plotter::Instance().SetOutput(".","Delta");
 
 
-    const auto totalN=DeltaT->SlotsCount();
+    const auto totalN=DeltaT->slotsCount();
     list<InexactEquation> equations;
     ConnectionChecker graph(totalN);
 
-    for(size_t L=1;L<=DeltaT->LayersCount();L++){
-	const size_t N=DeltaT->LayerSize(L);
+    for(size_t L=1;L<=DeltaT->layersCount();L++){
+	const size_t N=DeltaT->layerSize(L);
 	for(size_t i1=0;i1<(N/2);i1++){
 	    const auto i2=i1+(N/2);
 	    const auto&Item=Opo->operator[]({.layer=L,.slot=i1+1});
 	    const StripPos pos1={.layer=L,.slot=i1+1};
 	    const StripPos pos2={.layer=L,.slot=i2+1};
-	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
-	    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
+	    const auto gl1=DeltaT->globalSlotNumber(pos1);
+	    const auto gl2=DeltaT->globalSlotNumber(pos2);
 	    if(
 		AB->operator[](pos1).valid()&&
 		AB->operator[](pos2).valid()&&
@@ -80,14 +80,14 @@ int main(int argc, char **argv) {
 	}
 	for(size_t i1=0;i1<N;i1++){
 	    const StripPos pos1={.layer=L,.slot=i1+1};
-	    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
+	    const auto gl1=DeltaT->globalSlotNumber(pos1);
 	    if(AB->operator[](pos1).valid())
 	    for(size_t di=0;di<neighbour_delta_id.size();di++){
 		const auto&Item=Nei[di]->operator[](pos1);
 		const auto DI=neighbour_delta_id[di];
 		const auto i2=(i1+DI)%N;
 		const StripPos pos2={.layer=L,.slot=i2+1};
-		const auto gl2=DeltaT->GlobalSlotNumber(pos2);
+		const auto gl2=DeltaT->globalSlotNumber(pos2);
 		if(
 		    AB->operator[](pos2).valid()&&Item.valid()
 		){
@@ -99,14 +99,14 @@ int main(int argc, char **argv) {
 		}
 	    }
 	}
-	if(L<=IL->LayersCount()){
+	if(L<=IL->layersCount()){
 	    for(size_t i1=0;i1<N;i1++){
 		const StripPos pos1={.layer=L,.slot=i1+1};
 		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&equations,&graph](const SyncScatter_results&Item,const size_t coinc_index){
 		    const auto&item=SyncLayerIndices[L-1][coinc_index];
-		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->LayerSize(L+1))+1};
-		    const auto gl1=DeltaT->GlobalSlotNumber(pos1);
-		    const auto gl2=DeltaT->GlobalSlotNumber(pos2);
+		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->layerSize(L+1))+1};
+		    const auto gl1=DeltaT->globalSlotNumber(pos1);
+		    const auto gl2=DeltaT->globalSlotNumber(pos2);
 		    if(
 			AB->operator[](pos1).valid()&&AB->operator[](pos2).valid()&&Item.valid()
 		    ){
@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
     <<"set xlabel 'equation index'"<<"unset log y"<<"set yrange [-30:30]";
     Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-30:30]";
     for(size_t i=0;i<totalN;i++){
-	const StripPos slot=DeltaT->PositionOfGlobalNumber(i);
+	const StripPos slot=DeltaT->positionOfGlobalNumber(i);
 	const auto& ab=AB->operator[](slot).peak.val();
 	auto&Delta=DeltaT->item(slot);
 	Delta.A+=P[i]-(ab/2.0);

@@ -5,7 +5,7 @@
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <JPetPhysSignal/JPetPhysSignal.h>
 #include <JPetUnpacker/Unpacker2/EventIII.h>
-#include <LargeBarrelExtensions/BarrelExtensions.h>
+#include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 #include <IO/gethist.h>
 #include "PrepareHits.h"
 using namespace std;

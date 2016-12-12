@@ -3,9 +3,9 @@
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <JPetHit/JPetHit.h>
-#include <LargeBarrelExtensions/PetDict.h>
-#include <LargeBarrelExtensions/BarrelExtensions.h>
-#include <LargeBarrelExtensions/TimeSyncDeltas.h>
+#include <JPetLargeBarrelExtensions/PetDict.h>
+#include <JPetLargeBarrelExtensions/BarrelExtensions.h>
+#include <JPetLargeBarrelExtensions/TimeSyncDeltas.h>
 #include <math_h/error.h>
 #include <Calc/convention.h>
 #include <IO/gethist.h>
@@ -14,7 +14,7 @@ using namespace std;
 TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):TOT_Hists(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     LargeBarrelTask::init(opts);
-    fSync=make_shared<Synchronization>(map(),cin,DefaultTimeCalculation);
+    fSync=make_shared<Synchronization>(map(),cin,defaultTimeCalculation);
     f_AB_position=make_shared<JPetMap<SyncAB_results>>(map()->getLayersSizes());
     cin>>(*f_AB_position);
     for(auto & layer : getParamBank().getLayers()){
@@ -42,10 +42,10 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 void TaskSyncStrips::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
 	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
-	{
-	    const auto times=fSync->GetTimes(*currHit);
-	    const auto&AB=f_AB_position->operator[](strip);
-	    if(AB.valid()&&AB.peak.Contains(times.A-times.B)){
+	const auto&AB=f_AB_position->operator[](strip);
+	if(AB.valid()){
+	    const auto times=fSync->get_times(*currHit);
+	    if(AB.peak.Contains(times.A-times.B)){
 		if (fHits.empty()) {
 		    fHits.push_back(*currHit);
 		} else {
@@ -69,8 +69,8 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 	    const auto strip2=map()->getStripPos(hit2.getBarrelSlot());
 	    if ((strip1.layer == strip2.layer)&&(strip1.slot!=strip2.slot)) {
 		const auto&layer=strip1.layer;
-		const auto times1=fSync->GetTimes(hit1),
-		    times2=fSync->GetTimes(hit2);
+		const auto times1=fSync->get_times(hit1),
+		    times2=fSync->get_times(hit2);
 		auto hit_1=(times1.A+times1.B)/2.,
 		    hit_2=(times2.A+times2.B)/2.;
 		const int delta_ID = map()->calcDeltaID(hit1.getBarrelSlot(), hit2.getBarrelSlot());
@@ -120,9 +120,9 @@ void TaskSyncStrips::fillCoincidenceHistos(){
 		    const size_t index1=pr_strip.slot-1,index2=su_strip.slot-1;
 	    	    for(size_t i=0;i<SyncLayerIndices[L].size();i++){
 			const auto&item=SyncLayerIndices[L][i];
-			if(((index1*item.coef+item.offs)%f_AB_position->LayerSize(su_strip.layer))==index2){
-			    const auto times1=fSync->GetTimes(prev_hit),
-				times2=fSync->GetTimes(suc_hit);
+			if(((index1*item.coef+item.offs)%f_AB_position->layerSize(su_strip.layer))==index2){
+			    const auto times1=fSync->get_times(prev_hit),
+				times2=fSync->get_times(suc_hit);
 			    auto hit_1=(times1.A+times1.B)/2.,
 				hit_2=(times2.A+times2.B)/2.;
 			    getStatistics().getHisto1D(
