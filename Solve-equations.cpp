@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
 	}
     }
     solver_hits.SetAbsoluteMutationCoefficients(M);
-    solver_hits.SetAbsoluteMutationsProbability(0.1);
+    solver_hits.SetAbsoluteMutationsProbability(0.01);
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(connected.size()*7,init,engine);
     cerr<<"hits:"<<endl;
