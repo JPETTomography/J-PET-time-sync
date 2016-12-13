@@ -70,8 +70,8 @@ struct SyncScatter_results{
 	(assymetry.val()<=10)&&(assymetry.val()>=0.1)&&
 	(left.uncertainty()<=2.0)&&(left.uncertainty()>=0.2)&&
 	(right.uncertainty()<=2.0)&&(right.uncertainty()>=0.2)&&
-	((left.uncertainty()/right.uncertainty())<=1.5)&&
-	((right.uncertainty()/left.uncertainty())<=1.5)&&
+	((left.uncertainty()/right.uncertainty())<=1.7)&&
+	((right.uncertainty()/left.uncertainty())<=1.7)&&
 	(right.val()-left.val())>1.0;
     }
 };
