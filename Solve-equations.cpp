@@ -148,14 +148,13 @@ int main(int argc, char **argv) {
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,50);
-	    M<<1;
+	    M<<0.5;
 	}else{
 	    init<<make_shared<FixParam>(0);
 	    M<<0;
 	}
     }
     solver_hits.SetAbsoluteMutationCoefficients(M);
-    solver_hits.SetAbsoluteMutationsProbability(0.2);
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(totalN,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
@@ -163,6 +162,26 @@ int main(int argc, char **argv) {
     SortedPoints<double> opt_min,opt_max;
     double d_avr=100;
     while(d_avr>0.000001){
+	if(d_avr>1.0){
+	    solver_hits.SetAbsoluteMutationsProbability(0.6);
+	}else{
+	    if(d_avr>0.1){
+		solver_hits.SetAbsoluteMutationsProbability(0.4);
+	    }else{
+		if(d_avr>0.05){
+		    solver_hits.SetAbsoluteMutationsProbability(0.2);
+		}else{
+		    if(d_avr>0.01){
+			    solver_hits.SetAbsoluteMutationsProbability(0.1);
+		    }else{
+			if(d_avr>0.001)
+			    solver_hits.SetAbsoluteMutationsProbability(0.4);
+			else
+			    solver_hits.SetAbsoluteMutationsProbability(0.8);
+		    }
+		}
+	    }
+	}
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
@@ -173,7 +192,7 @@ int main(int argc, char **argv) {
 	d_avr=0;
 	for(const auto&p:solver_hits.ParametersStatistics())d_avr+=p.uncertainty();
 	d_avr/=solver_hits.ParamCount();
-	cerr<<"<D>="<<d_avr<<"             \r";
+	cerr<<"<D>="<<d_avr<<"; "<<"Pm="<<solver_hits.AbsoluteMutationsProbability()<<"             \r";
     }
     cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")
