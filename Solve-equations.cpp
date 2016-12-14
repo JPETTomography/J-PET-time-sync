@@ -142,43 +142,39 @@ int main(int argc, char **argv) {
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
     InexactEquationSolver<DifferentialMutations<AbsoluteMutations<>>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
-    ParamSet M;
+    ParamSet M1,M2,M3,M4;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,50);
-	    M<<0.5;
+	    M1<<1.0;M2<<0.5;M3<<0.2;M4<<0.05;
 	}else{
 	    init<<make_shared<FixParam>(0);
-	    M<<0;
+	    M1<<0;M2<<0;M3<<0;M4<<0;
 	}
     }
-    solver_hits.SetAbsoluteMutationCoefficients(M);
     solver_hits.SetThreadCount(thr_cnt);
     solver_hits.Init(totalN,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     double d_avr=100;
-    while(d_avr>0.000001){
+    while(d_avr>0.00001){
 	if(d_avr>1.0){
-	    solver_hits.SetAbsoluteMutationsProbability(0.6);
+	    solver_hits.SetAbsoluteMutationsProbability(0.8);
+	    solver_hits.SetAbsoluteMutationCoefficients(M1);
 	}else{
 	    if(d_avr>0.5){
-		solver_hits.SetAbsoluteMutationsProbability(0.5);
+		solver_hits.SetAbsoluteMutationsProbability(0.6);
+		solver_hits.SetAbsoluteMutationCoefficients(M2);
 	    }else{
 		if(d_avr>0.1){
 		    solver_hits.SetAbsoluteMutationsProbability(0.4);
+		    solver_hits.SetAbsoluteMutationCoefficients(M3);
 		}else{
-		    if(d_avr>0.05){
-			    solver_hits.SetAbsoluteMutationsProbability(0.3);
-		    }else{
-			if(d_avr>0.01)
-			    solver_hits.SetAbsoluteMutationsProbability(0.2);
-			else
-			    solver_hits.SetAbsoluteMutationsProbability(0.1);
-		    }
+		    solver_hits.SetAbsoluteMutationsProbability(0.6);
+		    solver_hits.SetAbsoluteMutationCoefficients(M4);
 		}
 	    }
 	}
@@ -192,7 +188,7 @@ int main(int argc, char **argv) {
 	d_avr=0;
 	for(const auto&p:solver_hits.ParametersStatistics())d_avr+=p.uncertainty();
 	d_avr/=solver_hits.ParamCount();
-	cerr<<"<D>="<<d_avr<<"; "<<"Pm="<<solver_hits.AbsoluteMutationsProbability()<<"             \r";
+	cerr<<"<D>="<<d_avr<<"             \r";
     }
     cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")
