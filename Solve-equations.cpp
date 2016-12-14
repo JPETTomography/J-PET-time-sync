@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     double d_max=100;
-    while(d_max>0.001){
+    while(d_max>0.005){
 	if(d_max>1.0){
 	    solver_hits.SetAbsoluteMutationsProbability(0.7);
 	    solver_hits.SetAbsoluteMutationCoefficients(M1);
