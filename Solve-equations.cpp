@@ -173,8 +173,12 @@ int main(int argc, char **argv) {
 		    solver_hits.SetAbsoluteMutationsProbability(0.4);
 		    solver_hits.SetAbsoluteMutationCoefficients(M3);
 		}else{
-		    solver_hits.SetAbsoluteMutationsProbability(0.6);
-		    solver_hits.SetAbsoluteMutationCoefficients(M4);
+		    if(d_avr>0.01){
+			solver_hits.SetAbsoluteMutationsProbability(0.6);
+			solver_hits.SetAbsoluteMutationCoefficients(M4);
+		    }else{
+			solver_hits.SetAbsoluteMutationsProbability(0.0);
+		    }
 		}
 	    }
 	}
