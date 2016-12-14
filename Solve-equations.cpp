@@ -122,12 +122,25 @@ int main(int argc, char **argv) {
 	    }
 	}
     }
-    const auto connected=graph.connected_to(0);
-    cerr<<equations.size()<<" equations"<<endl;
-    cerr<<connected.size()<<" variables connected with the first one"<<endl;
-    InexactEquationSolver<
-	DifferentialMutations<AbsoluteMutations<>>
-    > solver_hits(equations);
+    vector<size_t> connected;{
+	vector<size_t>look;
+	for(size_t grouphead=0;grouphead<totalN;grouphead++){
+	    bool isnew=true;
+	    for(const size_t i:look)if(i==grouphead)isnew=false;
+	    if(isnew){
+		vector<size_t> group=graph.connected_to(grouphead);
+		cerr<<"Connected group of "<<group.size()<<" variables found"<<endl;
+		for(const size_t i:group)look.push_back(i);
+		if(connected.size()<group.size()){
+		    connected.clear();
+		    for(const size_t i:group)connected.push_back(i);
+		}
+	    }
+	}
+    }
+    cerr<<equations.size()<<" equations connect "
+	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
+    InexactEquationSolver<DifferentialMutations<AbsoluteMutations<>>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
     ParamSet M;
     for(size_t i=0;i<totalN;i++){
@@ -135,34 +148,32 @@ int main(int argc, char **argv) {
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,50);
-	    M<<0.05;
+	    M<<1;
 	}else{
 	    init<<make_shared<FixParam>(0);
 	    M<<0;
 	}
     }
     solver_hits.SetAbsoluteMutationCoefficients(M);
-    solver_hits.SetAbsoluteMutationsProbability(0.5);
+    solver_hits.SetAbsoluteMutationsProbability(0.2);
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connected.size(),init,engine);
-    cerr<<"hits:"<<endl;
-    cerr<<solver_hits.ParamCount()<<" variables"<<endl;
+    solver_hits.Init(totalN,init,engine);
+    cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
-    while(
-	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
-    ){
+    double d_avr=100;
+    while(d_avr>0.000001){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
-	cerr<<solver_hits.iteration_count()<<" iterations; "
-	<<min<<"<chi^2<"<<max<<" ; ";
+	cerr<<solver_hits.iteration_count()<<": "
+	<<min<<"<chi^2<"<<max<<"; ";
 	opt_min << point<double>(solver_hits.iteration_count(),min);
 	opt_max << point<double>(solver_hits.iteration_count(),max);
-	double d=0;
-	for(const auto&p:solver_hits.ParametersStatistics())d+=p.uncertainty();
-	d/=solver_hits.ParamCount();
-	cerr<<"<dispersion>="<<d<<"             \r";
+	d_avr=0;
+	for(const auto&p:solver_hits.ParametersStatistics())d_avr+=p.uncertainty();
+	d_avr/=solver_hits.ParamCount();
+	cerr<<"<D>="<<d_avr<<"             \r";
     }
     cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")
