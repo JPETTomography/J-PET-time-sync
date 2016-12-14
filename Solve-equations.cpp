@@ -135,22 +135,22 @@ int main(int argc, char **argv) {
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,50);
-	    M<<0.01;
+	    M<<0.05;
 	}else{
 	    init<<make_shared<FixParam>(0);
 	    M<<0;
 	}
     }
     solver_hits.SetAbsoluteMutationCoefficients(M);
-    solver_hits.SetAbsoluteMutationsProbability(0.01);
+    solver_hits.SetAbsoluteMutationsProbability(0.5);
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connected.size()*7,init,engine);
+    solver_hits.Init(connected.size(),init,engine);
     cerr<<"hits:"<<endl;
     cerr<<solver_hits.ParamCount()<<" variables"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     while(
-	!solver_hits.AbsoluteOptimalityExitCondition(0.01)
+	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
     ){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
