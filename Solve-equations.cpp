@@ -165,19 +165,19 @@ int main(int argc, char **argv) {
 	if(d_avr>1.0){
 	    solver_hits.SetAbsoluteMutationsProbability(0.6);
 	}else{
-	    if(d_avr>0.1){
-		solver_hits.SetAbsoluteMutationsProbability(0.4);
+	    if(d_avr>0.5){
+		solver_hits.SetAbsoluteMutationsProbability(0.5);
 	    }else{
-		if(d_avr>0.05){
-		    solver_hits.SetAbsoluteMutationsProbability(0.2);
+		if(d_avr>0.1){
+		    solver_hits.SetAbsoluteMutationsProbability(0.4);
 		}else{
-		    if(d_avr>0.01){
-			    solver_hits.SetAbsoluteMutationsProbability(0.1);
+		    if(d_avr>0.05){
+			    solver_hits.SetAbsoluteMutationsProbability(0.3);
 		    }else{
-			if(d_avr>0.001)
-			    solver_hits.SetAbsoluteMutationsProbability(0.4);
+			if(d_avr>0.01)
+			    solver_hits.SetAbsoluteMutationsProbability(0.2);
 			else
-			    solver_hits.SetAbsoluteMutationsProbability(0.8);
+			    solver_hits.SetAbsoluteMutationsProbability(0.1);
 		    }
 		}
 	    }
