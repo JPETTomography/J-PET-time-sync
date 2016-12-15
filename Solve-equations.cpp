@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
 	}
     }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(200,init,engine);
+    solver_hits.Init(300,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
