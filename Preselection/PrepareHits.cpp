@@ -4,7 +4,7 @@
 #include <JPetWriter/JPetWriter.h>
 #include <JPetRawSignal/JPetRawSignal.h>
 #include <JPetPhysSignal/JPetPhysSignal.h>
-#include <JPetUnpacker/Unpacker2/EventIII.h>
+#include <Unpacker2/Unpacker2/EventIII.h>
 #include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 #include <IO/gethist.h>
 #include "PrepareHits.h"

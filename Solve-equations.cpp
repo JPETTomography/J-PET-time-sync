@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <thread>
 #include <map>
 #include <gnuplot_wrap.h>
 #include <Genetic/equation2.h>
@@ -18,21 +19,12 @@ using namespace Graph;
 int main(int argc, char **argv) {
     cerr<<"=========== SOLVING EQUATIONS ==============="<<endl;
     RANDOM engine;
-    if(argc!=5){
-	cerr<<"Usage: "<<argv[0]<<" <thread_count> <AB.txt> <Oposite.txt> <Nieghbour.txt>"<<endl;
+    if(argc!=4){
+	cerr<<"Usage: "<<argv[0]<<" <AB.txt> <Oposite.txt> <Scattered.txt>"<<endl;
 	return -1;
     }
-    size_t thr_cnt=0;
-    {
-	stringstream thr_count(argv[1]);
-	thr_count>>thr_cnt;
-	if(0==thr_cnt){
-	    cerr<<"Wrong threads count"<<endl;
-	    return -1;
-	}
-    }
     vector<string> filenames;
-    for(int i=2;i<argc;i++)
+    for(int i=1;i<argc;i++)
 	filenames.push_back(string(argv[i]));
     const auto AB=make_JPetMap<SyncAB_results>();
     {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
@@ -56,7 +48,7 @@ int main(int argc, char **argv) {
     const auto totalN=DeltaT->slotsCount();
     list<InexactEquation> equations;
     ConnectionChecker graph(totalN);
-
+    hist<double> conn_plot;
     for(size_t L=1;L<=DeltaT->layersCount();L++){
 	const size_t N=DeltaT->layerSize(L);
 	for(size_t i1=0;i1<(N/2);i1++){
@@ -76,6 +68,7 @@ int main(int argc, char **argv) {
 		    .right=Item.peak
 		});
 		graph.Connect(gl1,gl2);
+		conn_plot<<point<value<double>>(gl1,gl2);
 	    }
 	}
 	for(size_t i1=0;i1<N;i1++){
@@ -96,13 +89,16 @@ int main(int argc, char **argv) {
 			.right=(Item.left+Item.right)/2.0
 		    });
 		    graph.Connect(gl1,gl2);
+		    conn_plot<<point<value<double>>(gl1,gl2);
 		}
 	    }
 	}
 	if(L<=IL->layersCount()){
 	    for(size_t i1=0;i1<N;i1++){
 		const StripPos pos1={.layer=L,.slot=i1+1};
-		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&equations,&graph](const SyncScatter_results&Item,const size_t coinc_index){
+		auto process=[&pos1,&i1,&L,&N,&AB,&DeltaT,&equations,&graph,&conn_plot](
+		    const SyncScatter_results&Item,const size_t coinc_index
+		){
 		    const auto&item=SyncLayerIndices[L-1][coinc_index];
 		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->layerSize(L+1))+1};
 		    const auto gl1=DeltaT->globalSlotNumber(pos1);
@@ -115,6 +111,7 @@ int main(int argc, char **argv) {
 			    .right=(Item.left+Item.right)/2.0
 			});
 			graph.Connect(gl1,gl2);
+			conn_plot<<point<value<double>>(gl1,gl2);
 		    }
 		};
 		process(IL->operator[](pos1).zero,0);
@@ -122,47 +119,79 @@ int main(int argc, char **argv) {
 	    }
 	}
     }
-    const auto connected=graph.connected_to(0);
-    cerr<<equations.size()<<" equations"<<endl;
-    cerr<<connected.size()<<" variables connected with the first one"<<endl;
-    InexactEquationSolver<
-	DifferentialMutations<AbsoluteMutations<>>
-    > solver_hits(equations);
+    Plot<double>().Hist(conn_plot);
+    vector<size_t> connected;{
+	vector<size_t>look;
+	for(size_t grouphead=0;grouphead<totalN;grouphead++){
+	    bool isnew=true;
+	    for(const size_t i:look)if(i==grouphead)isnew=false;
+	    if(isnew){
+		vector<size_t> group=graph.connected_to(grouphead);
+		cerr<<"Connected group of "<<group.size()<<" variables found"<<endl;
+		for(const size_t i:group)look.push_back(i);
+		if(connected.size()<group.size()){
+		    connected.clear();
+		    for(const size_t i:group)connected.push_back(i);
+		}
+	    }
+	}
+    }
+    cerr<<equations.size()<<" equations connect "
+	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
+    InexactEquationSolver<DifferentialMutations<AbsoluteMutations<>>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
-    ParamSet M;
+    ParamSet M1,M2,M3,M4,M5;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
-	    init<<make_shared<DistribGauss>(0,50);
-	    M<<0.05;
+	    init<<make_shared<DistribGauss>(0,75);
+	    M1<<1.0;M2<<0.5;M3<<0.2;M4<<0.05;M5<<0.001;
 	}else{
 	    init<<make_shared<FixParam>(0);
-	    M<<0;
+	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
 	}
     }
-    solver_hits.SetAbsoluteMutationCoefficients(M);
-    solver_hits.SetAbsoluteMutationsProbability(0.5);
-    solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(connected.size(),init,engine);
-    cerr<<"hits:"<<endl;
-    cerr<<solver_hits.ParamCount()<<" variables"<<endl;
+    solver_hits.SetThreadCount(thread::hardware_concurrency());
+    solver_hits.Init(equations.size()*2,init,engine);
+    cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
-    while(
-	!solver_hits.AbsoluteOptimalityExitCondition(0.001)
-    ){
+    double d_max=100;
+    while(d_max>0.005){
+	if(d_max>1.0){
+	    solver_hits.SetAbsoluteMutationsProbability(0.7);
+	    solver_hits.SetAbsoluteMutationCoefficients(M1);
+	}else{
+	    if(d_max>0.5){
+		solver_hits.SetAbsoluteMutationsProbability(0.6);
+		solver_hits.SetAbsoluteMutationCoefficients(M2);
+	    }else{
+		if(d_max>0.2){
+		    solver_hits.SetAbsoluteMutationsProbability(0.5);
+		    solver_hits.SetAbsoluteMutationCoefficients(M3);
+		}else{
+		    if(d_max>0.05){
+			solver_hits.SetAbsoluteMutationsProbability(0.4);
+			solver_hits.SetAbsoluteMutationCoefficients(M4);
+		    }else{
+			solver_hits.SetAbsoluteMutationsProbability(0.3);
+			solver_hits.SetAbsoluteMutationCoefficients(M5);
+		    }
+		}
+	    }
+	}
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
-	cerr<<solver_hits.iteration_count()<<" iterations; "
-	<<min<<"<chi^2<"<<max<<" ; ";
+	cerr<<solver_hits.iteration_count()<<": "
+	<<min<<"<chi^2<"<<max<<"; ";
 	opt_min << point<double>(solver_hits.iteration_count(),min);
 	opt_max << point<double>(solver_hits.iteration_count(),max);
-	double d=0;
-	for(const auto&p:solver_hits.ParametersStatistics())d+=p.uncertainty();
-	d/=solver_hits.ParamCount();
-	cerr<<"<dispersion>="<<d<<"             \r";
+	d_max=0;
+	for(const auto&p:solver_hits.ParametersStatistics())
+	    if(p.uncertainty()>d_max)d_max=p.uncertainty();
+	cerr<<"D="<<d_max<<"             \r";
     }
     cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")

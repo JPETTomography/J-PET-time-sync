@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
@@ -10,22 +11,12 @@ using namespace std;
 using namespace GnuplotWrap;
 using namespace MathTemplates;
 int main(int argc, char **argv) {
-    if(argc<3){
-	cerr<<"Usage: "<<argv[0]<<" <thread_count> <filename> <filename> ..."<<endl;
+    if(argc<2){
+	cerr<<"Usage: "<<argv[0]<<" <filename> <filename> ..."<<endl;
 	return -1;
     }
-    size_t thr_cnt=0;
-    {
-	stringstream thr_count(argv[1]);
-	thr_count>>thr_cnt;
-	if(0==thr_cnt){
-	    cerr<<"Wrong threads count"<<endl;
-	    cerr<<"Usage: "<<argv[0]<<" <thread_count> <filename> <filename> ..."<<endl;
-	    return -1;
-	}
-    }
     vector<string> root_filenames;
-    for(int i=2;i<argc;i++)
+    for(int i=1;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
     vector<shared_ptr<JPetMap<SyncScatter_results>>> Nei;
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
@@ -40,7 +31,7 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlot(layer,slot)+"-deltaid"+to_string(neighbour_delta_id[i]);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name);
 	    auto& item=Nei[i]->item({.layer=layer,.slot=slot});
-	    item=Sync::Fit4SyncScatter(shist,"Neighbour "+name,thr_cnt);
+	    item=Sync::Fit4SyncScatter(shist,"Neighbour "+name,thread::hardware_concurrency());
 	    if(item.valid()){
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);
@@ -59,7 +50,7 @@ int main(int argc, char **argv) {
 	for(size_t slot=1;slot<=IL->layerSize(layer);slot++){
 	    const auto name="Inter-layer-"+LayerSlot(layer,slot)+"-"+to_string(i);
 	    const auto shist=ReadHist(root_filenames,name);
-	    SyncScatter_results res=Sync::Fit4SyncScatter(shist,"IL "+name,thr_cnt);
+	    SyncScatter_results res=Sync::Fit4SyncScatter(shist,"IL "+name,thread::hardware_concurrency());
 	    if(res.valid()){
 		left<<point<value<double>>(double(slot),res.left);
 		right<<point<value<double>>(double(slot),res.right);
