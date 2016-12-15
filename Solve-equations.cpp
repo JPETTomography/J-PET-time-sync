@@ -154,36 +154,36 @@ int main(int argc, char **argv) {
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,75);
-	    M1<<1.0;M2<<0.5;M3<<0.1;M4<<0.01;M5<<0.001;
+	    M1<<1.0;M2<<0.5;M3<<0.2;M4<<0.05;M5<<0.001;
 	}else{
 	    init<<make_shared<FixParam>(0);
 	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
 	}
     }
     solver_hits.SetThreadCount(thr_cnt);
-    solver_hits.Init(300,init,engine);
+    solver_hits.Init(equations.size()*2,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     double d_max=100;
     while(d_max>0.005){
 	if(d_max>1.0){
-	    solver_hits.SetAbsoluteMutationsProbability(0.8);
+	    solver_hits.SetAbsoluteMutationsProbability(0.7);
 	    solver_hits.SetAbsoluteMutationCoefficients(M1);
 	}else{
 	    if(d_max>0.5){
-		solver_hits.SetAbsoluteMutationsProbability(0.7);
+		solver_hits.SetAbsoluteMutationsProbability(0.6);
 		solver_hits.SetAbsoluteMutationCoefficients(M2);
 	    }else{
 		if(d_max>0.2){
-		    solver_hits.SetAbsoluteMutationsProbability(0.6);
+		    solver_hits.SetAbsoluteMutationsProbability(0.5);
 		    solver_hits.SetAbsoluteMutationCoefficients(M3);
 		}else{
 		    if(d_max>0.05){
-			solver_hits.SetAbsoluteMutationsProbability(0.5);
+			solver_hits.SetAbsoluteMutationsProbability(0.4);
 			solver_hits.SetAbsoluteMutationCoefficients(M4);
 		    }else{
-			solver_hits.SetAbsoluteMutationsProbability(0.4);
+			solver_hits.SetAbsoluteMutationsProbability(0.3);
 			solver_hits.SetAbsoluteMutationCoefficients(M5);
 		    }
 		}
