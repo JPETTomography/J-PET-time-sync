@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <map>
 #include <gnuplot_wrap.h>
 #include <IO/gethist.h>
@@ -10,22 +11,12 @@ using namespace std;
 using namespace GnuplotWrap;
 using namespace MathTemplates;
 int main(int argc, char **argv) {
-    if(argc<3){
+    if(argc<2){
 	cerr<<"Usage: "<<argv[0]<<" <thread_count> <filename> <filename> ..."<<endl;
 	return -1;
     }
-    size_t thr_cnt=0;
-    {
-	stringstream thr_count(argv[1]);
-	thr_count>>thr_cnt;
-	if(0==thr_cnt){
-	    cerr<<"Wrong threads count"<<endl;
-	    cerr<<"Usage: "<<argv[0]<<" <thread_count> <filename> <filename> ..."<<endl;
-	    return -1;
-	}
-    }
     vector<string> root_filenames;
-    for(int i=2;i<argc;i++)
+    for(int i=1;i<argc;i++)
 	root_filenames.push_back(string(argv[i]));
     auto map=make_OpoCoiMap();
     Plotter::Instance().SetOutput(".","Oposite");
@@ -35,7 +26,7 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlot(layer,slot);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
 	    auto& item=map->item({.layer=layer,.slot=slot});
-	    item=Sync::Fit4SyncOposite(shist,"Oposite "+name,thr_cnt);
+	    item=Sync::Fit4SyncOposite(shist,"Oposite "+name,thread::hardware_concurrency());
 	    if(item.valid()){
 		position<<point<value<double>>(double(slot),item.peak);
 		chisq<<point<value<double>>(double(slot),item.chi_sq);
