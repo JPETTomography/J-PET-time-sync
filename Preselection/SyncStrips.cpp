@@ -14,7 +14,7 @@ using namespace std;
 TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):TOT_Hists(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     LargeBarrelTask::init(opts);
-    fSync=make_shared<Synchronization>(map(),cin,defaultTimeCalculation);
+    fSync=make_shared<Synchronization>(map(),cin,Thr({0}));
     f_AB_position=make_shared<JPetMap<SyncAB_results>>(map()->getLayersSizes());
     cin>>(*f_AB_position);
     for(auto & layer : getParamBank().getLayers()){

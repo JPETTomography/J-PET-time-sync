@@ -11,7 +11,7 @@ TaskSyncAB::TaskSyncAB(const char * name, const char * description)
 TaskSyncAB::~TaskSyncAB(){}
 void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
     TOT_Hists::init(opts);
-    fSync=make_shared<Synchronization>(map(),cin,defaultTimeCalculation);
+    fSync=make_shared<Synchronization>(map(),cin,Thr({0}));
     createTOTHistos("coincidence");
     for(auto & layer : getParamBank().getLayers()){
 	const auto ln=map()->getLayerNumber(*layer.second);
