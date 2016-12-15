@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <thread>
 #include <map>
 #include <gnuplot_wrap.h>
 #include <Genetic/equation2.h>
@@ -18,21 +19,12 @@ using namespace Graph;
 int main(int argc, char **argv) {
     cerr<<"=========== SOLVING EQUATIONS ==============="<<endl;
     RANDOM engine;
-    if(argc!=5){
-	cerr<<"Usage: "<<argv[0]<<" <thread_count> <AB.txt> <Oposite.txt> <Nieghbour.txt>"<<endl;
+    if(argc!=4){
+	cerr<<"Usage: "<<argv[0]<<" <AB.txt> <Oposite.txt> <Scattered.txt>"<<endl;
 	return -1;
     }
-    size_t thr_cnt=0;
-    {
-	stringstream thr_count(argv[1]);
-	thr_count>>thr_cnt;
-	if(0==thr_cnt){
-	    cerr<<"Wrong threads count"<<endl;
-	    return -1;
-	}
-    }
     vector<string> filenames;
-    for(int i=2;i<argc;i++)
+    for(int i=1;i<argc;i++)
 	filenames.push_back(string(argv[i]));
     const auto AB=make_JPetMap<SyncAB_results>();
     {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
@@ -160,7 +152,7 @@ int main(int argc, char **argv) {
 	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
 	}
     }
-    solver_hits.SetThreadCount(thr_cnt);
+    solver_hits.SetThreadCount(thread::hardware_concurrency());
     solver_hits.Init(300,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;

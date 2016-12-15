@@ -55,7 +55,7 @@ During the analysis the software also generates ROOT files for events data and T
 
 - Positions of peaks on t_hit1-t_hit2 spectra for coincidences conditioned by scattering (Scattered.txt)
 
-- The final result - time offsets for synchronization (Deltas.txt)
+- The final result - time offsets for synchronization (Deltas*.new.txt)
 
 All these files are stored in the same directory with data files.
 
@@ -75,7 +75,10 @@ The commands needed to perform the analysis look so:
 
 	./analyse1-prepare.sh /path/to/the/data
 
-	./analyse2-sync.sh 1 /path/to/the/data
+	./analyse2-sync.sh A /path/to/the/data
 
-The parameter '1' in the last line means that the genetic algorithms will run in one thread.
-One can increase this parameter for parallelizing it if the processor has more than one core.
+First script starts reconstructing hits from RAW data.
+The second script runs analysis for reconstructed hits.
+The parameter 'A' means using first threshold. B, C and D mean respectively other thresholds.
+ATTENTION: it's important to use capital letters.
+If one uses more than one letter such as 'AB' it means that average will be taken as signal time.
