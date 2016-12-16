@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
 	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
 	}
     }
-    solver_hits.SetThreadCount(thread::hardware_concurrency());
+    solver_hits.SetThreadCount(1);
     solver_hits.Init(equations.size()*2,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
