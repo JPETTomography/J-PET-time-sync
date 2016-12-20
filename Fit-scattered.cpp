@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	    const auto name=LayerSlot(layer,slot)+"-deltaid"+to_string(neighbour_delta_id[i]);
 	    const auto shist=ReadHist(root_filenames,"DeltaT-with-neighbour-"+name);
 	    auto& item=Nei[i]->item({.layer=layer,.slot=slot});
-	    item=Sync::Fit4SyncScatter(shist,"Neighbour "+name,thread::hardware_concurrency());
+	    item=Sync::Fit4SyncScatter(shist,"Neighbour "+name,1);
 	    if(item.valid()){
 		left<<point<value<double>>(double(slot),item.left);
 		right<<point<value<double>>(double(slot),item.right);
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 	for(size_t slot=1;slot<=IL->layerSize(layer);slot++){
 	    const auto name="Inter-layer-"+LayerSlot(layer,slot)+"-"+to_string(i);
 	    const auto shist=ReadHist(root_filenames,name);
-	    SyncScatter_results res=Sync::Fit4SyncScatter(shist,"IL "+name,thread::hardware_concurrency());
+	    SyncScatter_results res=Sync::Fit4SyncScatter(shist,"IL "+name,1);
 	    if(res.valid()){
 		left<<point<value<double>>(double(slot),res.left);
 		right<<point<value<double>>(double(slot),res.right);
