@@ -1,3 +1,5 @@
+// this file is distributed under 
+// MIT license
 #include <JPetManager/JPetManager.h>
 #include <JPetTaskLoader/JPetTaskLoader.h>
 #include "PreselectionMain.h"

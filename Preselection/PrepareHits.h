@@ -1,6 +1,7 @@
+// this file is distributed under 
+// MIT license
 #ifndef TASKC_H 
-#define TASKC_H 
-
+#	define TASKC_H 
 #include <JPetTask/JPetTask.h>
 #include <JPetHit/JPetHit.h>
 #include <JPetRawSignal/JPetRawSignal.h>

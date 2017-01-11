@@ -1,3 +1,5 @@
+// this file is distributed under 
+// MIT license
 #ifndef ___________CONV_JPET_TIME_SYNC________
 #	define ___________CONV_JPET_TIME_SYNC________
 #include <iostream>

@@ -1,3 +1,5 @@
+// this file is distributed under 
+// MIT license
 #ifndef _____TIME___SYNC____TASK_________ 
 #       define _____TIME___SYNC____TASK_________
 #include <memory>

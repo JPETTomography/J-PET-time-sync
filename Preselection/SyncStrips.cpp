@@ -1,3 +1,5 @@
+// this file is distributed under 
+// MIT license
 #include <iostream>
 #include <JPetWriter/JPetWriter.h>
 #include <JPetRawSignal/JPetRawSignal.h>
@@ -10,6 +12,7 @@
 #include <Calc/convention.h>
 #include <IO/gethist.h>
 #include "SyncStrips.h"
+#include "TOT-conditions.h"
 using namespace std;
 TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):TOT_Hists(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
@@ -43,19 +46,21 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 }
 void TaskSyncStrips::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
-	const auto&AB=f_AB_position->operator[](strip);
-	if(AB.valid()){
-	    const auto times=fSync->get_times(*currHit);
-	    if(AB.peak.Contains(times.A-times.B)){
-		if (fHits.empty()) {
-		    fHits.push_back(*currHit);
-		} else {
-		    if (fHits[0].getTimeWindowIndex()==currHit->getTimeWindowIndex()) {
+	if(TOT_conditions(*currHit)){
+	    const auto strip=map()->getStripPos(currHit->getBarrelSlot());
+	    const auto&AB=f_AB_position->operator[](strip);
+	    if(AB.valid()){
+		const auto times=fSync->get_times(*currHit);
+		if(AB.peak.Contains(times.A-times.B)){
+		    if (fHits.empty()) {
 			fHits.push_back(*currHit);
 		    } else {
-			fillCoincidenceHistos();
-			fHits.push_back(*currHit);
+			if (fHits[0].getTimeWindowIndex()==currHit->getTimeWindowIndex()) {
+			    fHits.push_back(*currHit);
+			} else {
+			    fillCoincidenceHistos();
+			    fHits.push_back(*currHit);
+			}
 		    }
 		}
 	    }
