@@ -1,3 +1,5 @@
+// this file is distributed under 
+// MIT license
 #include <JPetWriter/JPetWriter.h>
 #include <JPetHitUtils/JPetHitUtils.h>
 #include <JPetLargeBarrelExtensions/BarrelExtensions.h>
@@ -5,6 +7,7 @@
 #include <IO/gethist.h>
 #include <Calc/convention.h>
 #include "SyncAB.h"
+#include "TOT-conditions.h"
 using namespace std;
 TaskSyncAB::TaskSyncAB(const char * name, const char * description)
 :TOT_Hists(name, description){}
@@ -24,10 +27,12 @@ void TaskSyncAB::init(const JPetTaskInterface::Options&opts){
 }
 void TaskSyncAB::exec(){
     if(auto currHit = dynamic_cast<const JPetHit*const>(getEvent())){
-	const auto strip=map()->getStripPos(currHit->getBarrelSlot());
-	const auto times=fSync->get_times(*currHit);
-	getStatistics().getHisto1D(LayerSlot(strip).c_str()).Fill(times.A-times.B);
-	fillTOTHistos(*currHit,"coincidence");
+	if(TOT_conditions(*currHit)){
+	    const auto strip=map()->getStripPos(currHit->getBarrelSlot());
+	    const auto times=fSync->get_times(*currHit);
+	    getStatistics().getHisto1D(LayerSlot(strip).c_str()).Fill(times.A-times.B);
+	    fillTOTHistos(*currHit,"coincidence");
+	}
     }
 }
 void TaskSyncAB::terminate(){}
