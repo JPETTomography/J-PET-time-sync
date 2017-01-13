@@ -11,6 +11,6 @@ const bool TOT_conditions(const JPetHit&hit){
     map<int,double> B = hit.getSignalB().getRecoSignal().getRawSignal().getTOTsVsThresholdNumber();
     bool good=true;
     for(size_t thr=1;good&&(thr<=4);thr++)
-	good&=(A[thr]>100.)&&(B[thr]>100.);
+	good&=(A[thr]>.001)&&(B[thr]>.001);
     return good;
 }
