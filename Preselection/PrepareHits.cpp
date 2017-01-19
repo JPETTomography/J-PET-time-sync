@@ -29,7 +29,7 @@ void PrepareHits::exec(){
 	    auto tdcChannel = dynamic_cast</*const*/ TDCChannel*const>(tdcHits->At(i));
 	    auto tomb_number =  tdcChannel->GetChannel();
 	    if (tomb_number % 65 == 0)continue;//skip trigger signals from TRB
-	    	    assert(0!=getParamBank().getTOMBChannels().count(tomb_number));
+		assert(0!=getParamBank().getTOMBChannels().count(tomb_number));
 	    JPetTOMBChannel& tomb_channel = getParamBank().getTOMBChannel(tomb_number);
 	    for(int j = tdcChannel->GetHitsNum()-1; j < tdcChannel->GetHitsNum(); ++j){
 		JPetSigCh sigChTmpLead,sigChTmpTrail;
@@ -51,7 +51,6 @@ void PrepareHits::exec(){
 		sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
 		if(tdcChannel->GetLeadTime (j)==-100000)continue;
 		if(tdcChannel->GetTrailTime(j)==-100000)continue;
-		if((tdcChannel->GetLeadTime (j)+0.1)>tdcChannel->GetTrailTime(j))continue;
 		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j));
 		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j));
 		tslot.addCh(sigChTmpLead);
