@@ -28,10 +28,16 @@ void PrepareHits::exec(){
 	for (int i = 0; i < ntdc; ++i) {
 	    auto tdcChannel = dynamic_cast</*const*/ TDCChannel*const>(tdcHits->At(i));
 	    auto tomb_number =  tdcChannel->GetChannel();
-	    if (tomb_number % 65 == 0)continue;//skip trigger signals from TRB
-		assert(0!=getParamBank().getTOMBChannels().count(tomb_number));
+	    if (tomb_number % 65 == 0){
+		continue;//skip trigger signals from TRB
+	    }
+	    if( getParamBank().getTOMBChannels().count(tomb_number) == 0 ) {
+		WARNING(Form("DAQ Channel %d appears in data but does not exist in the setup from DB.", tomb_number));
+		continue;
+	    }
 	    JPetTOMBChannel& tomb_channel = getParamBank().getTOMBChannel(tomb_number);
-	    for(int j = tdcChannel->GetHitsNum()-1; j < tdcChannel->GetHitsNum(); ++j){
+	    const int kNumHits = tdcChannel->GetHitsNum();
+	    for(int j = 0; j < kNumHits; ++j){
 		JPetSigCh sigChTmpLead,sigChTmpTrail;
 		sigChTmpLead.setDAQch(tomb_number);
 		sigChTmpTrail.setDAQch(tomb_number);
