@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
 		char * frameworkargs[argc+4];
 		frameworkargs[0]=argv[0];
 		frameworkargs[1]="-l";
-		frameworkargs[2]="large_barrel.json";
+		frameworkargs[2]="j-pet-setup.json";
 		frameworkargs[3]="-i";
 		frameworkargs[4]="43";
 		for(size_t i=1;i<argc;i++)frameworkargs[i+4]=argv[i];
