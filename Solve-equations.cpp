@@ -22,26 +22,40 @@ int main(int argc, char **argv) {
     cerr<<"=========== SOLVING EQUATIONS ==============="<<endl;
     RANDOM engine;
     if(argc!=4){
-	cerr<<"Usage: "<<argv[0]<<" <AB.txt> <Oposite.txt> <Scattered.txt>"<<endl;
+	cerr<<"Usage: "<<argv[0]
+	<<" <AB.txt> <Oposite.txt> <Scattered.txt>"<<endl;
 	return -1;
     }
     vector<string> filenames;
     for(int i=1;i<argc;i++)
 	filenames.push_back(string(argv[i]));
-    const auto AB=make_JPetMap<SyncAB_results>();
-    {ifstream file;file.open(filenames[0]);if(file){file>>(*AB);file.close();}}
-    const auto Opo=make_OpoCoiMap();
-    {ifstream file;file.open(filenames[1]);if(file){file>>(*Opo);file.close();}}
+    const auto AB=make_JPetMap<SyncAB_results>();{
+	ifstream file;
+	file.open(filenames[0]);
+	if(file){
+	    file>>(*AB);file.close();
+	}
+    }
+    const auto Opo=make_OpoCoiMap();{
+	ifstream file;
+	file.open(filenames[1]);
+	if(file){
+	    file>>(*Opo);file.close();
+	}
+    }
     vector<shared_ptr<JPetMap<SyncScatter_results>>> Nei;
     for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
 	Nei.push_back(make_JPetMap<SyncScatter_results>());
-    auto IL=make_InterLayerMap();
-    {ifstream file;file.open(filenames[2]);if(file){
-	for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
-	    file>>(*Nei[i]);
-	file>>(*IL);
-	file.close();
-    }}
+    auto IL=make_InterLayerMap();{
+	ifstream file;
+	file.open(filenames[2]);
+	if(file){
+	    for(size_t i=0,n=neighbour_delta_id.size();i<n;i++)
+		file>>(*Nei[i]);
+	    file>>(*IL);
+	    file.close();
+	}
+    }
     const auto DeltaT=make_JPetMap<SynchroStrip>();
     cin>>(*DeltaT);
     Plotter::Instance().SetOutput(".","Delta");
@@ -66,7 +80,9 @@ int main(int argc, char **argv) {
 		Item.valid()
 	    ){
 		equations.push_back({
-		    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
+		    .left=[gl1,gl2](const ParamSet&delta){
+			return delta[gl2]-delta[gl1];
+		    },
 		    .right=Item.peak
 		});
 		graph.Connect(gl1,gl2);
@@ -87,7 +103,9 @@ int main(int argc, char **argv) {
 		    AB->operator[](pos2).valid()&&Item.valid()
 		){
 		    equations.push_back({
-			.left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
+			.left=[gl1,gl2](const ParamSet&delta){
+			    return delta[gl2]-delta[gl1];
+			},
 			.right=(Item.left+Item.right)/2.0
 		    });
 		    graph.Connect(gl1,gl2);
@@ -102,14 +120,20 @@ int main(int argc, char **argv) {
 		    const SyncScatter_results&Item,const size_t coinc_index
 		){
 		    const auto&item=SyncLayerIndices[L-1][coinc_index];
-		    const StripPos pos2={.layer=L+1,.slot=((i1*item.coef+item.offs)%DeltaT->layerSize(L+1))+1};
+		    const StripPos pos2={
+			.layer=L+1,
+			.slot=((i1*item.coef+item.offs)%
+			    DeltaT->layerSize(L+1))+1
+		    };
 		    const auto gl1=DeltaT->globalSlotNumber(pos1);
 		    const auto gl2=DeltaT->globalSlotNumber(pos2);
 		    if(
 			AB->operator[](pos1).valid()&&AB->operator[](pos2).valid()&&Item.valid()
 		    ){
 			equations.push_back({
-			    .left=[gl1,gl2](const ParamSet&delta){return delta[gl2]-delta[gl1];},
+			    .left=[gl1,gl2](const ParamSet&delta){
+				return delta[gl2]-delta[gl1];
+			    },
 			    .right=(Item.left+Item.right)/2.0
 			});
 			graph.Connect(gl1,gl2);

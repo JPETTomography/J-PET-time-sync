@@ -30,12 +30,14 @@ int main(int argc, char **argv) {
 			auto&item=map->item({.layer=layer,.slot=slot});
 			item=Sync::Fit4SyncAB(shist,"SyncAB "+name,1);
 			if(item.valid()){
-			    position<<point<value<double>>(double(slot),item.peak);
-			    chisq<<point<value<double>>(double(slot),item.chi_sq);
+			    position<<point<value<double>>(slot,item.peak);
+			    chisq<<point<value<double>>(slot,item.chi_sq);
 			}
 		}
-		Plot<double>().Hist(position,"Position")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
-		Plot<double>().Hist(chisq,"Chi^2")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
+		Plot<double>().Hist(position,"Position")
+		<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
+		Plot<double>().Hist(chisq,"Chi^2")
+		<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
 	}
 	cout<<(*map);
 	return 0;

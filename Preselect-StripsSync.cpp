@@ -6,6 +6,10 @@
 #include <Preselection/SyncStrips.h>
 void AddModules() {
     JPetManager::getManager().registerTask([](){
-	return new JPetTaskLoader("Hits", "Stat4Strips",new TaskSyncStrips("Synchronization of strips",""));
+	return new JPetTaskLoader(
+	    "Hits", "Stat4Strips",new TaskSyncStrips(
+		"Synchronization of strips",""
+	    )
+	);
     });
 }

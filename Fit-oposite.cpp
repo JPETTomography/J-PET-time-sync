@@ -14,7 +14,8 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 int main(int argc, char **argv) {
     if(argc<2){
-	cerr<<"Usage: "<<argv[0]<<" <thread_count> <filename> <filename> ..."<<endl;
+	cerr<<"Usage: "<<argv[0]
+	<<" <thread_count> <filename> <filename> ..."<<endl;
 	return -1;
     }
     vector<string> root_filenames;
@@ -26,7 +27,9 @@ int main(int argc, char **argv) {
 	hist<double> position,chisq;
 	for(size_t slot=1;slot<=map->layerSize(layer);slot++){
 	    const auto name=LayerSlot(layer,slot);
-	    const auto shist=ReadHist(root_filenames,"DeltaT-with-oposite-"+name);
+	    const auto shist=ReadHist(
+		root_filenames,"DeltaT-with-oposite-"+name
+	    );
 	    auto& item=map->item({.layer=layer,.slot=slot});
 	    item=Sync::Fit4SyncOposite(shist,"Oposite "+name,1);
 	    if(item.valid()){
@@ -34,8 +37,11 @@ int main(int argc, char **argv) {
 		chisq<<point<value<double>>(double(slot),item.chi_sq);
 	    }
 	}
-	Plot<double>().Hist(position,"Position")<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
-	Plot<double>().Hist(chisq,"Chi^2")<<"set key on"<<"set yrange [0:]"<<"set title 'Layer "+to_string(layer)+"'";
+	Plot<double>().Hist(position,"Position")
+	<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
+	Plot<double>().Hist(chisq,"Chi^2")
+	<<"set key on"<<"set yrange [0:]"
+	<<"set title 'Layer "+to_string(layer)+"'";
     }
     cout<<(*map);
     return 0;
