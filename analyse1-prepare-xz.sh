@@ -1,5 +1,5 @@
 #!/bin/bash
-for X in `find $1|grep .hld.xz|grep -v .root`; do
+for X in `find $1|grep .xz|grep -v .root`; do
 	echo "File  ${X}"
 	if [ -e ${X%.*}.Hits.root ]; then
 		echo "has been analysed"
