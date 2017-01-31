@@ -5,7 +5,7 @@ for X in `find $1|grep .hld.xz|grep -v .root`; do
 		echo "has been analysed"
 	else
 		echo "starting analysis"
-		tar xf ${X}
+		unxz ${X}
  		./Preselect-Hits -t hld -f ${X%.*}
 	fi
 	rm ${X%.*}.hld.times.root
