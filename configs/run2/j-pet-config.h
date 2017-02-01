@@ -7,6 +7,8 @@
 //this file must be in agreement with other parts
 // of configuration
 
+//run number that must be in agreement with json file
+#	define JSON_RUN_NUMBER "2"
 //size of J-PET detector for structures
 //that store sets of strips parameters
 #	define Full_J_PET_SIZE {48,48,96}
