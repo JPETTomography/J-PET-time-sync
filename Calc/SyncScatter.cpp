@@ -25,12 +25,12 @@ namespace Sync{
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[3]>0)
-	    &&(P[2]>0.2)&&(P[5]>0.2)
+	    &&(P[2]>0.1)&&(P[5]>0.1)
 	    &&(P[2]<2.0)&&(P[5]<2.0)
 	    &&(P[1]>hist.left().X().max())&&(P[4]<hist.right().X().min())
 	    &&((P[4]-P[1])>(P[2]+P[5]))
-	    &&((P[4]-P[1])>2.0)&&((P[4]-P[1])<15.0)
-	    &&((P[0]/P[3])<10.0)&&((P[3]/P[0])<10.0);
+	    &&((P[4]-P[1])>0.5)&&((P[4]-P[1])<15.0)
+	    &&((P[0]/P[3])<15.0)&&((P[3]/P[0])<15.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
