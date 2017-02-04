@@ -4,7 +4,7 @@ for X in `find $1|grep .hld|grep -v .root`; do
 	if [ -e ${X%.*}.Hits.root ]; then
 		echo "has been analysed"
 	else
-	    if [ -e ${X%.*}.root ]; then
+	    if [ -e ${X}.root ]; then
 		echo "is being analysed"
 	    else
 		echo "starting analysis"
