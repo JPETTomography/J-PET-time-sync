@@ -4,9 +4,10 @@ for X in `find $1|grep .hld.xz|grep -v .root`; do
 	if [ -e ${X%.*}.Hits.root ]; then
 		echo "has been analysed"
 	else
-	    if [ -e ${X%.*} ]; then
+	    if [ -e ${X}.tmp ]; then
 		echo "is being analysed"
 	    else
+		touch ${X}.tmp
 		echo "starting analysis"
 		unxz ${X}
 		./Preselect-Hits -t hld -f ${X%.*}
@@ -14,6 +15,7 @@ for X in `find $1|grep .hld.xz|grep -v .root`; do
 		rm ${X%.*}.raw.root
 		rm ${X%.*}.root
 		rm ${X%.*}
+		rm ${X}.tmp
 	    fi
 	fi
 done
