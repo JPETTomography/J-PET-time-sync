@@ -31,7 +31,7 @@ namespace Sync{
 	    &&(P[1]>hist.left().X().max())&&(P[4]<hist.right().X().min())
 	    &&((P[4]-P[1])>(P[2]+P[5]))
 	    &&((P[4]-P[1])>0.5)&&((P[4]-P[1])<20.0)
-	    &&((P[0]/P[3])<20.0)&&((P[3]/P[0])<20.0);
+	    &&((P[0]/P[3])<30.0)&&((P[3]/P[0])<30.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;

@@ -67,15 +67,15 @@ inline const std::shared_ptr<JPetMap<SyncOposite_results>> make_OpoCoiMap(){
 
 //Hit-hit coincidences for neighbour strips in layer
 struct SyncScatter_results{
-  MathTemplates::value<double>left,right,assymetry;double chi_sq;
+    MathTemplates::value<double>left,right,assymetry;double chi_sq;
     inline const bool valid()const{
     return (chi_sq>=0)&&
-	(assymetry.val()<=10)&&(assymetry.val()>=0.1)&&
-	(left.uncertainty()<=2.0)&&(left.uncertainty()>=0.1)&&
-	(right.uncertainty()<=2.0)&&(right.uncertainty()>=0.1)&&
-	((left.uncertainty()/right.uncertainty())<=4.0)&&
-	((right.uncertainty()/left.uncertainty())<=4.0)&&
-	(right.val()-left.val())>0.5;
+	(assymetry.val()<=15.0)&&(assymetry.val()>=0.6667)&&
+	(left.uncertainty()<=3.0)&&(left.uncertainty()>=0.1)&&
+	(right.uncertainty()<=3.0)&&(right.uncertainty()>=0.1)&&
+	((left.uncertainty()/right.uncertainty())<=6.0)&&
+	((right.uncertainty()/left.uncertainty())<=6.0)&&
+	(right.val()-left.val())>1.0;
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){
