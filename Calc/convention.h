@@ -36,7 +36,9 @@ inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
 struct SyncAB_results{
     MathTemplates::value<double>peak;double chi_sq;
     inline const bool valid()const{
-      return (chi_sq>=0)&&(peak.uncertainty()<=1.0)&&(peak.uncertainty()>=0.1);
+      return (chi_sq>=0)&&
+      (peak.uncertainty()<=1.0*TIME_UNIT_CONST)&&
+      (peak.uncertainty()>=0.1*TIME_UNIT_CONST);
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncAB_results&item){
@@ -50,7 +52,9 @@ inline std::ostream&operator<<(std::ostream&str,const SyncAB_results&item){
 struct SyncOposite_results{
     MathTemplates::value<double>peak;double chi_sq;
     inline const bool valid()const{
-      return (chi_sq>=0)&&(peak.uncertainty()<=1.0)&&(peak.uncertainty()>=0.1);
+      return (chi_sq>=0)&&
+      (peak.uncertainty()<=1.5*TIME_UNIT_CONST)&&
+      (peak.uncertainty()>=0.1*TIME_UNIT_CONST);
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncOposite_results&item){
@@ -71,11 +75,13 @@ struct SyncScatter_results{
     inline const bool valid()const{
     return (chi_sq>=0)&&
 	(assymetry.val()<=15.0)&&(assymetry.val()>=0.6667)&&
-	(left.uncertainty()<=3.0)&&(left.uncertainty()>=0.1)&&
-	(right.uncertainty()<=3.0)&&(right.uncertainty()>=0.1)&&
+	(left.uncertainty()<=3.0*TIME_UNIT_CONST)&&
+	(left.uncertainty()>=0.1*TIME_UNIT_CONST)&&
+	(right.uncertainty()<=3.0*TIME_UNIT_CONST)&&
+	(right.uncertainty()>=0.1*TIME_UNIT_CONST)&&
 	((left.uncertainty()/right.uncertainty())<=6.0)&&
 	((right.uncertainty()/left.uncertainty())<=6.0)&&
-	(right.val()-left.val())>1.0;
+	(right.val()-left.val())>1.0*TIME_UNIT_CONST;
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){

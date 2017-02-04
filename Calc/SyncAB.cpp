@@ -18,7 +18,8 @@ namespace Sync{
 	    return {.peak=0,.chi_sq=-1};
 	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
-	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
+	double total=0;for(const auto&p:hist)
+	    total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef 
 	    Mul2<Par<0>,Func3<Gaussian ,Arg<0>,Par<1>,Par<2>>> 
 	Foreground;
@@ -34,7 +35,7 @@ namespace Sync{
 	fit.SetFilter([&hist](const ParamSet&P){
 	    static const Background bg_test;
 	    return (P[0]>0)&&(P[4]<0)&&(P[6]>0)
-	    &&(P[2]>0)&&(P[2]<2)
+	    &&(P[2]>0)&&(P[2]<3.0*TIME_UNIT_CONST)
 	    &&(-(P[4]/P[6])<5.0)&&(-(P[6]/P[4])<4.0)
 	    &&((P[3]+P[4])<(P[1]-P[2]))&&((P[1]+P[2])<(P[5]-P[6]))
 	    &&(P[3]>hist.left().X().max())&&(P[5]<hist.right().X().min())
@@ -45,13 +46,13 @@ namespace Sync{
 	fit.Init(500,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,total*40.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
-	    <<make_shared<DistribGauss>(0.5,0.3)
+	    <<make_shared<DistribGauss>(0.5*TIME_UNIT_CONST,0.3*TIME_UNIT_CONST)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
-	    <<make_shared<DistribGauss>(-0.5,0.5)
+	    <<make_shared<DistribGauss>(-0.5*TIME_UNIT_CONST,0.5*TIME_UNIT_CONST)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
-	    <<make_shared<DistribGauss>(0.5,0.5)
-	    <<make_shared<DistribUniform>(0,total*30.0)
-	    <<make_shared<DistribGauss>(0.0,10.0)
+	    <<make_shared<DistribGauss>(0.5*TIME_UNIT_CONST,0.5*TIME_UNIT_CONST)
+	    <<make_shared<DistribUniform>(0,total*30.0/TIME_UNIT_CONST)
+	    <<make_shared<DistribGauss>(0.0,10.0/(TIME_UNIT_CONST*TIME_UNIT_CONST))
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
