@@ -27,15 +27,15 @@ namespace Sync{
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[3]>0)
 	    &&(P[2]>0.1)&&(P[5]>0.1)
-	    &&(P[2]<2.0)&&(P[5]<2.0)
+	    &&(P[2]<4.0)&&(P[5]<4.0)
 	    &&(P[1]>hist.left().X().max())&&(P[4]<hist.right().X().min())
 	    &&((P[4]-P[1])>(P[2]+P[5]))
-	    &&((P[4]-P[1])>0.5)&&((P[4]-P[1])<15.0)
-	    &&((P[0]/P[3])<15.0)&&((P[3]/P[0])<15.0);
+	    &&((P[4]-P[1])>0.5)&&((P[4]-P[1])<20.0)
+	    &&((P[0]/P[3])<20.0)&&((P[3]/P[0])<20.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(600,make_shared<InitialDistributions>()
+	fit.Init(800,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,total*30.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
 	    <<make_shared<DistribGauss>(0.5,0.3)
@@ -79,13 +79,15 @@ namespace Sync{
 	    .left={P[1],P[2]},.right={P[4],P[5]},
 	    .assymetry=P[3]/P[0],.chi_sq=chi_sq_norm
 	};
-	if(res.valid())
+	if(res.valid()){
 	    Plot<double>().Hist(hist).Line(totalfit,"Fit")
 	    .Line(left).Line(right)<<"set key on"<<"set xrange [-30:30]"
 	    <<"set title'"+displayname+"'";
-	else
+	    cerr<<"VADID"<<endl;
+	}else{
 	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"
 	    <<"set title'"+displayname+"'";
+	}
 	return res;
     }
 }
