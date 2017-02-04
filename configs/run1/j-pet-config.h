@@ -3,12 +3,15 @@
 #ifndef ________J_PET_CONFIG_H_________
 #	define ________J_PET_CONFIG_H_________
 
-//ATTENTION: please note that all sizes defined in 
-//this file must be in agreement with other parts
-// of configuration
-
 //run number that must be in agreement with json file
 #	define JSON_RUN_NUMBER "43"
+//time unit constant. If nothing is changed in DAQ 
+// 1.0 means ns; 1000.0 means ps
+#	define TIME_UNIT_CONST 1.0
+//time diff histogram range: bins,from,to
+#	define TIME_HISTO_RANGE 400,-100.,+100.
+//time spectra plots options
+#	define TIME_PLOT_OPTS "set xrange [-30:30]"
 //size of J-PET detector for structures
 //that store sets of strips parameters
 #	define Full_J_PET_SIZE {48,48,96}

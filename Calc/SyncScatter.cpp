@@ -14,7 +14,7 @@ using namespace Genetic;
 namespace Sync{
     const SyncScatter_results Fit4SyncScatter(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
 	if(hist.TotalSum().val()<7.){
-	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
 	}
@@ -70,7 +70,7 @@ namespace Sync{
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	if(fit.iteration_count()>=1000){
-	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
 	}
@@ -81,11 +81,11 @@ namespace Sync{
 	};
 	if(res.valid()){
 	    Plot<double>().Hist(hist).Line(totalfit,"Fit")
-	    .Line(left).Line(right)<<"set key on"<<"set xrange [-30:30]"
+	    .Line(left).Line(right)<<"set key on"<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	    cerr<<"VADID"<<endl;
 	}else{
-	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	}
 	return res;

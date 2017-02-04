@@ -49,7 +49,27 @@ View available configurations in the directory
 
 Each sub-directory means new configuration type.
 The default one is "run1".
+Please note that each configuration contains also include file.
+It means that changing configuration requires recompilation of the software.
+Nevertheless, cmake allows to create several builds for different configurations.
 
+
+How to use the software
+=======================
+
+The commands needed to perform the analysis look so:
+
+	cd J-PET-time-sync-build
+
+	./analyse1-prepare.sh /path/to/the/data
+
+	./analyse2-sync.sh A /path/to/the/data
+
+First script starts reconstructing hits from RAW data.
+The second script runs analysis for reconstructed hits.
+The parameter 'A' means using first threshold. B, C and D mean respectively other thresholds.
+ATTENTION: it's important to use capital letters.
+If one uses more than one letter such as 'AB' it means that average will be taken as signal time.
 
 
 Input and output
@@ -69,6 +89,7 @@ During the analysis the software also generates ROOT files for events data and T
 
 All these files are stored in the same directory with data files.
 
+
 Debug output
 ============
 
@@ -76,19 +97,3 @@ The software also stores huge amount of debug information in build directory.
 If one has gnuplot installed in the system the plots with this information will be stored in PNG files.
 When this software is used once more for another data these files are overwritten.
 
-How to use the software
-=======================
-
-The commands needed to perform the analysis look so:
-
-	cd J-PET-time-sync-build
-
-	./analyse1-prepare.sh /path/to/the/data
-
-	./analyse2-sync.sh A /path/to/the/data
-
-First script starts reconstructing hits from RAW data.
-The second script runs analysis for reconstructed hits.
-The parameter 'A' means using first threshold. B, C and D mean respectively other thresholds.
-ATTENTION: it's important to use capital letters.
-If one uses more than one letter such as 'AB' it means that average will be taken as signal time.

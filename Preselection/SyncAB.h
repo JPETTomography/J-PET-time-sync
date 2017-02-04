@@ -9,7 +9,7 @@
 #include <JPetLargeBarrelExtensions/PetDict.h>
 #include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 class Synchronization;
-class TaskSyncAB:public TOT_Hists {
+class TaskSyncAB:public LargeBarrelTask{
 public:
   TaskSyncAB(const char * name, const char * description);
   virtual ~TaskSyncAB();

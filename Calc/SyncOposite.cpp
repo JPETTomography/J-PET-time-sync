@@ -14,7 +14,7 @@ using namespace Genetic;
 namespace Sync{
     const SyncOposite_results Fit4SyncOposite(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
 	if(hist.TotalSum().val()<10.){
-	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS<<"set title'"+displayname+"'";
 	    return {.peak=0,.chi_sq=-1};
 	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
@@ -51,7 +51,7 @@ namespace Sync{
 	auto chain=ChainWithCount(1000,hist.left().X().min(),hist.right().X().max());
 	SortedPoints<double> totalfit([&fit](double x)->double{return fit({x});},chain);
 	Plot<double>().Hist(hist).Line(totalfit,"Fit")
-	<<"set key on"<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
+	<<"set key on"<<TIME_PLOT_OPTS<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
 	if(fit.iteration_count()>=1000)return {.peak=0,.chi_sq=-1};

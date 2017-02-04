@@ -10,6 +10,7 @@
 #include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 #include <IO/gethist.h>
 #include "PrepareHits.h"
+#include <j-pet-config.h>
 using namespace std;
 PrepareHits::PrepareHits(const char * name, const char * description)
 :TOT_Hists(name, description),fCurrEventNumber(0){}
@@ -57,8 +58,8 @@ void PrepareHits::exec(){
 		sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
 		if(tdcChannel->GetLeadTime (j)==-100000)continue;
 		if(tdcChannel->GetTrailTime(j)==-100000)continue;
-		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j));
-		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j));
+		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j)*TIME_UNIT_CONST);
+		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j)*TIME_UNIT_CONST);
 		tslot.addCh(sigChTmpLead);
 		tslot.addCh(sigChTmpTrail);
 	    }
