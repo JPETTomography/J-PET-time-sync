@@ -5,8 +5,9 @@
 
 //run number that must be in agreement with json file
 #	define JSON_RUN_NUMBER "2"
-//time unit constant. If nothing is changed in DAQ 
-// 1.0 means ns; 1000.0 means ps
+//time unit constant used to obtain time from DAQ values
+#	define DAQ_2_TIME_UNIT 1.0
+//time unit constant. 1.0 means ns; 1000.0 means ps...
 #	define TIME_UNIT_CONST 1.0
 //time diff histogram range: bins,from,to
 #	define TIME_HISTO_RANGE 800,-100.,+100.

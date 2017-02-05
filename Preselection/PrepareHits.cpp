@@ -58,8 +58,8 @@ void PrepareHits::exec(){
 		sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
 		if(tdcChannel->GetLeadTime (j)==-100000)continue;
 		if(tdcChannel->GetTrailTime(j)==-100000)continue;
-		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j)*TIME_UNIT_CONST);
-		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j)*TIME_UNIT_CONST);
+		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j)*DAQ_2_TIME_UNIT);
+		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j)*DAQ_2_TIME_UNIT);
 		tslot.addCh(sigChTmpLead);
 		tslot.addCh(sigChTmpTrail);
 	    }
