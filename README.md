@@ -54,6 +54,7 @@ It means that changing configuration requires recompilation of the software.
 Nevertheless, cmake allows to create several builds for different configurations.
 If you want to create new configuration you'd better copy the files from run1 config and then change options you 
 are interested in.
+Only file j-pet-setup.json needs to be created from scratch (see manual from petwiki).
 
 
 How to use the software
