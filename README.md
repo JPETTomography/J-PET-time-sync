@@ -38,11 +38,11 @@ How to compile the software
 	
 	cd J-PET-time-sync-build
 	
-	cmake -Dconfig_type=<type> ../J-PET-time-sync
+	cmake -Dconfig_type=___ ../J-PET-time-sync
 	
 	make
 
-Here <type> means J-PET configuration needed for time synchronization.
+cmake variable config_type means J-PET configuration needed for time synchronization.
 View available configurations in the directory
 
 	configs/
@@ -52,6 +52,8 @@ The default one is "run1".
 Please note that each configuration contains also include file.
 It means that changing configuration requires recompilation of the software.
 Nevertheless, cmake allows to create several builds for different configurations.
+If you want to create new configuration you'd better copy the files from run1 config and then change options you 
+are interested in.
 
 
 How to use the software
