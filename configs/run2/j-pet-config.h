@@ -10,7 +10,7 @@
 //time unit constant. 1.0 means ns; 1000.0 means ps...
 #	define TIME_UNIT_CONST 1.0
 //time diff histogram range: bins,from,to
-#	define TIME_HISTO_RANGE 800,-100.,+100.
+#	define TIME_HISTO_RANGE 400,-100.,+100.
 //time spectra plots options
 #	define TIME_PLOT_OPTS "set xrange [-30:30]"
 //size of J-PET detector for structures
