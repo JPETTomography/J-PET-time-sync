@@ -100,7 +100,7 @@ When this software is used once more for another data these files are overwritte
 Generating report text file
 ===========================
 
-When you performed analysis for all four thresholds you can generate the text file that in the report format.
+When you performed analysis for all four thresholds you can generate the text file in the report format.
 There's a tool with the binary ./report that is responsible for this function.
 If you have four text files: DeltaA.txt ... DeltaD.txt you can execute the command
 
