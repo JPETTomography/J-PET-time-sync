@@ -5,7 +5,9 @@
 #include <Preselection/PreselectionMain.h>
 #include <Preselection/PrepareHits.h>
 void AddModules() {
-	JPetManager::getManager().registerTask([](){
-		return new JPetTaskLoader("hld","Hits",new PrepareHits("Preparing hits",""));
-	});
+    JPetManager::getManager().registerTask([](){
+	return new JPetTaskLoader(
+	    "hld","Hits",new PrepareHits("Preparing hits","")
+	);
+    });
 }

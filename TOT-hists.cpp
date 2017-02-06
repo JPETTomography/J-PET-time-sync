@@ -13,7 +13,8 @@ using namespace GnuplotWrap;
 using namespace MathTemplates;
 int main(int argc, char **argv) {
     if(argc<3){
-	cerr<<"Usage: "<<argv[0]<<" <plot-postfix> <filename> <filename> ..."<<endl;
+	cerr<<"Usage: "<<argv[0]
+	<<" <plot-postfix> <filename> <filename> ..."<<endl;
 	return -1;
     }
     vector<string> root_filenames;
@@ -28,7 +29,8 @@ int main(int argc, char **argv) {
 		Plot<double> plot;
 		plot<<"set key on"<<"set xrange [30:80]";
 		for(size_t t=0;t<thresholds_count;t++){
-		    string name="TOT-"+LayerSlotThr(layer,slot,t+1)+letter+postfix;
+		    string name="TOT-"+LayerSlotThr(layer,slot,t+1)+
+		    letter+postfix;
 		    auto shist=ReadHist(root_filenames,name);
 		    plot.Hist(shist,name);
 		    shist=shist.XRange(0.5,INFINITY);

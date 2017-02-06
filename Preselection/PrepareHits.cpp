@@ -10,13 +10,14 @@
 #include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 #include <IO/gethist.h>
 #include "PrepareHits.h"
+#include <j-pet-config.h>
 using namespace std;
 PrepareHits::PrepareHits(const char * name, const char * description)
 :TOT_Hists(name, description),fCurrEventNumber(0){}
 PrepareHits::~PrepareHits(){}
 void PrepareHits::init(const JPetTaskInterface::Options& opts){
     TOT_Hists::init(opts);
-    createTOTHistos("hits");
+    createTOTHistos("hits",100,0.,100.*TIME_UNIT_CONST);
 }
 void PrepareHits::exec(){
     if(auto evt = reinterpret_cast</*const*/ EventIII*const>(getEvent())){
@@ -32,7 +33,7 @@ void PrepareHits::exec(){
 		continue;//skip trigger signals from TRB
 	    }
 	    if( getParamBank().getTOMBChannels().count(tomb_number) == 0 ) {
-		WARNING(Form("DAQ Channel %d appears in data but does not exist in the setup from DB.", tomb_number));
+		//WARNING(Form("DAQ Channel %d appears in data but does not exist in the setup from DB.", tomb_number));
 		continue;
 	    }
 	    JPetTOMBChannel& tomb_channel = getParamBank().getTOMBChannel(tomb_number);
@@ -57,8 +58,8 @@ void PrepareHits::exec(){
 		sigChTmpTrail.setThreshold(tomb_channel.getThreshold());
 		if(tdcChannel->GetLeadTime (j)==-100000)continue;
 		if(tdcChannel->GetTrailTime(j)==-100000)continue;
-		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j));
-		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j));
+		sigChTmpLead .setValue(tdcChannel->GetLeadTime (j)*DAQ_2_TIME_UNIT);
+		sigChTmpTrail.setValue(tdcChannel->GetTrailTime(j)*DAQ_2_TIME_UNIT);
 		tslot.addCh(sigChTmpLead);
 		tslot.addCh(sigChTmpTrail);
 	    }

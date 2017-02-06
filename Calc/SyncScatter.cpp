@@ -13,11 +13,13 @@ using namespace MathTemplates;
 using namespace Genetic;
 namespace Sync{
     const SyncScatter_results Fit4SyncScatter(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
+	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	if(hist.TotalSum().val()<7.){
-	    Plot<double>().Hist(hist)<<"set xrange [-30:30]"<<"set title'"+displayname+"'";
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
+	    <<"set title'"+displayname+"'";
+	    cerr<<"TOO FEW STATISTICS"<<endl;
 	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
 	}
-	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef Mul2<Par<0>,Func3<Gaussian,Arg<0>,Par<1>,Par<2>>> Left;
 	typedef Mul2<Par<3>,Func3<Gaussian,Arg<0>,Par<4>,Par<5>>> Right;
@@ -25,22 +27,22 @@ namespace Sync{
 	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[3]>0)
-	    &&(P[2]>0.2)&&(P[5]>0.2)
-	    &&(P[2]<2.0)&&(P[5]<2.0)
+	    &&(P[2]>0.1*TIME_UNIT_CONST)&&(P[5]>0.1*TIME_UNIT_CONST)
+	    &&(P[2]<4.0*TIME_UNIT_CONST)&&(P[5]<4.0*TIME_UNIT_CONST)
 	    &&(P[1]>hist.left().X().max())&&(P[4]<hist.right().X().min())
 	    &&((P[4]-P[1])>(P[2]+P[5]))
-	    &&((P[4]-P[1])>2.0)&&((P[4]-P[1])<15.0)
-	    &&((P[0]/P[3])<10.0)&&((P[3]/P[0])<10.0);
+	    &&((P[4]-P[1])>0.5*TIME_UNIT_CONST)&&((P[4]-P[1])<20.0*TIME_UNIT_CONST)
+	    &&((P[0]/P[3])<30.0)&&((P[3]/P[0])<30.0);
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(600,make_shared<InitialDistributions>()
+	fit.Init(400,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,total*30.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
-	    <<make_shared<DistribGauss>(0.5,0.3)
+	    <<make_shared<DistribGauss>(0.5*TIME_UNIT_CONST,0.3*TIME_UNIT_CONST)
 	    <<make_shared<DistribUniform>(0,total*30.0)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
-	    <<make_shared<DistribGauss>(0.5,0.3)
+	    <<make_shared<DistribGauss>(0.5*TIME_UNIT_CONST,0.3*TIME_UNIT_CONST)
 	,r);
 	cerr<<fit.ParamCount()<<" parameters"<<endl;
 	cerr<<fit.PopulationSize()<<" points"<<endl;
@@ -66,13 +68,29 @@ namespace Sync{
 	    static const Right R;
 	    return R({x},fit.Parameters());
 	},chain);
-	Plot<double>().Hist(hist).Line(totalfit,"Fit")
-	.Line(left).Line(right)<<"set key on"<<"set xrange [-30:30]"
-	<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
-	if(fit.iteration_count()>=1000)return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
+	if(fit.iteration_count()>=1000){
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
+	    <<"set title'"+displayname+"'";
+	    cerr<<"TIMEOUT"<<endl;
+	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
+	}
 	const auto& P=fit.Parameters();
-	return {.left={P[1],P[2]},.right={P[4],P[5]},.assymetry=P[3]/P[0],.chi_sq=chi_sq_norm};
+	const SyncScatter_results res={
+	    .left={P[1],P[2]},.right={P[4],P[5]},
+	    .assymetry=P[3]/P[0],.chi_sq=chi_sq_norm
+	};
+	if(res.valid()){
+	    Plot<double>().Hist(hist).Line(totalfit,"Fit")
+	    .Line(left).Line(right)<<"set key on"<<TIME_PLOT_OPTS
+	    <<"set title'"+displayname+"'";
+	    cerr<<"VALID"<<endl;
+	}else{
+	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
+	    <<"set title'"+displayname+"'";
+	    cerr<<"NOT VALID"<<endl;
+	}
+	return res;
     }
 }

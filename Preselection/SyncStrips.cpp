@@ -14,7 +14,7 @@
 #include "SyncStrips.h"
 #include "TOT-conditions.h"
 using namespace std;
-TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):TOT_Hists(name, description){}
+TaskSyncStrips::TaskSyncStrips(const char * name, const char * description):LargeBarrelTask(name, description){}
 void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
     LargeBarrelTask::init(opts);
     string thr_msg;cin>>thr_msg;list<size_t> lst;
@@ -28,17 +28,17 @@ void TaskSyncStrips::init(const JPetTaskInterface::Options& opts){
 	getStatistics().createHistogram( new TH1F(("DeltaID-for-coincidences-"+Layer(layer_n)).c_str(),"",n_slots_in_half_layer+2, -1.5, n_slots_in_half_layer+0.5));
 	for(size_t slot=1;slot<=n_slots_in_half_layer;slot++){
 	    string histo_name = "DeltaT-with-oposite-"+LayerSlot(layer_n,slot);
-	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
+	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",TIME_HISTO_RANGE));
 	}
 	for(size_t slot=1;slot<=map()->getSlotsCount(*layer.second);slot++)for(const size_t&delta:neighbour_delta_id){
 	    string histo_name = "DeltaT-with-neighbour-"+LayerSlot(layer_n,slot)+"-deltaid"+to_string(delta);
-	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
+	    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",TIME_HISTO_RANGE));
 	}
 	if((layer_n-1) < SyncLayerIndices.size()){
 	    for(size_t i=0;i<SyncLayerIndices[layer_n-1].size();i++){
 		for(size_t slot=1;slot<=map()->getSlotsCount(*layer.second);slot++){
 		    string histo_name = "Inter-layer-"+LayerSlot(layer_n,slot)+"-"+to_string(i);
-		    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",400, -100.,+100.));
+		    getStatistics().createHistogram( new TH1F(histo_name.c_str(),"",TIME_HISTO_RANGE));
 		}
 	    }
 	}

@@ -35,3 +35,6 @@ echo "Fitting coincidences spectra"
 ./Fit-scattered${paramlist} > $2/Scattered.txt
 
 (cat $2/Deltas$1.txt)|./Solve-equations $2/AB-center.txt $2/Oposite-strips.txt $2/Scattered.txt > $2/Deltas$1.new.txt
+
+rm -f $2/Deltas$1.txt
+mv $2/Deltas$1.new.txt $2/Deltas$1.txt

@@ -7,7 +7,7 @@
 #include <JPetLargeBarrelExtensions/BarrelExtensions.h>
 class SyncAB_results;
 class Synchronization;
-class TaskSyncStrips:public TOT_Hists{
+class TaskSyncStrips:public LargeBarrelTask{
 public:
   TaskSyncStrips(const char * name, const char * description);
   virtual void init(const JPetTaskInterface::Options& opts)override;

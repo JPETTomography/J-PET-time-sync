@@ -9,8 +9,9 @@ int main(int argc, char **argv) {
     for(size_t L=1;L<=DeltaT->layersCount();L++){
 	const size_t N=DeltaT->layerSize(L);
 	for(size_t i=1;i<=N;i++){
-	    DeltaT->item({.layer=L,.slot=i}).A=0;
-	    DeltaT->item({.layer=L,.slot=i}).B=0;
+	    auto&item=DeltaT->item({.layer=L,.slot=i});
+	    item.A=0;item.B=0;
+	    item.dA=0;item.dB=0;
 	}
     }
     cout<<(*DeltaT);
