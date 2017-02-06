@@ -34,7 +34,7 @@ inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
 
 //Sync AB
 struct SyncAB_results{
-    MathTemplates::value<double>peak;double chi_sq;
+    MathTemplates::value<double>peak;double chi_sq,uncertainty_estimation;
     inline const bool valid()const{
       return (chi_sq>=0)&&
       (peak.uncertainty()<=1.0*TIME_UNIT_CONST)&&
@@ -42,10 +42,11 @@ struct SyncAB_results{
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncAB_results&item){
-  return str>>item.peak>>item.chi_sq;
+  return str>>item.peak>>item.chi_sq>>item.uncertainty_estimation;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncAB_results&item){
-  return str<<item.peak<<"\t"<<item.chi_sq;
+  return str<<item.peak<<"\t"<<item.chi_sq<<"\t"
+  <<item.uncertainty_estimation;
 }
 
 //Hit-hit coincidences: oposite

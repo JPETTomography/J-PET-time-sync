@@ -31,7 +31,7 @@ namespace Sync{
 	});
 	fit.SetThreadCount(threads);
 	RANDOM r;
-	fit.Init(500,make_shared<InitialDistributions>()
+	fit.Init(300,make_shared<InitialDistributions>()
 	    <<make_shared<DistribUniform>(0,30.0*total)
 	    <<make_shared<DistribUniform>(hist.left().X().min(),hist.right().X().max())
 	    <<make_shared<DistribGauss>(0.5*TIME_UNIT_CONST,0.2*TIME_UNIT_CONST)

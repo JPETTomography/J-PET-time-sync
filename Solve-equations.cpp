@@ -9,6 +9,7 @@
 #include <Genetic/equation2.h>
 #include <Genetic/genetic.h>
 #include <Genetic/initialconditions.h>
+#include <Genetic/parabolic.h>
 #include <IO/gethist.h>
 #include <JPetLargeBarrelExtensions/PetDict.h>
 #include <JPetLargeBarrelExtensions/TimeSyncDeltas.h>
@@ -164,9 +165,11 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations connect "
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
-    InexactEquationSolver<DifferentialMutations<AbsoluteMutations<>>> solver_hits(equations);
+    InexactEquationSolver<DifferentialMutations<
+	AbsoluteMutations<ParabolicErrorEstimationFromChisq>
+    >> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
-    ParamSet M1,M2,M3,M4,M5;
+    ParamSet M1,M2,M3,M4,M5, deltas;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
@@ -177,6 +180,7 @@ int main(int argc, char **argv) {
 	    init<<make_shared<FixParam>(0);
 	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
 	}
+	deltas<<0.01;
     }
     solver_hits.SetThreadCount(1);
     solver_hits.Init(equations.size()*2,init,engine);
@@ -224,10 +228,12 @@ int main(int argc, char **argv) {
     <<"set log y"<<"set xlabel 'Iteration index'";
     Plotter::Instance()<<"unset log y";
     cerr<<"chi^2/D = "<<solver_hits.Optimality()/(equations.size()-solver_hits.ParamCount())<<endl;
+    solver_hits.SetUncertaintyCalcDeltas(deltas);
     const auto&P=solver_hits.Parameters();
+    const auto&PP=solver_hits.ParametersWithUncertainties();
     hist<double> eq_left,eq_right,delta_hits;
     for(size_t i=0;i<totalN;i++)
-	delta_hits<<point<value<double>>(double(i),P[i]);
+	delta_hits<<point<value<double>>(double(i),PP[i]);
     for(const auto&eq:equations){
 	static size_t i=0;
 	eq_left<<point<value<double>>(double(i),eq.left(P));
@@ -235,14 +241,17 @@ int main(int argc, char **argv) {
 	i++;
     }
     Plot<double>().Hist(eq_left,"left").Hist(eq_right,"right")<<"set key on"
-    <<"set xlabel 'equation index'"<<"unset log y"<<"set yrange [-30:30]";
-    Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"<<"set yrange [-30:30]";
+    <<"set xlabel 'equation index'"<<"unset log y"<<OUT_PLOT_OPTS;
+    Plot<double>().Hist(delta_hits)<<"set xlabel 'global slot index'"
+    <<OUT_PLOT_OPTS;
     for(size_t i=0;i<totalN;i++){
 	const StripPos slot=DeltaT->positionOfGlobalNumber(i);
 	const auto& ab=AB->operator[](slot).peak.val();
+	const auto& dab=AB->operator[](slot).uncertainty_estimation;
 	auto&Delta=DeltaT->item(slot);
 	Delta.A+=P[i]-(ab/2.0);
 	Delta.B+=P[i]+(ab/2.0);
+	Delta.dA=Delta.dB=sqrt(pow(PP[i].uncertainty(),2)+(dab*dab));
     }
 
     cout<<(*DeltaT);
