@@ -12,7 +12,7 @@ When two strips register gamma-quanta from one positron anihillation one can det
 This reconstruction requires times of signals from four photomultipliers connected to the two strips that registered anihillation gamma-quanta.
 
 For performing such reconstruction one needs to synchronize all photomultipliers with each other i.e. to obtain the time offsets created by electronics that one needs to substract.
-This software calculates the set of offsets one needs to add or to substract respectively to the signs.
+This software calculates the set of offsets one needs to apply for permorming time synchronization.
 
 For the synchronization one needs the data from measurements performed with point-like beta-plus radioactive source placed in the center point with colimator that allows the anihillation gamma-quanta to hit only into the middles of the strips.
 This condition allows to easily synchronize the signals from both edges for every single strips.
