@@ -8,20 +8,16 @@ Conditions of measurements
 ==========================
 
 This software can be used for measurements with PET detector that consists of scintillator strips having photomultipliers in their edges.
-When two strips register gamma-quanta from one positron anihillation one can determine each gamma-quantum hit position and time from the times of signals from photomultipliers installed at the edges of the scintillator strips.
-The hits positions and times allow give enough information for reconstruction of the anihillation point position.
+When two strips register gamma-quanta from one positron anihillation one can determine  the anihillation point position.
+This reconstruction requires times of signals from four photomultipliers connected to the two strips that registered anihillation gamma-quanta.
 
-For performing such reconstruction one needs to synchronize all photomultipliers with each other i.e. to obtains the time offsets created by electronics that one needs to substract.
-This software calculates the set of offsets one needs to add but they can have any sign.
+For performing such reconstruction one needs to synchronize all photomultipliers with each other i.e. to obtain the time offsets created by electronics that one needs to substract.
+This software calculates the set of offsets one needs to add or to substract respectively to the signs.
 
-For the synchronization one needs the data from measurements performed with point-like beta-plus active source placed in the colimator that allows the direct anihillation gamma-quanta to hit only into the middles of the strips.
+For the synchronization one needs the data from measurements performed with point-like beta-plus radioactive source placed in the center point with colimator that allows the anihillation gamma-quanta to hit only into the middles of the strips.
 This condition allows to easily synchronize the signals from both edges for every single strips.
 
-For synchronizing the oposite strips the software analyses the coincidents considering them to be a product of true anihillations.
-In such conditions the true hits would occur at the same time if the source is exactly in the center point of the detector.
-
-For synchronizing the neighbour strips the software analyzes the coinsidences corresponding to scattering the quanta by one strip and registering the scattered quanta by another one.
-
+For synchronization of strips with each other the software analyses coincidences of anihillation quanta and ones caused by scattering.
 
 How to compile the software
 ===========================
