@@ -11,7 +11,7 @@ fi
 
 for X in `find $2|grep .root|grep .Hits.`; do
     echo "Stage AB : ${X}"
-    if [ -e ${X%.*}.Stat4AB.root ]; then
+    if [ -e ${X%%.*}.Stat4AB.root ]; then
 	echo "has been analysed"
     else
 	(echo $1;cat $2/Deltas$1.txt)| ./Preselect-AB -t root -f ${X}
@@ -28,7 +28,7 @@ echo "Fitting A-B hists"
 
 for X in `find $2|grep .root|grep .Hits.`; do
     echo "Stage Strips : ${X}"
-    if [ -e ${X%.*}.Stat4Strips.root ]; then
+    if [ -e ${X%%.*}.Stat4Strips.root ]; then
 	echo "has been analysed"
     else
 	(echo $1;cat $2/Deltas$1.txt & cat $2/AB-center.txt)|./Preselect-StripsSync -t root -f ${X}
