@@ -17,7 +17,7 @@ PrepareHits::PrepareHits(const char * name, const char * description)
 PrepareHits::~PrepareHits(){}
 void PrepareHits::init(const JPetTaskInterface::Options& opts){
     TOT_Hists::init(opts);
-    createTOTHistos("hits");
+    createTOTHistos("hits",100,0.,100.*TIME_UNIT_CONST);
 }
 void PrepareHits::exec(){
     if(auto evt = reinterpret_cast</*const*/ EventIII*const>(getEvent())){
