@@ -14,7 +14,6 @@ for X in `find $1|grep .hld.xz|grep -v .root`; do
 		rm ${X%.*}.times.root
 		rm ${X%.*}.raw.root
 		rm ${X%.*}.root
-		rm ${X%.*}
 		rm ${X}.tmp
 	    fi
 	fi
