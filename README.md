@@ -100,3 +100,6 @@ The software also stores huge amount of debug information in build directory.
 If one has gnuplot installed in the system the plots with this information will be stored in PNG files.
 When this software is used once more for another data these files are overwritten.
 
+Generating report text file
+===========================
+
