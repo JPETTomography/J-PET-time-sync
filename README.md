@@ -71,6 +71,12 @@ The parameter 'A' means using first threshold. B, C and D mean respectively othe
 ATTENTION: it's important to use capital letters.
 If one uses more than one letter such as 'AB' it means that average will be taken as signal time.
 
+If you have just performed an analysis for one threshold and want to start analysis for different threshold please run
+
+	rm -f /path/to/the/data/*.Stat4*.root
+
+
+to clean data after previous analysis.
 
 Input and output
 ================
