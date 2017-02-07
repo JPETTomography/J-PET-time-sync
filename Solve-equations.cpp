@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
-	    init<<make_shared<DistribGauss>(0,75);
+	    init<<make_shared<DistribGauss>(0,SOLVING_EQ_PARAM_SIGMA);
 	    M1<<1.0;M2<<0.5;M3<<0.2;M4<<0.05;M5<<0.001;
 	}else{
 	    init<<make_shared<FixParam>(0);
