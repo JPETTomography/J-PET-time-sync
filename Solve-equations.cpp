@@ -167,6 +167,7 @@ int main(int argc, char **argv) {
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
     InexactEquationSolver<DifferentialMutations<ParabolicErrorEstimationFromChisq>>
 	solver_hits(equations);
+    solver_hits.SetMutationCoefficient(1.0);
     auto init=make_shared<InitialDistributions>();
     ParamSet deltas;
     for(size_t i=0;i<totalN;i++){
