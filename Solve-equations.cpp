@@ -190,15 +190,15 @@ int main(int argc, char **argv) {
     double d_max=100;
     while(d_max>0.005){
 	if(d_max>1.0){
-	    solver_hits.SetAbsoluteMutationsProbability(0.7);
+	    solver_hits.SetAbsoluteMutationsProbability(0.1);
 	    solver_hits.SetAbsoluteMutationCoefficients(M1);
 	}else{
 	    if(d_max>0.5){
-		solver_hits.SetAbsoluteMutationsProbability(0.6);
+		solver_hits.SetAbsoluteMutationsProbability(0.2);
 		solver_hits.SetAbsoluteMutationCoefficients(M2);
 	    }else{
 		if(d_max>0.2){
-		    solver_hits.SetAbsoluteMutationsProbability(0.5);
+		    solver_hits.SetAbsoluteMutationsProbability(0.3);
 		    solver_hits.SetAbsoluteMutationCoefficients(M3);
 		}else{
 		    if(d_max>0.05){
