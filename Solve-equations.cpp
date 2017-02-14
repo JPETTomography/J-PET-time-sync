@@ -165,21 +165,25 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations connect "
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
-    InexactEquationSolver<DifferentialMutations<ParabolicErrorEstimationFromChisq>>
-	solver_hits(equations);
+    InexactEquationSolver<DifferentialMutations<
+	AbsoluteMutations<ParabolicErrorEstimationFromChisq>
+    >> solver_hits(equations);
     solver_hits.SetMutationCoefficient(0.75);
     auto init=make_shared<InitialDistributions>();
-    ParamSet deltas;
+    ParamSet mutations,deltas;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,SOLVING_EQ_PARAM_SIGMA);
+	    mutations<<SOLVING_EQ_MUTATIONS;
 	}else{
 	    init<<make_shared<FixParam>(0);
+	    mutations<<0.;
 	}
 	deltas<<0.01;
     }
+    solver_hits.SetAbsoluteMutationCoefficients(mutations);
     solver_hits.SetThreadCount(1);
     solver_hits.Init(equations.size()*7,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
@@ -190,6 +194,9 @@ int main(int argc, char **argv) {
 	(d_max>0.001*TIME_UNIT_CONST)||
 	(!solver_hits.AbsoluteOptimalityExitCondition(0.0001))
     ){
+	solver_hits.SetAbsoluteMutationsProbability(exp(
+	    -double(solver_hits.iteration_count())/SOLVING_EQ_TAU
+	));
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
