@@ -165,52 +165,30 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations connect "
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
-    InexactEquationSolver<DifferentialMutations<
-	AbsoluteMutations<ParabolicErrorEstimationFromChisq>
-    >> solver_hits(equations);
+    InexactEquationSolver<DifferentialMutations<ParabolicErrorEstimationFromChisq>>
+	solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
-    ParamSet M1,M2,M3,M4,M5, deltas;
+    ParamSet deltas;
     for(size_t i=0;i<totalN;i++){
 	bool c=false;
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,SOLVING_EQ_PARAM_SIGMA);
-	    M1<<1.0;M2<<0.5;M3<<0.2;M4<<0.05;M5<<0.001;
 	}else{
 	    init<<make_shared<FixParam>(0);
-	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
 	}
 	deltas<<0.01;
     }
     solver_hits.SetThreadCount(1);
-    solver_hits.Init(equations.size()*5,init,engine);
+    solver_hits.Init(equations.size()*15,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
-    double d_max=100;
-    while(d_max>0.005){
-	if(d_max>1.0){
-	    solver_hits.SetAbsoluteMutationsProbability(0.1);
-	    solver_hits.SetAbsoluteMutationCoefficients(M1);
-	}else{
-	    if(d_max>0.5){
-		solver_hits.SetAbsoluteMutationsProbability(0.2);
-		solver_hits.SetAbsoluteMutationCoefficients(M2);
-	    }else{
-		if(d_max>0.2){
-		    solver_hits.SetAbsoluteMutationsProbability(0.3);
-		    solver_hits.SetAbsoluteMutationCoefficients(M3);
-		}else{
-		    if(d_max>0.05){
-			solver_hits.SetAbsoluteMutationsProbability(0.4);
-			solver_hits.SetAbsoluteMutationCoefficients(M4);
-		    }else{
-			solver_hits.SetAbsoluteMutationsProbability(0.3);
-			solver_hits.SetAbsoluteMutationCoefficients(M5);
-		    }
-		}
-	    }
-	}
+    double d_max=SOLVING_EQ_PARAM_SIGMA;
+    while(
+	(d_max>0.001*TIME_UNIT_CONST)||
+	(!solver_hits.AbsoluteOptimalityExitCondition(0.0001))
+    ){
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
