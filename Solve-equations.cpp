@@ -176,14 +176,13 @@ int main(int argc, char **argv) {
 	for(const size_t ii:connected)if(ii==i)c=true;
 	if(c){
 	    init<<make_shared<DistribGauss>(0,SOLVING_EQ_PARAM_SIGMA);
-	    mutations<<SOLVING_EQ_MUTATIONS;
+	    mutations<<1.;
 	}else{
 	    init<<make_shared<FixParam>(0);
 	    mutations<<0.;
 	}
 	deltas<<0.01;
     }
-    solver_hits.SetAbsoluteMutationCoefficients(mutations);
     solver_hits.SetThreadCount(1);
     solver_hits.Init(equations.size()*7,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
@@ -194,9 +193,14 @@ int main(int argc, char **argv) {
 	(d_max>0.001*TIME_UNIT_CONST)||
 	(!solver_hits.AbsoluteOptimalityExitCondition(0.0001))
     ){
-	solver_hits.SetAbsoluteMutationsProbability(exp(
-	    -double(solver_hits.iteration_count())/SOLVING_EQ_TAU
-	));
+	if((solver_hits.iteration_count()%20)==0){
+	    ParamSet M=mutations;
+	    for(double&m:M)m*=(SOLVING_EQ_MUTATIONS*d_max);
+	    solver_hits.SetAbsoluteMutationCoefficients(M);
+	    solver_hits.SetAbsoluteMutationsProbability(exp(
+		-double(solver_hits.iteration_count())/SOLVING_EQ_TAU
+	    ));
+	}
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);

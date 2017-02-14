@@ -16,7 +16,7 @@
 //solving equations range
 #	define SOLVING_EQ_PARAM_SIGMA 10.
 //solving equations mutations
-#	define SOLVING_EQ_MUTATIONS 0.4
+#	define SOLVING_EQ_MUTATIONS 0.5
 //solving equations mutations probability decreasing
 #	define SOLVING_EQ_TAU 1000.
 //output plots options
