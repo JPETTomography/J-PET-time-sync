@@ -165,10 +165,7 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations connect "
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
-    InexactEquationSolver<DifferentialMutations<
-	AbsoluteMutations<ParabolicErrorEstimationFromChisq>
-    >> solver_hits(equations);
-    solver_hits.SetMutationCoefficient(0.75);
+    InexactEquationSolver<AbsoluteMutations<ParabolicErrorEstimationFromChisq>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
     ParamSet mutations,deltas;
     for(size_t i=0;i<totalN;i++){
@@ -184,23 +181,19 @@ int main(int argc, char **argv) {
 	deltas<<0.01;
     }
     solver_hits.SetThreadCount(1);
-    solver_hits.Init(equations.size()*7,init,engine);
+    solver_hits.SetAbsoluteMutationCoefficients(mutations);
+    solver_hits.SetAbsoluteMutationsProbability(1.);
+    solver_hits.Init(equations.size()*3,init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
-    double d_max=SOLVING_EQ_PARAM_SIGMA;
+    double d_max=SOLVING_EQ_PARAM_SIGMA*3.0;
     while(
-	(d_max>0.001*TIME_UNIT_CONST)||
-	(!solver_hits.AbsoluteOptimalityExitCondition(0.0001))
+	(d_max>0.01*TIME_UNIT_CONST)
     ){
-	if((solver_hits.iteration_count()%20)==0){
-	    ParamSet M=mutations;
-	    for(double&m:M)m*=(SOLVING_EQ_MUTATIONS*d_max);
-	    solver_hits.SetAbsoluteMutationCoefficients(M);
-	    solver_hits.SetAbsoluteMutationsProbability(exp(
-		-double(solver_hits.iteration_count())/SOLVING_EQ_TAU
-	    ));
-	}
+	ParamSet M=mutations;
+	for(double&m:M)m*=(SOLVING_EQ_MUTATIONS*d_max);
+	solver_hits.SetAbsoluteMutationCoefficients(mutations);
 	solver_hits.Iterate(engine);
 	auto &min=solver_hits.Optimality(),
 	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
@@ -211,7 +204,7 @@ int main(int argc, char **argv) {
 	d_max=0;
 	for(const auto&p:solver_hits.ParametersStatistics())
 	    if(p.uncertainty()>d_max)d_max=p.uncertainty();
-	cerr<<"D="<<d_max<<"             \r";
+	cerr<<"D="<<d_max<<";M="<<(SOLVING_EQ_MUTATIONS*d_max)<<"                 \r";
     }
     cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")
