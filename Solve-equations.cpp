@@ -185,13 +185,6 @@ int main(int argc, char **argv) {
     while(
 	(d_max>0.01*TIME_UNIT_CONST)
     ){
-	if((solver_hits.iteration_count()%500)==1){
-	    hist<double> delta_hits;
-	    const auto&PP=solver_hits.ParametersStatistics();
-	    for(size_t i=0;i<totalN;i++)
-		delta_hits<<point<value<double>>(double(i),PP[i]);
-	    variables.Hist(delta_hits);
-	}
 	ParamSet M;
 	auto &min=solver_hits.Optimality(),
             &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
@@ -210,6 +203,13 @@ int main(int argc, char **argv) {
 	    if(p.uncertainty()>d_max)d_max=p.uncertainty();
 	cerr<<"D="<<d_max<<";M="<<mc<<"                 \r";
         solver_hits.Iterate(engine);
+        if((solver_hits.iteration_count()%1000)==0){
+            hist<double> delta_hits;
+            const auto&PP=solver_hits.ParametersStatistics();
+            for(size_t i=0;i<totalN;i++)
+                delta_hits<<point<value<double>>(double(i),PP[i]);
+            variables.Hist(delta_hits);
+        }
     }
     cerr<<endl;
     cerr<<solver_hits.iteration_count()<<": chi^2 = "<<solver_hits.Optimality()<<";";
