@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
     variables<<"set xlabel 'global slot index'"
     <<OUT_PLOT_OPTS;
     while(
-	(d_max>0.001*TIME_UNIT_CONST)
+	(d_max>0.01*TIME_UNIT_CONST)
     ){
 	if((solver_hits.iteration_count()%500)==1){
 	    hist<double> delta_hits;
