@@ -179,13 +179,25 @@ int main(int argc, char **argv) {
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
     double d_max=SOLVING_EQ_PARAM_SIGMA*3.0;
+    Plot<double> variables;
+    variables<<"set xlabel 'global slot index'"
+    <<OUT_PLOT_OPTS;
     while(
 	(d_max>0.001*TIME_UNIT_CONST)
     ){
+	if((solver_hits.iteration_count()%500)==1){
+	    hist<double> delta_hits;
+	    const auto&PP=solver_hits.ParametersStatistics();
+	    for(size_t i=0;i<totalN;i++)
+		delta_hits<<point<value<double>>(double(i),PP[i]);
+	    variables.Hist(delta_hits);
+	}
 	ParamSet M;
 	auto &min=solver_hits.Optimality(),
-             &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
-	const double mc=(SOLVING_EQ_MUTATIONS*d_max*(max*min/(max-min)));
+            &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
+	const double mc=
+	    (SOLVING_EQ_MUTATIONS*sqrt(max)*min/((max-min)*d_max))
+	    *exp(-double(solver_hits.iteration_count())/SOLVING_EQ_MUTATIONS_TAU);
 	for(size_t i=0;i<totalN;i++)
 	     M<<mc;
 	solver_hits.SetAbsoluteMutationCoefficients(M);
