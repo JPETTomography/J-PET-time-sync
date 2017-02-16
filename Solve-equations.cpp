@@ -165,64 +165,54 @@ int main(int argc, char **argv) {
     }
     cerr<<equations.size()<<" equations connect "
 	<<connected.size()<<" of "<<totalN<<" variables"<<endl;
-    InexactEquationSolver<DifferentialMutations<
-	AbsoluteMutations<ParabolicErrorEstimationFromChisq>
-    >> solver_hits(equations);
+    InexactEquationSolver<AbsoluteMutations<ParabolicErrorEstimationFromChisq>> solver_hits(equations);
     auto init=make_shared<InitialDistributions>();
-    ParamSet M1,M2,M3,M4,M5, deltas;
+    ParamSet deltas;
     for(size_t i=0;i<totalN;i++){
-	bool c=false;
-	for(const size_t ii:connected)if(ii==i)c=true;
-	if(c){
-	    init<<make_shared<DistribGauss>(0,SOLVING_EQ_PARAM_SIGMA);
-	    M1<<1.0;M2<<0.5;M3<<0.2;M4<<0.05;M5<<0.001;
-	}else{
-	    init<<make_shared<FixParam>(0);
-	    M1<<0;M2<<0;M3<<0;M4<<0;M5<<0;
-	}
+	init<<make_shared<DistribGauss>(0,SOLVING_EQ_PARAM_SIGMA);
 	deltas<<0.01;
     }
     solver_hits.SetThreadCount(1);
-    solver_hits.Init(equations.size()*2,init,engine);
+    solver_hits.SetAbsoluteMutationsProbability(1.);
+    solver_hits.Init(init->Count(),init,engine);
     cerr<<"Genetic algorithm:"<<endl;
     cerr<<solver_hits.PopulationSize()<<" points"<<endl;
     SortedPoints<double> opt_min,opt_max;
-    double d_max=100;
-    while(d_max>0.005){
-	if(d_max>1.0){
-	    solver_hits.SetAbsoluteMutationsProbability(0.7);
-	    solver_hits.SetAbsoluteMutationCoefficients(M1);
-	}else{
-	    if(d_max>0.5){
-		solver_hits.SetAbsoluteMutationsProbability(0.6);
-		solver_hits.SetAbsoluteMutationCoefficients(M2);
-	    }else{
-		if(d_max>0.2){
-		    solver_hits.SetAbsoluteMutationsProbability(0.5);
-		    solver_hits.SetAbsoluteMutationCoefficients(M3);
-		}else{
-		    if(d_max>0.05){
-			solver_hits.SetAbsoluteMutationsProbability(0.4);
-			solver_hits.SetAbsoluteMutationCoefficients(M4);
-		    }else{
-			solver_hits.SetAbsoluteMutationsProbability(0.3);
-			solver_hits.SetAbsoluteMutationCoefficients(M5);
-		    }
-		}
-	    }
-	}
-	solver_hits.Iterate(engine);
+    double d_max=SOLVING_EQ_PARAM_SIGMA*3.0;
+    Plot<double> variables;
+    variables<<"set xlabel 'global slot index'"
+    <<OUT_PLOT_OPTS;
+    while(
+	(d_max>0.01*TIME_UNIT_CONST)
+    ){
+	ParamSet M;
 	auto &min=solver_hits.Optimality(),
-	    &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
-	cerr<<solver_hits.iteration_count()<<": "
-	<<min<<"<chi^2<"<<max<<"; ";
+            &max=solver_hits.Optimality(solver_hits.PopulationSize()-1);
+	const double mc=
+	    (SOLVING_EQ_MUTATIONS*sqrt(max)*min/((max-min)*d_max))
+	    *exp(-double(solver_hits.iteration_count())/SOLVING_EQ_MUTATIONS_TAU);
+	for(size_t i=0;i<totalN;i++)
+	     M<<mc;
+	solver_hits.SetAbsoluteMutationCoefficients(M);
+	solver_hits.Iterate(engine);
+	cerr<<solver_hits.iteration_count()<<": "<<min<<"<chi^2<"<<max<<"; ";
 	opt_min << point<double>(solver_hits.iteration_count(),min);
 	opt_max << point<double>(solver_hits.iteration_count(),max);
 	d_max=0;
 	for(const auto&p:solver_hits.ParametersStatistics())
 	    if(p.uncertainty()>d_max)d_max=p.uncertainty();
-	cerr<<"D="<<d_max<<"             \r";
+	cerr<<"D="<<d_max<<";M="<<mc<<"                 \r";
+        solver_hits.Iterate(engine);
+        if((solver_hits.iteration_count()%1000)==0){
+            hist<double> delta_hits;
+            const auto&PP=solver_hits.ParametersStatistics();
+            for(size_t i=0;i<totalN;i++)
+                delta_hits<<point<value<double>>(double(i),PP[i]);
+            variables.Hist(delta_hits);
+        }
     }
+    cerr<<endl;
+    cerr<<solver_hits.iteration_count()<<": chi^2 = "<<solver_hits.Optimality()<<";";
     cerr<<endl;
     Plot<double>().Line(opt_min,"").Line(opt_max,"")
     <<"set log y"<<"set xlabel 'Iteration index'";

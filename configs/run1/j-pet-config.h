@@ -14,7 +14,11 @@
 //time spectra plots options
 #	define TIME_PLOT_OPTS "set xrange [-30:30]"
 //solving equations range
-#	define SOLVING_EQ_PARAM_SIGMA 15.
+#	define SOLVING_EQ_PARAM_SIGMA 10.
+//solving equations mutations
+#	define SOLVING_EQ_MUTATIONS 0.000001
+//solving equation mutations time decay
+#	define SOLVING_EQ_MUTATIONS_TAU 3000.
 //output plots options
 #	define OUT_PLOT_OPTS "set yrange [-30:30]"
 //size of J-PET detector for structures

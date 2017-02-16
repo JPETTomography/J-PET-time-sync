@@ -33,7 +33,7 @@ void PrepareHits::exec(){
 		continue;//skip trigger signals from TRB
 	    }
 	    if( getParamBank().getTOMBChannels().count(tomb_number) == 0 ) {
-		//WARNING(Form("DAQ Channel %d appears in data but does not exist in the setup from DB.", tomb_number));
+		WARNING(Form("DAQ Channel %d appears in data but does not exist in the setup from DB.", tomb_number));
 		continue;
 	    }
 	    JPetTOMBChannel& tomb_channel = getParamBank().getTOMBChannel(tomb_number);
