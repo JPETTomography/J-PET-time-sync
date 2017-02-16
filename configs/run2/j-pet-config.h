@@ -16,7 +16,7 @@
 //solving equations range
 #	define SOLVING_EQ_PARAM_SIGMA 20.
 //solving equations mutations
-#	define SOLVING_EQ_MUTATIONS 0.3
+#	define SOLVING_EQ_MUTATIONS 0.0000001
 //output plots options
 #	define OUT_PLOT_OPTS "set yrange [-30:30]"
 //size of J-PET detector for structures
