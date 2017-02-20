@@ -2,27 +2,27 @@
 // MIT license
 #ifndef ________J_PET_CONFIG_H_________
 #	define ________J_PET_CONFIG_H_________
-
 //run number that must be in agreement with json file
 #	define JSON_RUN_NUMBER "43"
 //time unit constant used to obtain time from DAQ values
 #	define DAQ_2_TIME_UNIT 1.0
 //time unit constant. 1.0 means ns; 1000.0 means ps...
 #	define TIME_UNIT_CONST 1.0
-//time diff histogram range: bins,from,to
+//time diff histogram range: bins_count,from,to
 #	define TIME_HISTO_RANGE 120,-30.,+30.
 //time spectra plots options
 #	define TIME_PLOT_OPTS "set xrange [-30:30]"
-//solving equations range
+//solving equations initial parameters dispersion around zero
 #	define SOLVING_EQ_PARAM_SIGMA 10.
-//solving equations mutations
+//solving equations mutations constant (view formula in Solve-equations.cpp)
 #	define SOLVING_EQ_MUTATIONS 0.000001
-//solving equation mutations time decay
+//solving equation mutations time decay (view formula in Solve-equations.cpp)
 #	define SOLVING_EQ_MUTATIONS_TAU 3000.
-//output plots options
+//output plots options for Solve-equations utility
 #	define OUT_PLOT_OPTS "set yrange [-30:30]"
 //size of J-PET detector for structures
 //that store sets of strips parameters
+//this must be in agreement with configuration in json file
 #	define Full_J_PET_SIZE {48,48,96}
 //half-size of J-PET detector for storing opposite
 //coincidences hit time difference spectra
