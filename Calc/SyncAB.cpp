@@ -34,7 +34,7 @@ namespace Sync{
 	typedef Add<Foreground,Background> TotalFunc;
 	FitFunction<
 	    DifferentialMutations<ParabolicErrorEstimationFromChisq>,
-	    TotalFunc
+	    TotalFunc,ChiSquareWithXError
 	> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    static const Background bg_test;
