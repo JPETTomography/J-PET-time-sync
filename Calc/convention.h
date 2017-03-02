@@ -75,14 +75,14 @@ struct SyncScatter_results{
     MathTemplates::value<double>left,right,assymetry;double chi_sq;
     inline const bool valid()const{
     return (chi_sq>=0)&&
-	(assymetry.val()<=15.0)&&(assymetry.val()>=0.6667)&&
+	(assymetry.val()<=20.0)&&(assymetry.val()>=0.05)&&
 	(left.uncertainty()<=3.0*TIME_UNIT_CONST)&&
 	(left.uncertainty()>=0.1*TIME_UNIT_CONST)&&
 	(right.uncertainty()<=3.0*TIME_UNIT_CONST)&&
 	(right.uncertainty()>=0.1*TIME_UNIT_CONST)&&
-	((left.uncertainty()/right.uncertainty())<=6.0)&&
-	((right.uncertainty()/left.uncertainty())<=6.0)&&
-	(right.val()-left.val())>1.0*TIME_UNIT_CONST;
+	((left.uncertainty()/right.uncertainty())<=10.0)&&
+	((right.uncertainty()/left.uncertainty())<=10.0)&&
+	(right.val()-left.val())>0.5*TIME_UNIT_CONST;
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){
