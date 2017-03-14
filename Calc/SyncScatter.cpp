@@ -6,6 +6,7 @@
 #include <Genetic/fit.h>
 #include <Genetic/initialconditions.h>
 #include <Genetic/filter.h>
+#include <Genetic/parabolic.h>
 #include "SyncProcedures.h"
 using namespace std;
 using namespace GnuplotWrap;
@@ -18,13 +19,13 @@ namespace Sync{
 	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	    cerr<<"TOO FEW STATISTICS"<<endl;
-	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
+	    return {.left=0,.right=0,.hleft=0,.hright=0,.chi_sq=-1};
 	}
 	double total=0;for(const auto&p:hist)total+=p.Y().val()*p.X().uncertainty()*2.0;
 	typedef Mul2<Par<0>,Func3<Gaussian,Arg<0>,Par<1>,Par<2>>> Left;
 	typedef Mul2<Par<3>,Func3<Gaussian,Arg<0>,Par<4>,Par<5>>> Right;
 	typedef Add2<Left,Right> TotalFunc;
-	FitFunction<DifferentialMutations<>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
+	FitFunction<DifferentialMutations<Uncertainty>,TotalFunc,ChiSquare> fit(make_shared<FitPoints>(hist));
 	fit.SetFilter([&hist](const ParamSet&P){
 	    return (P[0]>0)&&(P[3]>0)
 	    &&(P[2]>0.1*TIME_UNIT_CONST)&&(P[5]>0.1*TIME_UNIT_CONST)
@@ -74,12 +75,14 @@ namespace Sync{
 	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	    cerr<<"TIMEOUT"<<endl;
-	    return {.left=0,.right=0,.assymetry=0,.chi_sq=-1};
+	    return {.left=0,.right=0,.hleft=0,.hright=0,.chi_sq=-1};
 	}
 	const auto& P=fit.Parameters();
+	const auto& Pu=fit.ParametersWithUncertainties();
 	const SyncScatter_results res={
 	    .left={P[1],P[2]},.right={P[4],P[5]},
-	    .assymetry=P[3]/P[0],.chi_sq=chi_sq_norm
+	    .hleft=Pu[0],.hright=Pu[3],
+	    .chi_sq=chi_sq_norm
 	};
 	if(res.valid()){
 	    Plot<double>().Hist(hist).Line(totalfit,"Fit")

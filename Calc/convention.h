@@ -34,7 +34,7 @@ inline std::ostream&operator<<(std::ostream&str,const TOT_cut&item){
 
 //Sync AB
 struct SyncAB_results{
-    MathTemplates::value<double>peak;double chi_sq,uncertainty_estimation;
+    MathTemplates::value<double>peak,height;double chi_sq,uncertainty_estimation;
     inline const bool valid()const{
       return (chi_sq>=0)&&
       (peak.uncertainty()<=1.0*TIME_UNIT_CONST)&&
@@ -42,16 +42,16 @@ struct SyncAB_results{
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncAB_results&item){
-  return str>>item.peak>>item.chi_sq>>item.uncertainty_estimation;
+  return str>>item.peak>>item.height>>item.chi_sq>>item.uncertainty_estimation;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncAB_results&item){
-  return str<<item.peak<<"\t"<<item.chi_sq<<"\t"
+  return str<<item.peak<<"\t"<<item.height<<"\t"<<item.chi_sq<<"\t"
   <<item.uncertainty_estimation;
 }
 
 //Hit-hit coincidences: oposite
 struct SyncOposite_results{
-    MathTemplates::value<double>peak;double chi_sq;
+    MathTemplates::value<double>peak,height;double chi_sq;
     inline const bool valid()const{
       return (chi_sq>=0)&&
       (peak.uncertainty()<=1.5*TIME_UNIT_CONST)&&
@@ -59,10 +59,10 @@ struct SyncOposite_results{
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncOposite_results&item){
-  return str>>item.peak>>item.chi_sq;
+  return str>>item.peak>>item.height>>item.chi_sq;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncOposite_results&item){
-  return str<<item.peak<<"\t"<<item.chi_sq;
+  return str<<item.peak<<"\t"<<item.height<<"\t"<<item.chi_sq;
 }
 inline const std::shared_ptr<JPetMap<SyncOposite_results>> make_OpoCoiMap(){
   return std::shared_ptr<JPetMap<SyncOposite_results>>(new JPetMap<SyncOposite_results>(Half_J_PET_SIZE));
@@ -72,10 +72,10 @@ inline const std::shared_ptr<JPetMap<SyncOposite_results>> make_OpoCoiMap(){
 
 //Hit-hit coincidences for neighbour strips in layer
 struct SyncScatter_results{
-    MathTemplates::value<double>left,right,assymetry;double chi_sq;
+    MathTemplates::value<double>left,right,hleft,hright;double chi_sq;
     inline const bool valid()const{
     return (chi_sq>=0)&&
-	(assymetry.val()<=15.0)&&(assymetry.val()>=0.6667)&&
+	(hleft/hright<=15.0)&&(hright/hleft<=15.0)&&
 	(left.uncertainty()<=3.0*TIME_UNIT_CONST)&&
 	(left.uncertainty()>=0.1*TIME_UNIT_CONST)&&
 	(right.uncertainty()<=3.0*TIME_UNIT_CONST)&&
@@ -86,10 +86,10 @@ struct SyncScatter_results{
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){
-  return str>>item.left>>item.right>>item.assymetry>>item.chi_sq;
+  return str>>item.left>>item.right>>item.hleft>>item.hright>>item.chi_sq;
 }
 inline std::ostream&operator<<(std::ostream&str,const SyncScatter_results&item){
-  return str<<item.left<<"\t"<<item.right<<"\t"<<item.assymetry<<"\t"<<item.chi_sq;
+  return str<<item.left<<"\t"<<item.right<<"\t"<<item.hleft<<"\t"<<item.hright<<"\t"<<"\t"<<item.chi_sq;
 }
 const std::vector<size_t> neighbour_delta_id{1,2};
 

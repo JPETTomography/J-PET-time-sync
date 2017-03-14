@@ -23,17 +23,20 @@ int main(int argc, char **argv) {
 	Plotter::Instance().SetOutput(".","AB");
 	auto map=make_JPetMap<SyncAB_results>();
 	for(size_t layer=1;layer<=map->layersCount();layer++){
-		hist<double> position,chisq;
+		hist<double> position,height,chisq;
 		for(size_t slot=1;slot<=map->layerSize(layer);slot++){
 			const auto name=LayerSlot(layer,slot);
 			const auto shist=ReadHist(root_filenames,name);
 			auto&item=map->item({.layer=layer,.slot=slot});
 			item=Sync::Fit4SyncAB(shist,"SyncAB "+name,1);
 			if(item.valid()){
+			    height<<point<value<double>>(slot,item.height);
 			    position<<point<value<double>>(slot,item.peak);
 			    chisq<<point<value<double>>(slot,item.chi_sq);
 			}
 		}
+		Plot<double>().Hist(height,"Peak height")
+		<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
 		Plot<double>().Hist(position,"Position")
 		<<"set key on"<<"set title 'Layer "+to_string(layer)+"'";
 		Plot<double>().Hist(chisq,"Chi^2")
