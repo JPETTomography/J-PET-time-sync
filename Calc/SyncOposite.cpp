@@ -15,6 +15,7 @@ namespace Sync{
     const SyncOposite_results Fit4SyncOposite(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
 	if(hist.TotalSum().val()<10.){
 	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS<<"set title'"+displayname+"'";
+	    cerr<<"TOO FEW STATISTICS"<<endl;
 	    return {.peak=0,.chi_sq=-1};
 	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
@@ -56,7 +57,11 @@ namespace Sync{
 	<<"set key on"<<TIME_PLOT_OPTS<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
-	if(fit.iteration_count()>=1000)return {.peak=0,.chi_sq=-1};
+	if(fit.iteration_count()>=1000){
+	    cerr<<"TIMEOUT"<<endl;
+	    return {.peak=0,.chi_sq=-1};
+	}
+	cerr<<"VALID"<<endl;
 	const auto&P=fit.Parameters();
 	return {.peak={P[1],P[2]},.chi_sq=chi_sq_norm};
     }
