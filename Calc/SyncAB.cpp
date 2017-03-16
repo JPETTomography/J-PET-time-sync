@@ -16,7 +16,8 @@ namespace Sync{
     const SyncAB_results Fit4SyncAB(const hist<double>&hist, const string&displayname,const size_t threads){
 	if(hist.TotalSum().val()<100.){
 	    Plot<double>().Hist(hist)<<"set title'"+displayname+"'"<<TIME_PLOT_OPTS;
-	    return {.peak=0,.chi_sq=-1,.uncertainty_estimation=0.};
+	    cerr<<"TOO FEW STATISTICS"<<endl;
+	    return {.peak=0,.height=0,.chi_sq=-1,.uncertainty_estimation=0.};
 	}
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
 	double total=0;for(const auto&p:hist)
@@ -81,11 +82,16 @@ namespace Sync{
 	<<"set key on"<<TIME_PLOT_OPTS<<"set title'"+displayname+"'";
 	auto chi_sq_norm=fit.Optimality()/(fit.Points()->size()-fit.ParamCount());
 	cerr<<endl<<"done. chi^2/D="<<chi_sq_norm<<endl;
-	if(fit.iteration_count()>=1000)return {.peak=0,.chi_sq=-1};
+	if(fit.iteration_count()>=1000){
+	    cerr<<"TIMEOUT"<<endl;
+	    return {.peak=0,.height=0,.chi_sq=-1};
+	}
 	const auto&P=fit.Parameters();
+	const auto&Pu=fit.ParametersWithUncertainties();
+	cerr<<"VALID"<<endl;
 	return {
-	    .peak={P[1],P[2]},.chi_sq=chi_sq_norm,
-	    .uncertainty_estimation=fit.ParametersWithUncertainties()[1].uncertainty()
+	    .peak={P[1],P[2]},.height=Pu[0],.chi_sq=chi_sq_norm,
+	    .uncertainty_estimation=Pu[1].uncertainty()
 	};
     }
 };
