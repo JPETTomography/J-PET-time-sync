@@ -15,7 +15,7 @@ using namespace Genetic;
 namespace Sync{
     const SyncScatter_results Fit4SyncScatter(const MathTemplates::hist<double>&hist, const std::string&displayname,const size_t threads){
 	cerr<<"=========== "<<displayname<<" ==============="<<endl;
-	if(hist.TotalSum().val()<7.){
+	if(hist.TotalSum().val()<5.){
 	    Plot<double>().Hist(hist)<<TIME_PLOT_OPTS
 	    <<"set title'"+displayname+"'";
 	    cerr<<"TOO FEW STATISTICS"<<endl;
@@ -51,7 +51,7 @@ namespace Sync{
 	while(
 	    (!fit.AbsoluteOptimalityExitCondition(0.00001))&&
 	    (!fit.ParametersDispersionExitCondition(deltas))&&
-	    (fit.iteration_count()<1000)
+	    (fit.iteration_count()<3000)
 	){
 	    fit.Iterate(r);
 	    cerr<<fit.iteration_count()<<" iterations; "

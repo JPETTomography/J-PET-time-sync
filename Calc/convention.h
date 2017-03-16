@@ -80,9 +80,9 @@ struct SyncScatter_results{
 	(left.uncertainty()>=0.1*TIME_UNIT_CONST)&&
 	(right.uncertainty()<=3.0*TIME_UNIT_CONST)&&
 	(right.uncertainty()>=0.1*TIME_UNIT_CONST)&&
-	((left.uncertainty()/right.uncertainty())<=6.0)&&
-	((right.uncertainty()/left.uncertainty())<=6.0)&&
-	(right.val()-left.val())>1.0*TIME_UNIT_CONST;
+	((left.uncertainty()/right.uncertainty())<=10.0)&&
+	((right.uncertainty()/left.uncertainty())<=10.0)&&
+	(right.val()-left.val())>0.5*TIME_UNIT_CONST;
     }
 };
 inline std::istream&operator>>(std::istream&str,SyncScatter_results&item){
