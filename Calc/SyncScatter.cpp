@@ -77,6 +77,7 @@ namespace Sync{
 	    cerr<<"TIMEOUT"<<endl;
 	    return {.left=0,.right=0,.hleft=0,.hright=0,.chi_sq=-1};
 	}
+	fit.SetUncertaintyCalcDeltas({0.01,0.01,0.01,0.01});
 	const auto& P=fit.Parameters();
 	const auto& Pu=fit.ParametersWithUncertainties();
 	const SyncScatter_results res={
