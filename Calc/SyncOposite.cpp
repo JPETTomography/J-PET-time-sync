@@ -63,6 +63,7 @@ namespace Sync{
 	    return {.peak=0,.height=0,.chi_sq=-1};
 	}
 	cerr<<"VALID"<<endl;
+	fit.SetUncertaintyCalcDeltas({0.01});
 	const auto&P=fit.Parameters();
 	const auto&Pu=fit.ParametersWithUncertainties();
 	return {.peak={P[1],P[2]},.height=Pu[0],.chi_sq=chi_sq_norm};
